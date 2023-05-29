@@ -8,17 +8,24 @@
   </head>
   <body>
     <!-- HEADER -->
-    <header>
-      <nav class="position-relative nav p-3 bg-primary text-white fs-4 px-5">
-        <img src="../image/logo.svg" class="img-fluid ms-4 me-2" width="35" alt="...">FUKUFUKU
-        <div class="position-absolute bottom-0 end-0">
-          <ul class="nav fs-5 px-4">
-            <li class="me-3">Mypage</li>
-            <li class="me-5">LogOut</li>
-          </ul>
-        </div>
-      </nav>
-    </header>
+    <header class="p-3 bg-primary">
+      <div class="container">
+          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+              <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                  <img src="../image/logo.svg" class="img-fluid me-2" width="45" alt="...">
+                  <h4 class="fs-3 mb-0 ">FUKUFUKU</h4>
+              </a>
+  
+              <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                  
+              </ul>
+              <div class="text-end">
+                  <button type="button" class="btn btn-outline-light me-2">Login</button>
+                  <button type="button" class="btn btn-warning">Sign-up</button>
+              </div>
+          </div>
+      </div>
+  </header>
 
     <!-- TITLE -->
     <div class="container">
@@ -29,7 +36,7 @@
       </div>
 
       <!-- CONTENT  -->
-      <div class="row">
+      <div class="row" style="height: 500px;">
         <!-- SIDE_BAR -->
         <div class="col-2 bd-sidebar border border-primary me-4 fw-semibold text-center">
           <ul class="nav pt-3 flex-column">
