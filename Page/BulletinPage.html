@@ -50,38 +50,10 @@
             <div class="container">
                 <div class="row g-5">
                     <div class="col-md-4">
-                        <a href="/" class="text-decoration-none text-dark">
+                        <a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#exampleModal">
                             <div class="card" style="height: 470px">
-                                <div id="carousel-1" class="carousel slide card-img-top" data-bs-ride="true" style="height: 300px;">
-                                    <div class="carousel-indicators">
-                                        <button type="button" data-bs-target="#carousel-1" data-bs-slide-to="0" class="active"
-                                            aria-current="true" aria-label="Slide 1"></button>
-                                        <button type="button" data-bs-target="#carousel-1" data-bs-slide-to="1"
-                                            aria-label="Slide 2"></button>
-                                        <button type="button" data-bs-target="#carousel-1" data-bs-slide-to="2"
-                                            aria-label="Slide 3"></button>
-                                    </div>
-                                    <div class="carousel-inner">
-                                        <div class="carousel-item active">
-                                            <img src="/image/미야케 우동1.jpg" class="d-block w-100" alt="...">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img src="/image/미야케 우동2.jpg" class="d-block w-100" alt="...">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img src="/image/미야케 우동3.jpg" class="d-block w-100" alt="...">
-                                        </div>
-                                    </div>
-                                    <button class="carousel-control-prev" type="button" data-bs-target="#carousel-1"
-                                        data-bs-slide="prev">
-                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Previous</span>
-                                    </button>
-                                    <button class="carousel-control-next" type="button" data-bs-target="#carousel-1"
-                                        data-bs-slide="next">
-                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                        <span class="visually-hidden">Next</span>
-                                    </button>
+                                <div style="height: 300px;">
+                                    <img src="../image/미야케 우동1.jpg" height="300px" class="img-fluid">
                                 </div>
                                 <div class="card-body">
                                     <h5 class="card-title">미야케 우동</h5>
@@ -232,6 +204,124 @@
             </div>
         </div>
 
+
+
+
+
+        <!-- modal -->
+        <div class="modal" id="exampleModal">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">미야케 우동</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-8 bg-warning">
+                                    <!-- 본문 창 -->
+
+                                </div>
+                                <div class="col-4 bg-primary  d-flex justify-content-center" style="overflow-y: auto; max-height: 60vh;">
+                                    <!-- 댓글 창 -->
+                                    <div class="col-11">
+                                        <span class="mt-5">댓글</span>
+                                        <div class="row border mt-3 p-1">
+                                            <div class="col-12">
+                                                    <div class="row">
+                                                    <div class="col-5">닉네임</div>
+                                                    <div class="col-6">2023-06-01 16:28</div>
+                                                    <div class="btn btn-warning col-1 text-center m-0 p-0">❌</div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="col-12">우와! 정말 맛집이네요!!</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row border mt-3 p-1">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-5">닉네임</div>
+                                                    <div class="col-6">2023-06-01 16:28</div>
+                                                    <div class="btn btn-warning col-1 text-center m-0 p-0">❌</div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="col-12">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sed tempora eos natus quidem earum iure hic ipsam libero eius repellat. Laudantium ipsa facere dolor adipisci perspiciatis, voluptatem et amet? Nostrum.</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row border mt-3 p-1">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-5">닉네임</div>
+                                                    <div class="col-6">2023-06-01 16:28</div>
+                                                    <div class="btn btn-warning col-1 text-center m-0 p-0">❌</div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="col-12">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sed tempora eos natus quidem earum
+                                                    iure hic ipsam libero eius repellat. Laudantium ipsa facere dolor adipisci perspiciatis, voluptatem et amet?
+                                                    Nostrum.</div>
+                                            </div>
+                                        </div><div class="row border mt-3 p-1">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-5">닉네임</div>
+                                                    <div class="col-6">2023-06-01 16:28</div>
+                                                    <div class="btn btn-warning col-1 text-center m-0 p-0">❌</div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="col-12">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sed tempora eos natus quidem earum
+                                                    iure hic ipsam libero eius repellat. Laudantium ipsa facere dolor adipisci perspiciatis, voluptatem et amet?
+                                                    Nostrum.</div>
+                                            </div>
+                                        </div><div class="row border mt-3 p-1">
+                                            <div class="col-12">
+                                                <div class="row">
+                                                    <div class="col-5">닉네임</div>
+                                                    <div class="col-6">2023-06-01 16:28</div>
+                                                    <div class="btn btn-warning col-1 text-center m-0 p-0">❌</div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="col-12">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Sed tempora eos natus quidem earum
+                                                    iure hic ipsam libero eius repellat. Laudantium ipsa facere dolor adipisci perspiciatis, voluptatem et amet?
+                                                    Nostrum.</div>
+                                            </div>
+                                        </div>
+                                        <div class="row">2</div>
+                                        <div class="row">3</div>
+                                        <div class="row">4</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-8 bg-primary" style="height: 15vh;">
+                                    <span>가격도 저렴하고 맛있어요</span>
+                                </div>
+                                <div class="col-4 bg-warning">
+                                    <div class="row mt-3 h-75">
+                                        <div class="col-12 d-flex justify-content-end">
+                                            <textarea id="modal_commentText" class="form-control"></textarea>
+                                            <button id="modal_submitBtn" class="btn btn-primary">작성</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     
     </main>
 
@@ -239,6 +329,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
         crossorigin="anonymous"></script>
+    <script src="../js/script.js"></script>
 </body>
 
 </html>
