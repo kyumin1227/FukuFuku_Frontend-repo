@@ -6,6 +6,8 @@ const handleModalComment = () => {
   console.log(modalCommentText.value);
   const date = new Date();
   let formData = new FormData();
+  console.log(modalCommentText.value);
+  console.log(date);
   formData.append("boardNo", `${null}`);
   formData.append("nickname", `${null}`);
   formData.append("comment", `${modalCommentText.value}`);
