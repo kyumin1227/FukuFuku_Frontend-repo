@@ -1,12 +1,16 @@
 import Home from "./pages/Home.js";
 import Posts from "./pages/Posts.js";
 import Settings from "./pages/Settings.js";
+import Bulletin from "./pages/Bulletin.js";
+import MyUserData from "./pages/MyUserData.js";
 
 const router = async () => {
   const routes = [
     { path: "/", view: Home },
     { path: "/posts", view: Posts },
     { path: "/settings", view: Settings },
+    { path: "/bulletin", view: Bulletin },
+    { path: "/MyUserData", view: MyUserData },
   ];
 
   const pageMatches = routes.map((route) => {
