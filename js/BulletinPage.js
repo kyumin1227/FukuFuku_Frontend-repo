@@ -3,11 +3,11 @@ const modalCommentSubmit = document.querySelector("#modal_submitBtn");
 const modalCommentText = document.querySelector("#modal_commentText");
 
 const handleModalComment = () => {
+  // 댓글 작성을 눌렀을 경우
   console.log(modalCommentText.value);
   const date = new Date();
   let formData = new FormData();
-  console.log(modalCommentText.value);
-  console.log(date);
+  // 던질 데이터 생성
   formData.append("boardNo", `${null}`);
   formData.append("nickname", `${null}`);
   formData.append("comment", `${modalCommentText.value}`);
