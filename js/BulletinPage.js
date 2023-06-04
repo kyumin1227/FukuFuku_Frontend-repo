@@ -3,20 +3,26 @@ const modalCommentSubmit = document.querySelector("#modal_submitBtn");
 const modalCommentText = document.querySelector("#modal_commentText");
 
 const handleModalComment = () => {
-  console.log(modalCommentText.value);
+  // console.log(modalCommentText.value);
   const date = new Date();
   let formData = new FormData();
-  console.log(modalCommentText.value);
-  console.log(date);
+  // formData 생성
   formData.append("boardNo", `${null}`);
   formData.append("nickname", `${null}`);
   formData.append("comment", `${modalCommentText.value}`);
-  formData.append("commentDate", `${date}`);
+  formData.append("commentDate", `${date.toISOString()}`);
 
-  fetch("", {
+  const serializedData = new URLSearchParams(formData).toString();
+
+  console.log(serializedData);
+
+  fetch("http://localhost:4000/test", {
     method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    },
     cache: "no-cache",
-    body: formData,
+    body: serializedData,
   })
     .then((response) => response.json())
     .then((data) => {
