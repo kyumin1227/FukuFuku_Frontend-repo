@@ -1,7 +1,7 @@
 import Home from "./pages/Home.js";
 import Posts from "./pages/Posts.js";
 import Settings from "./pages/Settings.js";
-import Bulletin from "./pages/Bulletin.js";
+import Bulletin from "./pages/BulletinPage.js";
 import MyUserData from "./pages/MyUserData.js";
 
 const router = async () => {
