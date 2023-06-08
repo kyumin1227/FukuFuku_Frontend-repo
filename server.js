@@ -7,7 +7,7 @@ const path = require("path");
 // express 사용
 const app = express();
 
-const PORT = 3000;
+const PORT = 3100;
 
 app.use(
   "/static",
