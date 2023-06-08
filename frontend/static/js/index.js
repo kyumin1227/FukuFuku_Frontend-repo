@@ -203,7 +203,10 @@ const router = async () => {
         })
           .then((response) => response.json())
           .then((data) => console.log(data))
- 
+
+          .catch(
+            (error) => (console.log('get 실패'),error)
+          )
       })
     }
     
