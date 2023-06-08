@@ -36,7 +36,7 @@ export default class {
             <!-- 게시글 블록입니다. -->
 
             <div class="row g-5 block_post">
-                ${bullet} <!-- 게시글 코드를 Bulletin.js 파일로부터 받아옴 -->
+                <!-- 게시글 코드를 Bulletin.js 파일로부터 받아옴 (index.js에서 생성하는 걸로 변경) -->
             </div>
         </div>
     </div>
