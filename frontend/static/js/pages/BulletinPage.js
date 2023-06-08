@@ -3,8 +3,6 @@
 // 모달 id = modal(index)
 // 코멘트 블록 id = (index)block_comment
 
-import modals from "../BulletinModal.js";
-
 export default class {
   constructor() {
     document.title = "Bulletin";
@@ -48,7 +46,7 @@ export default class {
 <!-- modal -->
 
 <div id="block_modal">
-    ${modals} <!-- modal을 위한 코드를 BulletinModal.js 파일로부터 받아옴 -->
+    <!-- modal을 위한 코드를 BulletinModal.js 파일로부터 받아옴 (index.js에서 생성하는 걸로 변경) -->
 </div>
 
 
