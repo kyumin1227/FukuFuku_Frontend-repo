@@ -5,6 +5,10 @@ export default class {
     document.title = "MyUserData";
   }
   async getHtml() {
+    // 데이터 값 불러오기
+    const userId = "dori";
+    const nikName = "dorimu";
+
     return `
             <!-- TITLE -->
     <div class="container">
@@ -30,18 +34,18 @@ export default class {
           <div class="mb-4 pt-3 row">
             <label for="staticEmail" class="col-sm-2 col-form-label">ID</label>
             <div class="col-sm-10">
-              <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="dorimu">
+              <input type="text" readonly class="form-control-plaintext" id="staticEmail" value=${userId}>
             </div>
           </div>
 
           <!-- DATA 전달 -->
           <form class="row" action="" method="post">
             <div class="mb-4 row">
-              <label for="inputPassword" class="col-sm-2 col-form-label">Name</label>
+              <label for="inputName" class="col-sm-2 col-form-label">Name</label>
               <div class="col-sm-10">
                 <div class="row">
                   <div class="col">
-                    <input type="name" class="form-control" id="inputName" placeholder="dori">
+                    <input type="name" class="form-control" id="inputName" placeholder=${nikName}>
                   </div>
                   <!-- 필요 여부에 따라 변동 -->
                   <!-- <div class="col-sm-4">
@@ -57,7 +61,7 @@ export default class {
               </div>
             </div>
             <div class="mb-4 row">
-              <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+              <label for="inputConfirmPassword" class="col-sm-2 col-form-label">Password</label>
               <div class="col-sm-10">
                 <input type="password" class="form-control" id="inputPassword">
               </div>

@@ -180,6 +180,33 @@ const router = async () => {
       // clickCommentSubmit.addEventListener("click", handleModalComment);
       // clickBoard.addEventListener("click", handleClickBoard);
     }
+    if (location.pathname === "/userWithdrawal") {
+      const destroyBtn = document.querySelector('#destroyBtn');
+
+      destroyBtn.addEventListener('click', async () => {
+
+        let formData = new FormData();
+        // formData 생성
+        formData.append("userId", `${null}`);
+        formData.append("userPassword", `${inputPassword.value}`);
+
+        console.log(formData);
+        console.log(formData.get('userPassword'));
+
+        fetch("https://jsonplaceholder.typicode.com/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          cache: 'no-cache',
+          body: formData
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+ 
+      })
+    }
+    
   }
 };
 

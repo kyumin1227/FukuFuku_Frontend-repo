@@ -1,8 +1,56 @@
 export default class {
   constructor() {
-    document.title = "Bulletin";
+    document.title = "Drawal";
   }
+
   async getHtml() {
+    
+    const response = await fetch("https://jsonplaceholder.typicode.com/users");
+    const data = await response.json();
+    const userData = data.filter((item) => item.id === 1);
+    console.log(userData);
+
+    // document.addEventListener("DOMContentLoaded", () => {
+    //   const destroyBtn = document.getElementById('destroyBtn');
+    //   destroyBtn.addEventListener('click', async () => {
+    //     // 이벤트 핸들러 내용
+    //     const password = document.getElementById('inputPassword').value
+
+    //   fetch("https://jsonplaceholder.typicode.com/users", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       userId: 1,
+    //       userPassword: password,
+    //     })
+    //   })
+    //     .then((response) => response.json())
+    //     .then((data) => console.log(data))
+    //   });
+    // });
+    
+    // destroyBtn.addEventListener('click',async () => {
+    //   const password = document.getElementById('inputPassword').value
+
+    //   fetch("https://jsonplaceholder.typicode.com/users", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       userId: 1,
+    //       userPassword: password,
+    //     })
+    //   })
+    //     .then((response) => response.json())
+    //     .then((data) => console.log(data))
+    // });
+
+
+
+    
     return `<div class="container">
       <div class="row ">
         <div class="col-2 mt-5 mb-1 fs-5 fw-bolder text-center">
@@ -23,11 +71,10 @@ export default class {
         
         <!-- MY_WRITE_LISST -->
         <div class="col border-top border-bottom border-primary">
-          <form action="#" method="post">
             <div class="mb-4 pt-3 row">
               <label for="staticEmail" class="col-sm-2 col-form-label">ID</label>
               <div class="col-sm-10">
-                <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="dorimu">
+                <input type="text" readonly class="form-control-plaintext" id="staticEmail" value='${userData[0].name}'>
               </div>
             </div>
             <!-- <div class="mb-4 border-top border-gray">
@@ -39,8 +86,7 @@ export default class {
               </div>
             </div>
             <!-- 탈퇴_btn -->
-            <button type="submit" class="btn btn-outline-primary float-end mb-3">탈퇴하기</button>
-          </form>
+            <button id="destroyBtn" class="btn btn-outline-primary float-end mb-3">탈퇴하기</button>
         </div>
       </div>
     </div>`;
