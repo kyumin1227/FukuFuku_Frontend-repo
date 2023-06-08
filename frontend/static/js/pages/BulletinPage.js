@@ -3,7 +3,6 @@
 // 모달 id = modal(index)
 // 코멘트 블록 id = (index)block_comment
 
-import bullet from "../Bulletin.js";
 import modals from "../BulletinModal.js";
 
 export default class {
@@ -29,14 +28,15 @@ export default class {
 
     <div class="album pb-5 bg-light">
         <div class="container d-flex flex-row-reverse py-3">
-            <div><a class="btn btn-warning col-0.5 px-4" href="#" data-bs-toggle="modal" data-bs-target="#Write_Modal">New</a></div>
+            <div><a class="btn btn-warning col-0.5 px-4" href="#" data-bs-toggle="modal"
+                    data-bs-target="#Write_Modal">New</a></div>
         </div>
-        <div class="container">
+        <div id="board-list" class="container">
 
             <!-- 게시글 블록입니다. -->
 
             <div class="row g-5 block_post">
-                ${bullet} <!-- 게시글 코드를 Bulletin.js 파일로부터 받아옴 -->
+                <!-- 게시글 코드를 Bulletin.js 파일로부터 받아옴 (index.js에서 생성하는 걸로 변경) -->
             </div>
         </div>
     </div>

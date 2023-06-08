@@ -1,25 +1,4 @@
-// comments를 먼저 생성하여 modals안에 집어넣은 후 export 합니다.
-
-const nickname = "닉네임";
-const comment = "우와! 정말 맛집이네요!!";
-const commentDate = "2023-06-01 16:28";
-
-const boardNo = 0;
-const boardId = `board${boardNo}`;
-const modalId = `modal${boardNo}`;
-const title = "미야케 우동";
-const content = "미야케 우동 가격도 저렴하고 맛있어요";
-const fileName = "미야케 우동1";
-const imgUrl = `./static/image/${fileName}.jpg`;
-const writer = "규민";
-const writeDate = "2023.06.02 00:09";
-const hit = 48;
-
-let comments = "";
-
-let modals = "";
-
-modals += `<div class="modal" id="${modalId}"> <!-- modal 아이디 지정 -->
+<div class="modal" id="${modalId}"> <!-- modal 아이디 지정 -->
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -113,6 +92,4 @@ modals += `<div class="modal" id="${modalId}"> <!-- modal 아이디 지정 -->
             </div>
         </div>
     </div>
-</div>`;
-
-export default modals;
+</div>
