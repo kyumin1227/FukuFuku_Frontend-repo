@@ -319,6 +319,11 @@ const router = async () => {
 
       // -------------------------------------------------------------- < 댓글 작성 (POST) 테스트 코드 ------------------------------------------------------------
 
+      // 댓글 작성에서 해야할 것
+      // 댓글 보낸 후 textarea 내부 비우기
+      // 입력값이 없으면 fetch 보내지 않기
+      // post 보낸 이후 get으로 다시 댓글 생성하기
+
       const block_modal = document.querySelector("#block_modal");
 
       block_modal.addEventListener(
