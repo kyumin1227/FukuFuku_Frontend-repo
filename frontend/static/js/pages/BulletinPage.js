@@ -3,7 +3,6 @@
 // 모달 id = modal(index)
 // 코멘트 블록 id = (index)block_comment
 
-import bullet from "../Bulletin.js";
 import modals from "../BulletinModal.js";
 
 export default class {
