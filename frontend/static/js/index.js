@@ -181,32 +181,38 @@ const router = async () => {
       // clickBoard.addEventListener("click", handleClickBoard);
     }
     if (location.pathname === "/userWithdrawal") {
+
+      const response = await fetch("https://jsonplaceholder.typicode.com/users");
+      const data = await response.json();
+      const userData = data.filter((item) => item.id === 1);
+
       const destroyBtn = document.querySelector('#destroyBtn');
 
       destroyBtn.addEventListener('click', async () => {
+        let myPassword = inputPassword.value;
 
-        let formData = new FormData();
-        // formData 생성
-        formData.append("userId", `${null}`);
-        formData.append("userPassword", `${inputPassword.value}`);
+        // let formData = new FormData();
+        // // formData 생성
+        // formData.append("userId", `${null}`);
+        // formData.append("userPassword", `${inputPassword.value}`);
 
-        console.log(formData);
-        console.log(formData.get('userPassword'));
+        // console.log(formData);
+        // console.log(formData.get('userPassword'));
 
         fetch("https://jsonplaceholder.typicode.com/users", {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
           },
           cache: 'no-cache',
-          body: formData
+          body: JSON.stringify({
+            nikname: userData[0].username,
+            userPassword: myPassword
+          })
         })
           .then((response) => response.json())
           .then((data) => console.log(data))
 
-          .catch(
-            (error) => (console.log('get 실패'),error)
-          )
       })
     }
     

@@ -10,12 +10,6 @@ export default class {
     const userData = data.filter((item) => item.id === 1);
     console.log(userData);
 
-    // document.addEventListener("DOMContentLoaded", () => {
-    //   const destroyBtn = document.getElementById('destroyBtn');
-    //   destroyBtn.addEventListener('click', async () => {
-    //     // 이벤트 핸들러 내용
-    //     const password = document.getElementById('inputPassword').value
-
     //   fetch("https://jsonplaceholder.typicode.com/users", {
     //     method: "POST",
     //     headers: {
