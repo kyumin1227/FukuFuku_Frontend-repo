@@ -260,18 +260,25 @@ const router = async () => {
 
       // ------------------------------------------------------------------ < 댓글 생성 ------------------------------------------------------------------
       console.log("bullet");
-      /**댓글 생성 함수 - 받아온 id와 data를 통해 해당 게시물에 받아온 댓글을 생성합니다.
+      /**
+       * 댓글 생성 함수 - 게시물에 ID를 받아와서 해당 게시물에 받아온 댓글을 생성합니다.
        *
-       * id = 게시물 아이디
-       *
-       * data = Get을 통해 받아온 데이터
+       * @param {게시물 아이디} id
        */
-      const appendComment = (id, data) => {
-        const block_comment = document.querySelector(`#block_comment${id}`);
-        block_comment.innerHTML = '<span class="mt-5 fs-4">Comment</span>'; // 클릭 이전에 코멘트가 있다면 삭제
-        // console.log(data);
-        for (var value of data) {
-          block_comment.innerHTML += `<div class="row border mt-3 p-1">
+      const GetComment = (id) => {
+        console.log("CommentGet " + id);
+        // fetch를 이용해 값 가져오기 (임시 값)
+        fetch("https://jsonplaceholder.typicode.com/users", {
+          method: "get",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // 받아온 값을 이용하여 해당 게시물에 코멘트 추가 (임시값)
+            const block_comment = document.querySelector(`#block_comment${id}`);
+            block_comment.innerHTML = '<span class="mt-5 fs-4">Comment</span>'; // 클릭 이전에 코멘트가 있다면 삭제
+            // console.log(data);
+            for (var value of data) {
+              block_comment.innerHTML += `<div class="row border mt-3 p-1">
                 <div class="col-12">
                   <div class="row">
                     <div class="col-5">${value.name}</div>
@@ -285,7 +292,10 @@ const router = async () => {
                   <div class="col-12">${value.company.catchPhrase}</div>
                 </div>
               </div>`;
-        }
+            }
+            console.log("생성 완료");
+          })
+          .catch((error) => console.log("fetch 에러!", error));
       };
 
       const boardList = document.querySelector("#board-list");
@@ -301,18 +311,9 @@ const router = async () => {
           id = path.id;
           console.log(id);
         }
-        // nowId = id;
 
-        // fetch를 이용해 값 가져오기 (임시 값)
-        fetch("https://jsonplaceholder.typicode.com/users", {
-          method: "get",
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            // 받아온 값을 이용하여 해당 게시물에 코멘트 추가 (임시값)
-            appendComment(id, data);
-          })
-          .catch((error) => console.log("fetch 에러!", error));
+        GetComment(id);
+        // nowId = id;
       });
 
       // ------------------------------------------------------------------ 댓글 생성 > ------------------------------------------------------------------
@@ -324,6 +325,52 @@ const router = async () => {
       // 입력값이 없으면 fetch 보내지 않기
       // post 보낸 이후 get으로 다시 댓글 생성하기
 
+      /**
+       *  commentBtnId를 받아 fetch를 통해 POST 합니다.
+       * @param {선택한 버튼의 id} commentBtnId
+       * @returns 댓글 POST
+       */
+      const postComment = (commentBtnId) => {
+        const submitId = commentBtnId.replace("modal_submitBtn", "");
+        console.log("submitId = " + submitId); // 보드 넘버 ex) 0
+        const commentText = document.querySelector(
+          `#modal_commentText${submitId}`
+        );
+        if (commentText.value.trim() === "") {
+          // 댓글을 공백으로 작성 후 작성 버튼을 눌렀을 경우 동작
+          return;
+        }
+        console.log(commentText);
+        console.log(commentText.value);
+
+        const date = new Date();
+        let formData = new FormData();
+        // formData 생성
+        formData.append("boardNo", `${submitId}`);
+        formData.append("nickname", `규민`);
+        formData.append("comment", `${commentText.value}`);
+        formData.append("commentDate", `${date.toISOString()}`);
+
+        // const serializedData = new URLSearchParams(formData).toString();
+
+        // console.log(serializedData);
+
+        fetch("http://localhost:4000/test", {
+          method: "POST",
+          cache: "no-cache",
+          // body: serializedData,
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          });
+
+        commentText.value = "";
+
+        return submitId;
+      };
+
       const block_modal = document.querySelector("#block_modal");
 
       block_modal.addEventListener(
@@ -332,37 +379,9 @@ const router = async () => {
           console.log(event.target.id);
           const commentBtnId = event.target.id;
           if (commentBtnId.indexOf("modal_submitBtn") != -1) {
-            // 댓글 작성 버튼을 눌렀을 경우
-            const submitId = commentBtnId.replace("modal_submitBtn", "");
-            console.log("submitId = " + submitId); // 보드 넘버 ex) 0
-            const commentText = document.querySelector(
-              `#modal_commentText${submitId}`
-            );
-            console.log(commentText);
-            console.log(commentText.value);
-
-            const date = new Date();
-            let formData = new FormData();
-            // formData 생성
-            formData.append("boardNo", `${submitId}`);
-            formData.append("nickname", `규민`);
-            formData.append("comment", `${commentText.value}`);
-            formData.append("commentDate", `${date.toISOString()}`);
-
-            // const serializedData = new URLSearchParams(formData).toString();
-
-            // console.log(serializedData);
-
-            fetch("http://localhost:4000/test", {
-              method: "POST",
-              cache: "no-cache",
-              // body: serializedData,
-              body: formData,
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                console.log(data);
-              });
+            // 댓글 작성 버튼을 눌렀을 경우 동작
+            const id = postComment(commentBtnId);
+            GetComment(id);
           }
         }
         // -------------------------------------------------------------- 댓글 작성 (POST) 테스트 코드 > ------------------------------------------------------------
