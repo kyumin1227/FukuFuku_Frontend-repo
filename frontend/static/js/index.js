@@ -281,15 +281,15 @@ const router = async () => {
               block_comment.innerHTML += `<div class="row border mt-3 p-1">
                 <div class="col-12">
                   <div class="row">
-                    <div class="col-5">${value.name}</div>
-                    <div class="col-6">${id}</div>
-                    <div class="btn btn-warning col-1 text-center m-0 p-0">
+                    <div class="col-5 commentWriter">${value.name}</div>
+                    <div class="col-6 commentDate">${id}</div>
+                    <div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
                     </div>
                   </div>
                 </div>
                 <div class="row mt-1">
-                  <div class="col-12">${value.company.catchPhrase}</div>
+                  <div class="col-12 commentValue">${value.company.catchPhrase}</div>
                 </div>
               </div>`;
             }
@@ -313,12 +313,12 @@ const router = async () => {
         }
 
         GetComment(id);
-        // nowId = id;
+        nowId = id;
       });
 
       // ------------------------------------------------------------------ 댓글 생성 > ------------------------------------------------------------------
 
-      // -------------------------------------------------------------- < 댓글 작성 (POST) 테스트 코드 ------------------------------------------------------------
+      // -------------------------------------------------------------- < 댓글 작성 (POST), 댓글 삭제 ------------------------------------------------------------
 
       // 댓글 작성에서 해야할 것
       // 댓글 보낸 후 textarea 내부 비우기
@@ -344,12 +344,12 @@ const router = async () => {
         console.log(commentText.value);
 
         const date = new Date();
-        let formData = new FormData();
-        // formData 생성
-        formData.append("boardNo", `${submitId}`);
-        formData.append("nickname", `규민`);
-        formData.append("comment", `${commentText.value}`);
-        formData.append("commentDate", `${date.toISOString()}`);
+        // let formData = new FormData();
+        // // formData 생성
+        // formData.append("boardNo", `${submitId}`);
+        // formData.append("nickname", `규민`);
+        // formData.append("comment", `${commentText.value}`);
+        // formData.append("commentDate", `${date.toISOString()}`);
 
         // const serializedData = new URLSearchParams(formData).toString();
 
@@ -357,9 +357,17 @@ const router = async () => {
 
         fetch("http://localhost:4000/test", {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           cache: "no-cache",
           // body: serializedData,
-          body: formData,
+          body: JSON.stringify({
+            boardNo: submitId,
+            nickname: "규민",
+            comment: commentText.value,
+            commentDate: date.toISOString(),
+          }),
         })
           .then((response) => response.json())
           .then((data) => {
@@ -377,14 +385,38 @@ const router = async () => {
         "click",
         (event) => {
           console.log(event.target.id);
-          const commentBtnId = event.target.id;
-          if (commentBtnId.indexOf("modal_submitBtn") != -1) {
+          if (event.target.id.indexOf("modal_submitBtn") != -1) {
+            const commentBtnId = event.target.id;
             // 댓글 작성 버튼을 눌렀을 경우 동작
             const id = postComment(commentBtnId);
             GetComment(id);
           }
+          if (event.target.classList.contains("commentDel")) {
+            // 댓글 삭제 버튼을 눌렀을 경우 동작
+            console.log("삭제버튼");
+            console.log(nowId);
+            console.dir(event.target);
+            const boardNo = nowId;
+            let comment = event.target;
+            console.log(comment.parentNode.children[0].innerText);
+            console.log(comment.parentNode.children[1].innerText);
+            const nickname = comment.parentNode.children[0].innerText;
+            const commentDate = comment.parentNode.children[1].innerText;
+
+            fetch("http://localhost:4000/test", {
+              method: "DELETE",
+              headers: {
+                Authorization: localStorage.getItem("access_token"),
+              },
+              body: JSON.stringify({
+                boardNo,
+                nickname,
+                commentDate,
+              }),
+            });
+          }
         }
-        // -------------------------------------------------------------- 댓글 작성 (POST) 테스트 코드 > ------------------------------------------------------------
+        // -------------------------------------------------------------- 댓글 작성 (POST), 댓글 삭제 > ------------------------------------------------------------
       );
     }
   }

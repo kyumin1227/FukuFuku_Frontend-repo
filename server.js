@@ -10,7 +10,7 @@ const app = express();
 
 const PORT = 3000;
 
-app.use(cors()); // 모든 도메인 허용
+// app.use(cors()); // 모든 도메인 허용
 
 app.use(
   "/static",
