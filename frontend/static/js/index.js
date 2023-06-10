@@ -5,6 +5,7 @@ import Bulletin from "./pages/BulletinPage.js";
 import MyUserData from "./pages/MyUserData.js";
 import UserWithdrawal from "./pages/UserWithdrawal.js";
 import MyWriteList from "./pages/MyWriteList.js";
+import SignUp from "./pages/SignUp.js";
 
 const router = async () => {
   const routes = [
@@ -15,6 +16,7 @@ const router = async () => {
     { path: "/myUserData", view: MyUserData },
     { path: "/userWithdrawal", view: UserWithdrawal },
     { path: "/myWriteList", view: MyWriteList },
+    { path: "/signup", view: SignUp},
   ];
 
   const pageMatches = routes.map((route) => {
