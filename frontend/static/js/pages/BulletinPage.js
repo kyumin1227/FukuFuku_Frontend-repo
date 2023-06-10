@@ -77,8 +77,8 @@ export default class {
                 </div>
                 <!-- 등록 파일 출력 -->
                 <div class="border border-gray w-50 overflow-scroll" style="height: 100px;">
-                    <ul>
-                        <li>filename1</li>
+                    <ul id="imageList">
+                        
                     </ul>
                 </div>
                 <!-- 작성 내용 -->
