@@ -35,5 +35,10 @@
 }
 
 .wrap {
-  float: left;
+  display: inline-block;
+  width: 200px;
+  height: 100px;
+  position: relative;
+  top: 800px;
+  left: 100px;
 }
