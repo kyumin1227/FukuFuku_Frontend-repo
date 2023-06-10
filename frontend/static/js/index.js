@@ -16,30 +16,8 @@ const router = async () => {
     { path: "/myUserData", view: MyUserData },
     { path: "/userWithdrawal", view: UserWithdrawal },
     { path: "/myWriteList", view: MyWriteList },
-    { path: "/signup", view: SignUp},
+    { path: "/signup", view: SignUp },
   ];
-
-  // ------------------------------------------------------------------ < 클래스 감지 ------------------------------------------------------------------
-  // observer.disconnect();
-  // const $body = document.querySelector("body");
-
-  // // MutationObserver 생성자를 통해 observer 인스턴스 생성
-  // const observer = new MutationObserver((mutationsList) => {
-  //   for (let mutation of mutationsList) {
-  //     if (
-  //       mutation.type === "attributes" &&
-  //       mutation.attributeName === "class"
-  //     ) {
-  //       // 클래스 변경이 감지되었을 때 실행될 로직
-  //       console.log("클래스가 변경되었습니다.");
-  //     }
-  //   }
-  // });
-
-  // // observer에 감지할 대상 요소와 옵션 등록
-  // observer.observe($body, { attributes: true });
-
-  // ------------------------------------------------------------------ 클래스 감지 > ------------------------------------------------------------------
 
   const pageMatches = routes.map((route) => {
     return {
@@ -70,7 +48,23 @@ const router = async () => {
 
       // 조만간 게시판 코드 리팩토링 한 번 할게요
 
+      let isAdmin = false; // 임시값 입니다.
+      let isUser = true;
+      const userName = ""; // 임시값 입니다.
+      if (
+        // 관리자 여부 체크 (임시값)
+        localStorage.getItem("isAdmin") ==
+        "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
+      ) {
+        isAdmin = true;
+      } else if (!userName) {
+        isUser = false;
+        const newBoard = document.querySelector("#newBoard");
+        newBoard.style.display = "none";
+      }
       let nowId = null;
+      console.log("isAdmin = " + isAdmin);
+      console.log("isUser = " + isUser);
 
       // ------------------------------------------------------------------ < 게시글 생성 ------------------------------------------------------------------
 
@@ -80,7 +74,7 @@ const router = async () => {
       const boardNo = 0;
       const boardId = `board${boardNo}`;
       const modalId = `modal${boardNo}`;
-      let count = 0;
+      let count = 1; // test를 위해 1로 임시 변경 (id 부여를 위한 임시값)
       // const title = "미야케 우동";
       // const content = "미야케 우동 가격도 저렴하고 맛있어요";
       // const fileName = "미야케 우동1";
@@ -111,25 +105,30 @@ const router = async () => {
       let modals = "";
 
       // fetch를 이용해 값 가져오기 (임시 값)
-      fetch("https://jsonplaceholder.typicode.com/users", {
-        method: "get",
-      })
+      await fetch(
+        "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
+        {
+          method: "get",
+        }
+      )
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
           for (var value of data) {
-            post.innerHTML += `<div class="col-md-4 board" id = "${count}">    <!-- 게시판 아이디 지정 -->
+            post.innerHTML += `<div class="col-md-4 board" id = "${
+              value.id || count
+            }">    <!-- 게시판 아이디 지정 -->
                     <a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
                         data-bs-target="#modal${count}">   <!-- modal 아이디로 타켓 지정 -->
                         <div class="card" style="height: 460px">
-                            <div style="height: 300px;">
+                            <div style="height: 300px; max-height: 300px;" class="text-center">
                                 <img src="${
-                                  value.name || imgUrl
-                                }" height="300px" class="img-fluid">
+                                  value.url || imgUrl
+                                }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
                             </div>
                             <div class="card-body">
-                                <h5 class="card-title">${
-                                  value.email + count || title
+                                <h5 class="card-title text-truncate">${
+                                  value.title + count || title
                                 }</h5>
                                 <p class="card-text text-truncate mt-4">${
                                   value.phone +
@@ -141,8 +140,18 @@ const router = async () => {
                                     value.phone || content
                                 }</p>
                                 <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
-                                    <div class="col-3 px-0"><a href="#" class="btn btn-primary container-fluid">Edit</a>
-                                    </div>
+                                ${
+                                  isAdmin
+                                    ? `<div id="edit${count}" class="col-3 px-0"><a class="btn btn-primary container-fluid">Edit</a>
+                                    </div>`
+                                    : value.title ==
+                                      "officia delectus consequatur vero aut veniam explicabo molestias" // 로그인 한 사람 이름 (임시값)
+                                    ? `<div id="edit${count}" class="col-3 px-0"><a class="btn btn-primary container-fluid">Edit</a>
+                                    </div>`
+                                    : `<div class="col-3 px-0">
+                                    </div>`
+                                }
+                                    
                                     <span class="col-9 text-end px-0 align-text-top">${
                                       value.name || writer
                                     }</span>
@@ -285,13 +294,24 @@ const router = async () => {
                   <div class="row">
                     <div class="col-5 commentWriter">${value.name}</div>
                     <div class="col-6 commentDate">${id}</div>
-                    <div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+                    ${
+                      isAdmin
+                        ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
-                    </div>
+                    </div>`
+                        : value.name == userName
+                        ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+                      ❌
+                    </div>`
+                        : ""
+                    }
+                    
                   </div>
                 </div>
                 <div class="row mt-1">
-                  <div class="col-12 commentValue">${value.company.catchPhrase}</div>
+                  <div class="col-12 commentValue">${
+                    value.company.catchPhrase
+                  }</div>
                 </div>
               </div>`;
             }
@@ -422,14 +442,15 @@ const router = async () => {
       );
     }
     if (location.pathname === "/userWithdrawal") {
-
-      const response = await fetch("https://jsonplaceholder.typicode.com/users");
+      const response = await fetch(
+        "https://jsonplaceholder.typicode.com/users"
+      );
       const data = await response.json();
       const userData = data.filter((item) => item.id === 1);
 
-      const destroyBtn = document.querySelector('#destroyBtn');
+      const destroyBtn = document.querySelector("#destroyBtn");
 
-      destroyBtn.addEventListener('click', async () => {
+      destroyBtn.addEventListener("click", async () => {
         let myPassword = inputPassword.value;
 
         // let formData = new FormData();
@@ -445,18 +466,17 @@ const router = async () => {
           headers: {
             "Content-Type": "application/json",
           },
-          cache: 'no-cache',
+          cache: "no-cache",
           body: JSON.stringify({
             nikname: userData[0].username,
-            userPassword: myPassword
-          })
+            userPassword: myPassword,
+          }),
         })
           .then((response) => response.json())
-          .then((data) => console.log(data))
-
-      })
+          .then((data) => console.log(data));
+      });
+      localStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
     }
-    
   }
 };
 

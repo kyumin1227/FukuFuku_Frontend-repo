@@ -26,7 +26,7 @@ export default class {
 
     <div class="album pb-5 bg-light">
         <div class="container d-flex flex-row-reverse py-3">
-            <div><a class="btn btn-warning col-0.5 px-4" href="#" data-bs-toggle="modal"
+            <div id="newBoard"><a class="btn btn-warning col-0.5 px-4" href="#" data-bs-toggle="modal"
                     data-bs-target="#Write_Modal">New</a></div>
         </div>
         <div id="board-list" class="container">
