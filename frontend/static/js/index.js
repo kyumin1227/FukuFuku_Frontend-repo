@@ -250,6 +250,21 @@ const router = async () => {
                   </div>
               </div>
           </div>`;
+            
+          const inputImage = document.getElementById('formFile');
+          const imageList = document.getElementById('imageList');
+        
+          inputImage.addEventListener('change', (event) => {
+            const files = event.target.files; // 선택된 이미지 파일들
+            imageList.innerHTML = ''; // 이미지 리스트 초기화
+        
+            for (let i = 0; i < files.length; i++) {
+              const file = files[i];
+              const listItem = document.createElement('li');
+              listItem.textContent = file.name; // 파일 이름을 리스트 아이템에 텍스트로 설정
+              imageList.appendChild(listItem); // 리스트 아이템을 이미지 리스트에 추가
+            }
+          });
             count++;
           }
           console.log("ok");
@@ -404,6 +419,32 @@ const router = async () => {
           .then((data) => console.log(data))
 
       })
+    }
+    if (location.pathname === "/signup"){
+      // 사용자가 값 입력 시 post
+      const input = document.querySelectorAll("input")
+      console.log(input.value);
+      const addUser = document.querySelector("#addUser");
+
+      if(input.value != null){
+
+        addUser.addEventListener('click', async () => {
+          console.log('hi');
+          fetch("", {
+            method: "POST",
+            headers: {
+              "Content-type": "applycation/json",
+            },
+            cache: 'no-cache',
+            body: JSON.stringify({
+              userId: InputId.value,
+              Nikname: InputNikname,
+              userPassword: inputPassword.value,
+              user
+            })
+          })
+        })
+      }
     }
     
   }
