@@ -8,7 +8,7 @@ const cors = require("cors");
 // express 사용
 const app = express();
 
-const PORT = 3000;
+const PORT = 3100;
 
 app.use(cors()); // 모든 도메인 허용
 

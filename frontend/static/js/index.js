@@ -5,6 +5,7 @@ import Bulletin from "./pages/BulletinPage.js";
 import MyUserData from "./pages/MyUserData.js";
 import UserWithdrawal from "./pages/UserWithdrawal.js";
 import MyWriteList from "./pages/MyWriteList.js";
+import SignUp from "./pages/SignUp.js";
 
 const router = async () => {
   const routes = [
@@ -15,6 +16,7 @@ const router = async () => {
     { path: "/myUserData", view: MyUserData },
     { path: "/userWithdrawal", view: UserWithdrawal },
     { path: "/myWriteList", view: MyWriteList },
+    { path: "/signup", view: SignUp},
   ];
 
   // ------------------------------------------------------------------ < 클래스 감지 ------------------------------------------------------------------
@@ -368,6 +370,42 @@ const router = async () => {
         // -------------------------------------------------------------- 댓글 작성 (POST) 테스트 코드 > ------------------------------------------------------------
       );
     }
+    if (location.pathname === "/userWithdrawal") {
+
+      const response = await fetch("https://jsonplaceholder.typicode.com/users");
+      const data = await response.json();
+      const userData = data.filter((item) => item.id === 1);
+
+      const destroyBtn = document.querySelector('#destroyBtn');
+
+      destroyBtn.addEventListener('click', async () => {
+        let myPassword = inputPassword.value;
+
+        // let formData = new FormData();
+        // // formData 생성
+        // formData.append("userId", `${null}`);
+        // formData.append("userPassword", `${inputPassword.value}`);
+
+        // console.log(formData);
+        // console.log(formData.get('userPassword'));
+
+        fetch("https://jsonplaceholder.typicode.com/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          cache: 'no-cache',
+          body: JSON.stringify({
+            nikname: userData[0].username,
+            userPassword: myPassword
+          })
+        })
+          .then((response) => response.json())
+          .then((data) => console.log(data))
+
+      })
+    }
+    
   }
 };
 
