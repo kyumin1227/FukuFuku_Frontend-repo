@@ -1,8 +1,14 @@
+
+
 export default class {
   constructor() {
     document.title = "MyUserData";
   }
   async getHtml() {
+    // 데이터 값 불러오기
+    const userId = "dori";
+    const nikName = "dorimu";
+
     return `
             <!-- TITLE -->
     <div class="container">
@@ -17,9 +23,9 @@ export default class {
         <!-- SIDE_BAR -->
         <div class="col-2 bd-sidebar border-top border-bottom border-primary me-5 fw-semibold text-center" >
           <ul class="nav pt-3 flex-column">
-            <li class="nav-item"><a class="nav-link active link-dark" href="/myUserData">회원정보 수정</a></li>
-            <li class="nav-item"><a class="nav-link active link-dark" href="/myWriteList">쓴 글 목록</a></li>
-            <li class="nav-item"><a class="nav-link active link-dark" href="/userWithdrawal">회원 탈퇴</a></li>
+            <li class="nav-item"><a class="nav-link active link-dark" href="/myUserData" data-link>회원정보 수정</a></li>
+            <li class="nav-item"><a class="nav-link active link-dark" href="/myWriteList" data-link>쓴 글 목록</a></li>
+            <li class="nav-item"><a class="nav-link active link-dark" href="/userWithdrawal" data-link>회원 탈퇴</a></li>
           </ul>
         </div>
         
@@ -28,18 +34,18 @@ export default class {
           <div class="mb-4 pt-3 row">
             <label for="staticEmail" class="col-sm-2 col-form-label">ID</label>
             <div class="col-sm-10">
-              <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="dorimu">
+              <input type="text" readonly class="form-control-plaintext" id="staticEmail" value=${userId}>
             </div>
           </div>
 
           <!-- DATA 전달 -->
           <form class="row" action="" method="post">
             <div class="mb-4 row">
-              <label for="inputPassword" class="col-sm-2 col-form-label">Name</label>
+              <label for="inputName" class="col-sm-2 col-form-label">Name</label>
               <div class="col-sm-10">
                 <div class="row">
                   <div class="col">
-                    <input type="name" class="form-control" id="inputName" placeholder="dori">
+                    <input type="name" class="form-control" id="inputName" placeholder=${nikName}>
                   </div>
                   <!-- 필요 여부에 따라 변동 -->
                   <!-- <div class="col-sm-4">
@@ -55,7 +61,7 @@ export default class {
               </div>
             </div>
             <div class="mb-4 row">
-              <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
+              <label for="inputConfirmPassword" class="col-sm-2 col-form-label">Password</label>
               <div class="col-sm-10">
                 <input type="password" class="form-control" id="inputPassword">
               </div>
