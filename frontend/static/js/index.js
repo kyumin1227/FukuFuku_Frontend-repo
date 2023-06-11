@@ -6,10 +6,11 @@ import MyUserData from "./pages/MyUserData.js";
 import UserWithdrawal from "./pages/UserWithdrawal.js";
 import MyWriteList from "./pages/MyWriteList.js";
 import SignUp from "./pages/SignUp.js";
+import Main from "./pages/MainPage.js";
 
 const router = async () => {
   const routes = [
-    { path: "/", view: Home },
+    { path: "/", view: Main },
     { path: "/posts", view: Posts },
     { path: "/settings", view: Settings },
     { path: "/bulletin", view: Bulletin },
@@ -259,7 +260,7 @@ const router = async () => {
                   </div>
               </div>
           </div>`;
-            
+
             count++;
           }
           console.log("ok");
@@ -443,21 +444,20 @@ const router = async () => {
       );
 
       // 이미지 리스트 출력
-      const inputImage = document.getElementById('formFile');
-      const imageList = document.getElementById('imageList');
-    
-      inputImage.addEventListener('change', (event) => {
+      const inputImage = document.getElementById("formFile");
+      const imageList = document.getElementById("imageList");
+
+      inputImage.addEventListener("change", (event) => {
         const files = event.target.files; // 선택된 이미지 파일들
-        imageList.innerHTML = ''; // 이미지 리스트 초기화
-    
+        imageList.innerHTML = ""; // 이미지 리스트 초기화
+
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
-          const listItem = document.createElement('li');
+          const listItem = document.createElement("li");
           listItem.textContent = file.name; // 파일 이름을 리스트 아이템에 텍스트로 설정
           imageList.appendChild(listItem); // 리스트 아이템을 이미지 리스트에 추가
         }
       });
-
     }
     if (location.pathname === "/userWithdrawal") {
       const response = await fetch(
@@ -495,33 +495,31 @@ const router = async () => {
       });
       localStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
     }
-    if (location.pathname === "/signup"){
+    if (location.pathname === "/signup") {
       // 사용자가 값 입력 시 post
-      const input = document.querySelectorAll("input")
+      const input = document.querySelectorAll("input");
       console.log(input.value);
       const addUser = document.querySelector("#addUser");
 
-      if(input.value != null){
-
-        addUser.addEventListener('click', async () => {
-          console.log('hi');
+      if (input.value != null) {
+        addUser.addEventListener("click", async () => {
+          console.log("hi");
           fetch("", {
             method: "POST",
             headers: {
               "Content-type": "applycation/json",
             },
-            cache: 'no-cache',
+            cache: "no-cache",
             body: JSON.stringify({
               userId: InputId.value,
               Nikname: InputNikname,
               userPassword: inputPassword.value,
-              user
-            })
-          })
-        })
+              user,
+            }),
+          });
+        });
       }
     }
-    
   }
 };
 
