@@ -15,9 +15,9 @@ export default class {
         <!-- SIDE_BAR -->
         <div class="col-2 bd-sidebar border-top border-bottom border-primary me-5 fw-semibold text-center" >
           <ul class="nav pt-3 flex-column">
-            <li class="nav-item"><a class="nav-link active link-dark" href="/myUserData">회원정보 수정</a></li>
-            <li class="nav-item"><a class="nav-link active link-dark" href="/myWriteList">쓴 글 목록</a></li>
-            <li class="nav-item"><a class="nav-link active link-dark" href="/userWithdrawal">회원 탈퇴</a></li>
+            <li class="nav-item"><a class="nav-link active link-dark" href="/myUserData" data-link>회원정보 수정</a></li>
+            <li class="nav-item"><a class="nav-link active link-dark" href="/myWriteList" data-link>쓴 글 목록</a></li>
+            <li class="nav-item"><a class="nav-link active link-dark" href="/userWithdrawal" data-link>회원 탈퇴</a></li>
           </ul>
         </div>
         
