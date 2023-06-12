@@ -6,6 +6,7 @@ import MyUserData from "./pages/MyUserData.js";
 import UserWithdrawal from "./pages/UserWithdrawal.js";
 import MyWriteList from "./pages/MyWriteList.js";
 import SignUp from "./pages/SignUp.js";
+import SignIn from "./pages/SignIn.js";
 
 const router = async () => {
   const routes = [
@@ -17,6 +18,7 @@ const router = async () => {
     { path: "/userWithdrawal", view: UserWithdrawal },
     { path: "/myWriteList", view: MyWriteList },
     { path: "/signup", view: SignUp },
+    { path: "/signin", view: SignIn },
   ];
 
   const pageMatches = routes.map((route) => {
@@ -460,66 +462,192 @@ const router = async () => {
 
     }
     if (location.pathname === "/userWithdrawal") {
-      const response = await fetch(
-        "https://jsonplaceholder.typicode.com/users"
-      );
-      const data = await response.json();
-      const userData = data.filter((item) => item.id === 1);
-
+      // 버튼 태그 불러오기
       const destroyBtn = document.querySelector("#destroyBtn");
 
+      // 버튼 이벤트 추가
       destroyBtn.addEventListener("click", async () => {
         let myPassword = inputPassword.value;
 
-        // let formData = new FormData();
-        // // formData 생성
-        // formData.append("userId", `${null}`);
-        // formData.append("userPassword", `${inputPassword.value}`);
+        // 입력값이 존재할 떄
+        if (myPassword != ""){
 
-        // console.log(formData);
-        // console.log(formData.get('userPassword'));
-
-        fetch("https://jsonplaceholder.typicode.com/users", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          cache: "no-cache",
-          body: JSON.stringify({
-            nikname: userData[0].username,
-            userPassword: myPassword,
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => console.log(data));
-      });
-      localStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
-    }
-    if (location.pathname === "/signup"){
-      // 사용자가 값 입력 시 post
-      const input = document.querySelectorAll("input")
-      console.log(input.value);
-      const addUser = document.querySelector("#addUser");
-
-      if(input.value != null){
-
-        addUser.addEventListener('click', async () => {
-          console.log('hi');
-          fetch("", {
+          fetch("http://localhost:4000/user", {
             method: "POST",
             headers: {
-              "Content-type": "applycation/json",
+              "Content-Type": "application/json",
             },
-            cache: 'no-cache',
+            cache: "no-cache",
             body: JSON.stringify({
-              userId: InputId.value,
-              Nikname: InputNikname,
-              userPassword: inputPassword.value,
-              user
-            })
+              nikname: localStorage.getItem('nikname'),
+              userPassword: myPassword,
+            }),
           })
-        })
-      }
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              // 회원 탈퇴 성공
+              if (data.status == 204){
+                localStorage.clear();
+                alert("회원탈퇴 성공");
+              } 
+              // 올바르지 않은 데이터
+              else if (data.status == 422){
+                console.log(data.message);
+                alert("유효하지 않은 값입니다.");
+              } 
+              // 서버 문제
+              else if (data.status == 500){
+                console.log(data.message);
+                alert("서버에 문제가 생겼습니다.");
+              }
+            })
+        } 
+        // 입력값이 존재하지 않을 경우
+        else {
+          alert("비밀번호를 입력해주세요.");
+        }
+
+      });
+
+      localStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
+    }
+    if (location.pathname === "/signup") {
+      // 태그 불러오기
+      const idCheck = document.querySelector("#idConfirm");
+      const addUser = document.querySelector("#addUser");
+      let userId = document.getElementById('InputId').value;
+      let Check = false;
+
+      // 이벤트 추가
+      idCheck.addEventListener('click', async () => {
+        userId = document.getElementById('InputId').value;
+        console.log(userId);
+        if(userId != ""){
+          fetch("http://localhost:4000/signin/idCheck", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            cache: "no-cache",
+            body: JSON.stringify({
+              userId: userId,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // 사용가능
+              console.log(data)
+              if(data.status == 200){
+                console.log(data.message);
+                alert("사용가능한 아이디 입니다.")
+                Check = true;
+              }
+              // 중복
+              if(data.status == 409){
+                console.log(data.messgae);
+                alert("아이디가 이미 존재합니다.")
+              }
+            })
+        }
+      })
+      // 버튼에 이벤트 추가
+      addUser.addEventListener('click', async () => {
+        const username = document.getElementById('InputNikname').value;
+        const userPassword = document.getElementById('InputPassword').value;
+        const userConfirmPassword = document.getElementById('InputConfirmPassword').value;
+
+        // 입력값이 없을 시 경고
+        if(username != "" && userPassword != "" && userConfirmPassword){
+          // 중복확인 확인
+          if(Check){
+            if(userPassword == userConfirmPassword){
+              // 값 POST
+              fetch("http://localhost:4000/data", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                cache: "no-cache",
+                body: JSON.stringify({
+                  userId: userId,
+                  userPassword: userPassword,
+                  nikname: username,
+                }),
+              })
+                .then((response) => response.json())
+                .then((data) => {
+                  // 회원 가입 성공
+                  if (data.status == 201) {
+                    console.log(data.message);
+                    alert("회원 가입 성공");
+                  }
+                  // 서버 오류
+                  if (data.status == 500) {
+                    console.log(data.message);
+                    alert("서버 측 오류");
+                  }
+                })
+  
+                .catch((error) => {
+                  console.log(error);
+                })
+            } 
+            // 입력한 값이 서로 다를 경우
+            else {
+              console.log('password error');
+              alert("비밀번호가 일치하지않습니다.");
+            }
+          }else{
+            alert("아이디 중복확인 해주세요.");
+          } 
+        
+        }else{
+          alert("값을 모두 입력해주세요.");
+        }
+      })
+    }
+    if (location.pathname === "/signin") {
+      const login = document.getElementById('LoginBtn');
+
+    // 버튼에 이벤트 달기
+    login.addEventListener("click", () => {
+      const inputId = InputId.value;;
+      const inputPassword = InputPassword.value;
+
+      // 값 POST 전달
+      fetch("http://localhost:4000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: inputId,
+          userPassword: inputPassword,
+        }),
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        // 사용자 로그인 성공
+        if(data.status == 200) {
+          alert("로그인 성공");
+          localStorage.setItem('token', data.data.token);
+          localStorage.setItem('nickname', data.data.nickname);
+          // 관리자 여부 확인
+          if(data.data.isAdmin != undefined){
+            localStorage.setItem('isAdmin', data.data.isAdmin);
+          }
+        }
+        // 로그인 실패 
+        if(data.status == 400) {
+          console.log(data.message);
+          alert("로그인 실패");
+        }
+      })
+
+      .catch((error) => console.log(error))
+    })
     }
     
   }
