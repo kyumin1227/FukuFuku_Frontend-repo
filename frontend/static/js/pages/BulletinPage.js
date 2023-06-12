@@ -33,7 +33,7 @@ export default class {
 
             <!-- 게시글 블록입니다. -->
 
-            <div class="row g-5 block_post">
+            <div id="block_post" class="row g-5">
                 <!-- 게시글 코드를 Bulletin.js 파일로부터 받아옴 (index.js에서 생성하는 걸로 변경) -->
             </div>
         </div>
@@ -56,7 +56,7 @@ export default class {
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5 border-bottom" id="exampleModalLabel"><input type="text"
-                        class="form-control" style="border:0" id="" placeholder="title"></h1>
+                        class="form-control" style="border:0" id="uploadTitle" placeholder="title"></h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -68,7 +68,7 @@ export default class {
                             <form action="" method="post" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label for="formFile" class="form-label ms-2">이미지 선택</label>
-                                    <input class="form-control" name="filename[]" type="file" id="formFile"
+                                    <input class="form-control" name="filename[]" type="file" id="uploadImg"
                                         multiple="multiple" accept="image/*">
                                 </div>
                             </form>
@@ -83,17 +83,19 @@ export default class {
                 </div>
                 <!-- 작성 내용 -->
                 <div>
-                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : Dorimu</div>
+                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${localStorage.getItem(
+                      "name"
+                    )}</div>
                 </div>
                 <div class="form-floating">
-                    <textarea class="form-control mt-3" placeholder="Leave a comment here" id="floatingTextarea2"
+                    <textarea class="form-control mt-3" placeholder="Leave a comment here" id="uploadText"
                         style="height: 100px" resize="none"></textarea>
 
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">upload</button>
+                <button id="uploadBtn" type="button" class="btn btn-primary">upload</button>
             </div>
         </div>
     </div>

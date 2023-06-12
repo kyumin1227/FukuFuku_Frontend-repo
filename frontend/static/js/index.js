@@ -41,6 +41,8 @@ const router = async () => {
     console.log("페이지 변경");
     document.querySelector("#root").innerHTML = await page.getHtml();
 
+    // -------------------------------------------------------------- < 게시판 페이지 ------------------------------------------------------------
+
     if (location.pathname === "/bulletin") {
       // 게시판 들어왔을 때 실행
       // 1. 게시물 불러오기 (완료)
@@ -69,7 +71,7 @@ const router = async () => {
 
       // ------------------------------------------------------------------ < 게시글 생성 ------------------------------------------------------------------
 
-      const post = document.querySelector(".block_post");
+      const post = document.querySelector("#block_post");
       post.innerHTML = "";
 
       const boardNo = 0;
@@ -98,7 +100,7 @@ const router = async () => {
       const fileName = "미야케 우동1";
       const imgUrl = `./static/image/${fileName}.jpg`;
       const writer = "규민";
-      const writeDate = "2023.06.02 00:09";
+      let writeDate = "2023.06.02 00:09";
       const hit = 48;
 
       let comments = "";
@@ -379,6 +381,8 @@ const router = async () => {
 
         // console.log(serializedData);
 
+        // const nickname = localStorage.getItem(name);
+
         fetch("http://localhost:4000/test", {
           method: "POST",
           headers: {
@@ -413,7 +417,7 @@ const router = async () => {
             const commentBtnId = event.target.id;
             // 댓글 작성 버튼을 눌렀을 경우 동작
             const id = postComment(commentBtnId);
-            GetComment(id);
+            // GetComment(id);
           }
           if (event.target.classList.contains("commentDel")) {
             // 댓글 삭제 버튼을 눌렀을 경우 동작
@@ -443,8 +447,9 @@ const router = async () => {
         // -------------------------------------------------------------- 댓글 작성 (POST), 댓글 삭제 > ------------------------------------------------------------
       );
 
-      // 이미지 리스트 출력
-      const inputImage = document.getElementById("formFile");
+      // -------------------------------------------------------------- < 이미지 리스트 출력 ------------------------------------------------------------
+
+      const inputImage = document.getElementById("uploadImg");
       const imageList = document.getElementById("imageList");
 
       inputImage.addEventListener("change", (event) => {
@@ -458,6 +463,227 @@ const router = async () => {
           imageList.appendChild(listItem); // 리스트 아이템을 이미지 리스트에 추가
         }
       });
+
+      // -------------------------------------------------------------- 이미지 리스트 출력 > ------------------------------------------------------------
+
+      // -------------------------------------------------------------- < 게시판 신규 작성 ------------------------------------------------------------
+
+      const uploadBtn = document.querySelector("#uploadBtn");
+      const uploadText = document.querySelector("#uploadText");
+      const uploadTitle = document.querySelector("#uploadTitle");
+      const uploadImg = document.querySelector("#uploadImg");
+
+      const handleUpload = async () => {
+        const title = uploadTitle.value;
+        const content = uploadText.value;
+        const images = uploadImg.files;
+        const formData = new FormData();
+
+        createNewBoard(title, content, "124", "fsdafasdfasdfsad", images[0]);
+        createNewModal(title, content, "124", "fsdafasdfasdfsad", images[0]);
+
+        formData.append("title", title);
+        formData.append("content", content);
+        for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          formData.append("image", image);
+        }
+
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/posts",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        console.log(response);
+
+        if (response.status == 201) {
+          const boardNo = response.boardNo;
+          const writeDate = response.writeDate;
+          const fileNames = response.fileName;
+
+          uploadText.value = "";
+          uploadTitle.value = "";
+          uploadImg.files = null;
+
+          createNewBoard(title, content, boardNo, writeDate, fileNames);
+        }
+      };
+
+      /**
+       * 새로운 더미 게시글을 만든 후 가장 상단에 추가하는 함수입니다..
+       *
+       * @param {String} title - 제목
+       * @param {String} content - 글 내용
+       * @param {Number} boardNo - 게시물 아이디
+       * @param {Date} writeDate - 글 작성 일자 (DB로 부터 받아옵니다.)
+       * @param {Url []} fileNames - 이미지 url 배열
+       */
+      const createNewBoard = (
+        title,
+        content,
+        boardNo,
+        writeDate,
+        fileNames
+      ) => {
+        const nickname = localStorage.getItem("name");
+        const div = document.createElement("div");
+        div.classList = "col-md-4 board";
+        div.id = boardNo;
+        div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
+                        data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
+                        <div class="card" style="height: 460px">
+                            <div style="height: 300px; max-height: 300px;" class="text-center">
+                                <img src="${
+                                  fileNames[0]
+                                }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">${title}</h5>
+                                <p class="card-text text-truncate mt-4">${content}</p>
+                                <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
+                                ${
+                                  isAdmin
+                                    ? `<div id="edit${count}" class="col-3 px-0"><a class="btn btn-primary container-fluid">Edit</a>
+                                    </div>`
+                                    : value.title ==
+                                      "officia delectus consequatur vero aut veniam explicabo molestias" // 로그인 한 사람 이름 (임시값)
+                                    ? `<div id="edit${count}" class="col-3 px-0"><a class="btn btn-primary container-fluid">Edit</a>
+                                    </div>`
+                                    : `<div class="col-3 px-0">
+                                    </div>`
+                                }
+                                    
+                                    <span class="col-9 text-end px-0 align-text-top">${nickname}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>`;
+        post.prepend(div);
+      };
+
+      /**
+       * 새로운 게시글의 더미 모달 페이지를 만든 후 가장 상단에 추가하는 함수입니다.
+       *
+       * @param {String} title - 제목
+       * @param {String} content - 글 내용
+       * @param {Number} boardNo - 게시물 아이디
+       * @param {Date} writeDate - 글 작성 일자 (DB로 부터 받아옵니다.)
+       * @param {Url []} fileNames - 이미지 url 배열
+       */
+      const createNewModal = (
+        title,
+        content,
+        boardNo,
+        writeDate,
+        fileNames
+      ) => {
+        const div = document.createElement("div");
+        div.className = "modal";
+        div.id = `modal${boardNo}`;
+        div.innerHTML = `<div class="modal-dialog modal-xl">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="container-fluid">
+                              <div class="row">
+                                  <div class="col-8 p-0">
+                                      <!-- 이미지 창 -->
+
+                                      <div class="d-flex align-items-center">
+
+                                          <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
+                                              <div class="carousel-indicators">
+                                                  <button type="button" data-bs-target="#carouselExampleIndicators"
+                                                      data-bs-slide-to="0" class="active" aria-current="true"
+                                                      aria-label="Slide 1"></button>
+                                                  <button type="button" data-bs-target="#carouselExampleIndicators"
+                                                      data-bs-slide-to="1" aria-label="Slide 2"></button>
+                                                  <button type="button" data-bs-target="#carouselExampleIndicators"
+                                                      data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                              </div>
+                                              <div class="carousel-inner">
+                                                  <div class="carousel-item active">
+                                                      <img src="${imgUrl}" class="d-block w-100" alt="...">
+                                                  </div>
+                                                  <div class="carousel-item">
+                                                      <img src="./static/image/미야케 우동2.jpg" class="d-block w-100" alt="...">
+                                                  </div>
+                                                  <div class="carousel-item">
+                                                      <img src="./static/image/미야케 우동3.jpg" class="d-block w-100" alt="...">
+                                                  </div>
+                                              </div>
+                                              <button class="carousel-control-prev" type="button"
+                                                  data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                  <span class="visually-hidden">Previous</span>
+                                              </button>
+                                              <button class="carousel-control-next" type="button"
+                                                  data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                  <span class="visually-hidden">Next</span>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-4 d-flex justify-content-center" style="overflow-y: auto; height: 65vh;">
+                                      <!-- 댓글 창 -->
+                                      <div id="block_comment${boardNo}" class="col-11"> <!-- 모달의 코멘트 블록 아이디 지정 -->
+
+                                          
+
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <!-- 본문, 댓글작성 창 -->
+                              <div class="row">
+
+                                  <!-- 본문 창 -->
+
+                                  <div class="col-8 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
+                                      style="height: 15vh;">
+                                      <span>${content}</span>
+                                      <div class="row d-flex justify-content-end">
+                                          <div class="col-6">작성 일자: <span>${writeDate}</span></div>
+                                          <div class="col-3">작성자: <span>${writer}</span></div>
+                                          <div class="col-3">조회수: <span>${hit}</span></div>
+                                      </div>
+                                  </div>
+
+                                  <!-- 댓글작성 창 -->
+
+                                  <div class="col-4">
+                                      <div class="row mt-3 h-75">
+                                          <div class="col-12 d-flex justify-content-end">
+                                              <textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
+                                              <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                  </div>
+              </div>`;
+
+        modal.prepend(div);
+      };
+
+      uploadBtn.addEventListener("click", handleUpload);
+
+      // -------------------------------------------------------------- 게시판 신규 작성 > ------------------------------------------------------------
+
+      // -------------------------------------------------------------- 게시판 페이지 > ------------------------------------------------------------
     }
     if (location.pathname === "/userWithdrawal") {
       const response = await fetch(
@@ -494,6 +720,7 @@ const router = async () => {
           .then((data) => console.log(data));
       });
       localStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
+      localStorage.setItem("name", "Ervin Howell");
     }
     if (location.pathname === "/signup") {
       // 사용자가 값 입력 시 post
