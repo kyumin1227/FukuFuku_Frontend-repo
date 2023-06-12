@@ -34,7 +34,7 @@
   transform: rotateY(180deg);
 }
 
-.wrap {
+.wrap-token {
   display: inline-block;
   width: 200px;
   height: 100px;

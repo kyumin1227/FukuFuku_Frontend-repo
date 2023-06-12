@@ -1,11 +1,13 @@
 .size {
+    display: block;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
     color: #fff;
-    padding: 20px;
+    width: 80%;
+    height: 80%;
 }
 h5 {
     color: black;
@@ -24,6 +26,8 @@ p {
         cursor: pointer;
         margin-top: 20px;
 }
-.d-block {
-    
+
+.container{
+    display: block;
+    position: relative;
 }

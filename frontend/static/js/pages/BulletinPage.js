@@ -3,8 +3,6 @@
 // 모달 id = modal(index)
 // 코멘트 블록 id = (index)block_comment
 
-import modals from "../BulletinModal.js";
-
 export default class {
   constructor() {
     document.title = "Bulletin";
@@ -28,7 +26,7 @@ export default class {
 
     <div class="album pb-5 bg-light">
         <div class="container d-flex flex-row-reverse py-3">
-            <div><a class="btn btn-warning col-0.5 px-4" href="#" data-bs-toggle="modal"
+            <div id="newBoard"><a class="btn btn-warning col-0.5 px-4" href="#" data-bs-toggle="modal"
                     data-bs-target="#Write_Modal">New</a></div>
         </div>
         <div id="board-list" class="container">
@@ -48,7 +46,7 @@ export default class {
 <!-- modal -->
 
 <div id="block_modal">
-    ${modals} <!-- modal을 위한 코드를 BulletinModal.js 파일로부터 받아옴 -->
+    <!-- modal을 위한 코드를 BulletinModal.js 파일로부터 받아옴 (index.js에서 생성하는 걸로 변경) -->
 </div>
 
 
@@ -79,8 +77,8 @@ export default class {
                 </div>
                 <!-- 등록 파일 출력 -->
                 <div class="border border-gray w-50 overflow-scroll" style="height: 100px;">
-                    <ul>
-                        <li>filename1</li>
+                    <ul id="imageList">
+                        
                     </ul>
                 </div>
                 <!-- 작성 내용 -->
