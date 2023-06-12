@@ -34,9 +34,90 @@ const router = async () => {
     const page = new NotFound();
     document.querySelector("#root").innerHTML = await page.getHtml();
   } else {
+    // 토큰 값 여부로 바꾸기
     const page = new match.route.view();
     console.log("페이지 변경");
     document.querySelector("#root").innerHTML = await page.getHtml();
+
+    // ------------------------------------------------------------------ 회원정보 수정 ------------------------------------------------------------------  
+
+    if (location.pathname === "/myUserData"){
+      localStorage.setItem("userId", "userIdSomething");  // 로컬스토리지 테스트
+      // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
+      let nicknameChkVal = false;
+      const nameInput = document.querySelector("#inputName");
+      const nicknameChkBtn = document.querySelector("#idChkBtn");
+      const modifyBtn = document.querySelector("#modifyBtn");
+      
+      nicknameChkBtn.addEventListener("click", () => {
+
+        if(nameInput.value === ""){
+          alert('변경할 닉네임을 입력해주세요!');
+        }else{
+          fetch("https://my-json-server.typicode.com/typicode/demo/posts", {
+            method: "POST",
+            headers:{
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              "nickname": nameInput.value,
+            })
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              // found 값에 따라 True 또는 False 전달
+              if(data.status == 200){
+                alert('사용할 수 있는 닉네임입니다!');
+                nicknameChkVal = true;
+              }else{
+                alert('이미 사용중인 닉네임입니다!');
+              }
+            }); 
+        }
+      });
+
+      // modify 버튼으로 닉네임 중복여부를 확인하고
+      // 확인되면 비밀번호 값과 nickname 값을 post 로 보내서
+      // 비밀번호가 일치하면 post로 보낸 nickname 값으로 닉네임을 변경한다
+      // 만약, 비밀번호가 일치하지 않으면 alert 창 떠서 꺼지게 만든다!
+      modifyBtn.addEventListener("click", () => {
+        if(nicknameChkVal){
+          fetch("https://my-json-server.typicode.com/typicode/demo/posts", {
+            // fetch에는 웹서버/updateNickname 으로 보내기
+            method: "POST",
+            headers:{
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              "userId": localStorage.getItem("userId"),
+              "password": inputPassword.value,
+              "nickname": nameInput.value,
+            }),
+            // 변경할 닉네임 + (입력했던 pw와 로컬 스토리지에 있는 nickname 값 보내기)
+          })
+          // 해당 처리 결과반환
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status == 200) {
+                // 일치 여부에 따른 결과값
+                // TRUE / FALSE
+                alert("닉네임이 성공적으로 변경되었습니다!");
+              } else {
+                alert("비밀번호가 일치하지 않습니다!");
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+        }else{
+          alert("닉네임 중복 체크를 해주세요!");
+        }
+      });
+
+
+    }
+
+      // ------------------------------------------------------------------ 게시글 생성 ------------------------------------------------------------------
 
     if (location.pathname === "/bulletin") {
       // 게시판 들어왔을 때 실행
@@ -474,7 +555,7 @@ const router = async () => {
             },
             cache: "no-cache",
             body: JSON.stringify({
-              nikname: localStorage.getItem('nikname'),
+              nickname: localStorage.getItem('nikname'),
               userPassword: myPassword,
             }),
           })
@@ -568,7 +649,7 @@ const router = async () => {
                 body: JSON.stringify({
                   userId: userId,
                   userPassword: userPassword,
-                  nikname: username,
+                  nickname: username,
                 }),
               })
                 .then((response) => response.json())
