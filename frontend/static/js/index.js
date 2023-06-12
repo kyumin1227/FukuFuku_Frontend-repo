@@ -610,44 +610,44 @@ const router = async () => {
     if (location.pathname === "/signin") {
       const login = document.getElementById('LoginBtn');
 
-    // 버튼에 이벤트 달기
-    login.addEventListener("click", () => {
-      const inputId = InputId.value;;
-      const inputPassword = InputPassword.value;
+      // 버튼에 이벤트 달기
+      login.addEventListener("click", () => {
+        const inputId = InputId.value;;
+        const inputPassword = InputPassword.value;
 
-      // 값 POST 전달
-      fetch("http://localhost:4000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: inputId,
-          userPassword: inputPassword,
-        }),
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        // 사용자 로그인 성공
-        if(data.status == 200) {
-          alert("로그인 성공");
-          localStorage.setItem('token', data.data.token);
-          localStorage.setItem('nickname', data.data.nickname);
-          // 관리자 여부 확인
-          if(data.data.isAdmin != undefined){
-            localStorage.setItem('isAdmin', data.data.isAdmin);
+        // 값 POST 전달
+        fetch("http://localhost:4000/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: inputId,
+            userPassword: inputPassword,
+          }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          // 사용자 로그인 성공
+          if(data.status == 200) {
+            alert("로그인 성공");
+            localStorage.setItem('token', data.data.token);
+            localStorage.setItem('nickname', data.data.nickname);
+            // 관리자 여부 확인
+            if(data.data.isAdmin != undefined){
+              localStorage.setItem('isAdmin', data.data.isAdmin);
+            }
           }
-        }
-        // 로그인 실패 
-        if(data.status == 400) {
-          console.log(data.message);
-          alert("로그인 실패");
-        }
-      })
+          // 로그인 실패 
+          if(data.status == 400) {
+            console.log(data.message);
+            alert("로그인 실패");
+          }
+        })
 
-      .catch((error) => console.log(error))
-    })
+        .catch((error) => console.log(error))
+      })
     }
     
   }
