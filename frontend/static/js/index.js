@@ -1,6 +1,3 @@
-import Home from "./pages/Home.js";
-import Posts from "./pages/Posts.js";
-import Settings from "./pages/Settings.js";
 import Bulletin from "./pages/BulletinPage.js";
 import MyUserData from "./pages/MyUserData.js";
 import UserWithdrawal from "./pages/UserWithdrawal.js";
@@ -12,8 +9,6 @@ import SignIn from "./pages/SignIn.js";
 const router = async () => {
   const routes = [
     { path: "/", view: Main },
-    { path: "/posts", view: Posts },
-    { path: "/settings", view: Settings },
     { path: "/bulletin", view: Bulletin },
     { path: "/myUserData", view: MyUserData },
     { path: "/userWithdrawal", view: UserWithdrawal },
@@ -616,6 +611,11 @@ const router = async () => {
         const inputId = InputId.value;;
         const inputPassword = InputPassword.value;
 
+        const loginFunc = () => {
+          status_login.style.display = "none";
+          status_guest.style.display = "block";
+        }
+
         // 값 POST 전달
         fetch("http://localhost:4000/login", {
           method: "POST",
@@ -635,10 +635,12 @@ const router = async () => {
             alert("로그인 성공");
             localStorage.setItem('token', data.data.token);
             localStorage.setItem('nickname', data.data.nickname);
+            loginFunc();
             // 관리자 여부 확인
             if(data.data.isAdmin != undefined){
               localStorage.setItem('isAdmin', data.data.isAdmin);
             }
+            location.reload();
           }
           // 로그인 실패 
           if(data.status == 400) {
