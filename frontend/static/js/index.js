@@ -39,10 +39,136 @@ const router = async () => {
     console.log("페이지 변경");
     document.querySelector("#root").innerHTML = await page.getHtml();
 
+    // ------------------------------------------------------------------ 조원 소개 기능 ------------------------------------------------------------------
+
+    if (location.pathname === "/"){
+
+      const memberCBtn = document.querySelector("#uploadBtn");
+      const newBtn = document.querySelector("#memberCBtn");
+      const memberUpload = async () => {
+        const memberName = uploadMemberName.value;
+        const introduceContent = uploadMemberContent.value;
+        const fileName = uploadImg.files;
+        const formData = new FormData();
+        console.log(memberName);
+
+        formData.append("memberName", memberName);
+        formData.append("introduceContent", introduceContent);
+        formData.append("fileName", fileName);
+        console.log(formData.memberName);
+
+        const response = await fetch(
+          "https://jsonplaceholder.typicode.com/posts",
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        console.log(response.body);
+        if (response.status == 201) {
+          alert("조원 등록 성공!");
+          // 값이 잘 전달 되었을 때 생성
+          const boardNo = response.boardNo;
+          const memberName = response.memberName;
+          const introduceContent = response.introduceContent;
+          const fileName = response.fileName;
+  
+          // 작성 페이지의 제목과 글 비우기
+          uploadMemberName.value = "";
+          uploadMemberContent.value = "";
+          uploadImg.files = null;
+          createBoard(boardNo, memberName, boardNo, introduceContent, fileName);
+        }else if(response.status == 422){
+          alert("올바르지 않은 데이터 양식입니다");
+        }else{
+          alert("Server Error");
+        }
+      }
+      memberCBtn.addEventListener("click", memberUpload);
+      
+      let isAdmin = false; // 임시값 입니다.
+
+      if (
+        // 관리자 여부 체크 (임시값)
+        sessionStorage.getItem("isAdmin") ==
+        "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
+      ) {
+        isAdmin = true;
+      }
+      
+      if(!isAdmin){
+        newBtn.style.display = "none";
+      }
+
+      // 조원 데이터를 get으로 불러와서 해당 데이터에 맞게끔 조원소개란이 생성됩니다
+      // 조원소개판 함수 정의
+
+      /**
+       * 새로운 더미 게시글을 만든 후 하단에 추가하는 함수입니다
+       *
+       * @param {Number} boardNo - 소개란 번호
+       * @param {String} memberName - 조원 명
+       * @param {String} introduceContent - 소개 내용
+       * @param {Url} fileName - 이미지 url
+       */
+      const createBoard = (boardNo, memberName, introduceContent, fileName) => {
+        const div = document.createElement("div");
+        div.classList = "col-4 mt-5";
+        div.id = boardNo;
+        div.innerHTML = `
+                          <div class="flip-outer m-auto">
+                              <div class="flip-inner">
+                                  <img src="${fileName}" class="front shadow-lg" />
+                                  <div class="back shadow-lg">
+                                      <h4 class="p-5">${memberName}</h4>
+                                      <h4>${introduceContent}</h4>
+                                  </div>
+                              </div>
+                          </div>
+                        `;
+        post.prepend(div);
+      };
+
+      // ------------------------------------------------------------------ < 조원 소개 생성 ------------------------------------------------------------------
+
+      const post = document.querySelector("#member_post");
+      post.innerHTML = "";
+      // fetch를 이용해 값 가져오기 (임시 값)
+      await fetch(
+        "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
+        {
+          method: "get",
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          let count = 0; // 예제 블럭 제한 걸기
+          console.log(data);
+          for (let value of data) {
+            createBoard(
+              value.title,
+              value.phone,
+              value.id,
+              value.url
+            );
+
+            // // 예제 블럭 6개만 뽑아쓰기
+            // count++;
+            // if (count === 6) {
+            //   break;
+            // }
+          }
+        })
+        .catch((error) => console.log("fetch 에러!", error));
+
+      // ------------------------------------------------------------------ 조원 소개 생성 > ----------------------------------------------------------------
+    }
+
+
     // ------------------------------------------------------------------ 회원정보 수정 ------------------------------------------------------------------
 
     if (location.pathname === "/myUserData") {
-      localStorage.setItem("userId", "userIdSomething"); // 로컬스토리지 테스트
+      sessionStorage.setItem("userId", "userIdSomething"); // 로컬스토리지 테스트
       // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
       let nicknameChkVal = false;
       const nameInput = document.querySelector("#inputName");
@@ -88,7 +214,7 @@ const router = async () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              userId: localStorage.getItem("userId"),
+              userId: sessionStorage.getItem("userId"),
               password: inputPassword.value,
               nickname: nameInput.value,
             }),
@@ -131,7 +257,7 @@ const router = async () => {
       const userName = ""; // 임시값 입니다.
       if (
         // 관리자 여부 체크 (임시값)
-        localStorage.getItem("isAdmin") ==
+        sessionStorage.getItem("isAdmin") ==
         "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
       ) {
         isAdmin = true;
@@ -156,7 +282,7 @@ const router = async () => {
        * @param {Url []} fileNames - 이미지 url 배열
        */
       const createBoard = (title, content, boardNo, writeDate, fileNames) => {
-        const nickname = localStorage.getItem("name");
+        const nickname = sessionStorage.getItem("name");
         const div = document.createElement("div");
         div.classList = "col-md-4 board";
         div.id = boardNo;
@@ -327,7 +453,7 @@ const router = async () => {
                         ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
                     </div>`
-                        : name == localStorage.getItem("name")
+                        : name == sessionStorage.getItem("name")
                         ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
                     </div>`
@@ -461,7 +587,7 @@ const router = async () => {
             // 테스트
             console.log(block_comment);
             createComment(
-              localStorage.getItem("name"),
+              sessionStorage.getItem("name"),
               commentText.value,
               submitId,
               block_comment
@@ -484,7 +610,7 @@ const router = async () => {
             if (response.status == 201) {
               commentText.value = "";
               createComment(
-                localStorage.getItem("name"),
+                sessionStorage.getItem("name"),
                 commentText.value,
                 id,
                 block_comment
@@ -506,7 +632,7 @@ const router = async () => {
             fetch("http://localhost:4000/test", {
               method: "DELETE",
               headers: {
-                Authorization: localStorage.getItem("access_token"),
+                Authorization: sessionStorage.getItem("access_token"),
               },
               body: JSON.stringify({
                 boardNo,
@@ -610,7 +736,7 @@ const router = async () => {
             },
             cache: "no-cache",
             body: JSON.stringify({
-              nickname: localStorage.getItem("nikname"),
+              nickname: sessionStorage.getItem("nikname"),
               userPassword: myPassword,
             }),
           })
@@ -619,7 +745,7 @@ const router = async () => {
               console.log(data);
               // 회원 탈퇴 성공
               if (data.status == 204) {
-                localStorage.clear();
+                sessionStorage.clear();
                 alert("회원탈퇴 성공");
                 guestFunc();
                 mainLink.click();
@@ -642,7 +768,7 @@ const router = async () => {
         }
       });
 
-      localStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
+      sessionStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
     }
     if (location.pathname === "/signup") {
       // 태그 불러오기
@@ -766,12 +892,12 @@ const router = async () => {
             // 사용자 로그인 성공
             if (data.status == 200) {
               alert("로그인 성공");
-              localStorage.setItem("token", data.data.token);
-              localStorage.setItem("nickname", data.data.nickname);
+              sessionStorage.setItem("token", data.data.token);
+              sessionStorage.setItem("nickname", data.data.nickname);
               loginFunc();
               // 관리자 여부 확인
               if (data.data.isAdmin == true) {
-                localStorage.setItem(
+                sessionStorage.setItem(
                   "isAdmin",
                   "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
                 );
