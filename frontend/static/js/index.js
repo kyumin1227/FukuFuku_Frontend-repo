@@ -41,6 +41,8 @@ const router = async () => {
 
     // ------------------------------------------------------------------ 조원 소개 기능 ------------------------------------------------------------------
 
+    const PATH = "http://43.200.196.118:3000";
+
     if (location.pathname === "/"){
 
       const memberCBtn = document.querySelector("#uploadBtn");
@@ -958,7 +960,7 @@ const router = async () => {
         userId = document.getElementById("InputId").value;
         console.log(userId);
         if (userId != "") {
-          fetch("http://43.200.196.118:3000/account/idCheck/?userId=dori", {
+          fetch(`${PATH}/account/idCheck/?userId=${userId}`, {
             method: "GET",
             query: {
               userId: userId,
@@ -996,7 +998,7 @@ const router = async () => {
           if (Check) {
             if (userPassword == userConfirmPassword) {
               // 값 POST
-              fetch("http://43.200.196.118:3000/account/signUp", {
+              fetch(`${PATH}/account/signUp`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -1048,7 +1050,7 @@ const router = async () => {
         const inputPassword = InputPassword.value;
 
         // 값 POST 전달
-        fetch("http://localhost:4000/login", {
+        fetch(`${PATH}/account`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
