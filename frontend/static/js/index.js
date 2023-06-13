@@ -544,6 +544,7 @@ const router = async () => {
       const uploadText = document.querySelector("#uploadText");
       const uploadTitle = document.querySelector("#uploadTitle");
       const uploadImg = document.querySelector("#uploadImg");
+      const modalCloseBtn = document.querySelector("#btn-close");
 
       // Upload 버튼을 눌렀을 경우
       const handleUpload = async () => {
@@ -578,12 +579,16 @@ const router = async () => {
           const writeDate = response.writeDate;
           const fileNames = response.fileName;
 
-          // 작성 페이지의 제목과 글 비우기
+          createBoard(title, content, boardNo, writeDate, fileNames);
+          createModal(title, content, boardNo, writeDate, fileNames);
+
+          // 모달 창 비우기
           uploadText.value = "";
           uploadTitle.value = "";
-          uploadImg.files = null;
-
-          createBoard(title, content, boardNo, writeDate, fileNames);
+          uploadImg.type = "radio";
+          uploadImg.type = "file";
+          imageList.innerHTML = ""; // 이미지 리스트 초기화
+          modalCloseBtn.click(); // 모달 창 닫기
         }
       };
 
@@ -623,7 +628,7 @@ const router = async () => {
                 alert("회원탈퇴 성공");
                 guestFunc();
                 mainLink.click();
-              } 
+              }
               // 올바르지 않은 데이터
               else if (data.status == 422) {
                 console.log(data.message);

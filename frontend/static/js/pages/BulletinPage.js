@@ -57,7 +57,7 @@ export default class {
             <div class="modal-header">
                 <h1 class="modal-title fs-5 border-bottom" id="exampleModalLabel"><input type="text"
                         class="form-control" style="border:0" id="uploadTitle" placeholder="title"></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button id="btn-close" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -78,7 +78,7 @@ export default class {
                 <!-- 등록 파일 출력 -->
                 <div class="border border-gray w-50 overflow-scroll" style="height: 100px;">
                     <ul id="imageList">
-                        
+
                     </ul>
                 </div>
                 <!-- 작성 내용 -->
