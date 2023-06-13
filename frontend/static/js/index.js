@@ -168,7 +168,6 @@ const router = async () => {
     // ------------------------------------------------------------------ 회원정보 수정 ------------------------------------------------------------------
 
     if (location.pathname === "/myUserData") {
-      sessionStorage.setItem("userId", "userIdSomething"); // 로컬스토리지 테스트
       // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
       let nicknameChkVal = false;
       const nameInput = document.querySelector("#inputName");
@@ -247,7 +246,7 @@ const router = async () => {
     if (location.pathname === "/bulletin") {
       let isAdmin = false; // 임시값 입니다.
       let isUser = true;
-      const userName = ""; // 임시값 입니다.
+      const userName = sessionStorage.getItem('nickname'); // 임시값 입니다.
       if (
         // 관리자 여부 체크 (임시값)
         sessionStorage.getItem("isAdmin") ==
@@ -946,7 +945,6 @@ const router = async () => {
         }
       });
 
-      sessionStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
     }
     if (location.pathname === "/signup") {
       // 태그 불러오기
