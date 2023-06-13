@@ -52,7 +52,7 @@
     <div id="block_modal"></div>
     
     <script>
-        const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const status_login = document.querySelector('#status_login');
     const status_guest = document.querySelector('#status_guest');
     const logOut = document.querySelector('#logOut')
@@ -75,7 +75,7 @@
     }
     
     logOut.addEventListener('click', () => {
-        localStorage.clear();
+        sessionStorage.clear();
         guestFunc();
         mainLink.click();
     });

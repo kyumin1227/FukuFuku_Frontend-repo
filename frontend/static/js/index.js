@@ -41,6 +41,8 @@ const router = async () => {
 
     // ------------------------------------------------------------------ 조원 소개 기능 ------------------------------------------------------------------
 
+    const PATH = "http://43.200.196.118:3000";
+
     if (location.pathname === "/"){
 
       const memberCBtn = document.querySelector("#uploadBtn");
@@ -168,7 +170,6 @@ const router = async () => {
     // ------------------------------------------------------------------ 회원정보 수정 ------------------------------------------------------------------
 
     if (location.pathname === "/myUserData") {
-      sessionStorage.setItem("userId", "userIdSomething"); // 로컬스토리지 테스트
       // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
       let nicknameChkVal = false;
       const nameInput = document.querySelector("#inputName");
@@ -247,7 +248,7 @@ const router = async () => {
     if (location.pathname === "/bulletin") {
       let isAdmin = false; // 임시값 입니다.
       let isUser = true;
-      const userName = ""; // 임시값 입니다.
+      const userName = sessionStorage.getItem('nickname'); // 임시값 입니다.
       if (
         // 관리자 여부 체크 (임시값)
         sessionStorage.getItem("isAdmin") ==
@@ -946,7 +947,6 @@ const router = async () => {
         }
       });
 
-      sessionStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
     }
     if (location.pathname === "/signup") {
       // 태그 불러오기
@@ -960,15 +960,12 @@ const router = async () => {
         userId = document.getElementById("InputId").value;
         console.log(userId);
         if (userId != "") {
-          fetch("http://localhost:4000/signin/idCheck", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          fetch(`${PATH}/account/idCheck/?userId=${userId}`, {
+            method: "GET",
+            query: {
+              userId: userId,
             },
             cache: "no-cache",
-            body: JSON.stringify({
-              userId: userId,
-            }),
           })
             .then((response) => response.json())
             .then((data) => {
@@ -1001,7 +998,7 @@ const router = async () => {
           if (Check) {
             if (userPassword == userConfirmPassword) {
               // 값 POST
-              fetch("http://localhost:4000/data", {
+              fetch(`${PATH}/account/signUp`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -1053,7 +1050,7 @@ const router = async () => {
         const inputPassword = InputPassword.value;
 
         // 값 POST 전달
-        fetch("http://localhost:4000/login", {
+        fetch(`${PATH}/account`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1091,6 +1088,9 @@ const router = async () => {
           .catch((error) => console.log(error));
       });
     }
+    if (location.pathname === "/MyWriteList"){
+
+    }
   }
 };
 
@@ -1110,3 +1110,4 @@ window.addEventListener("popstate", () => {
   console.log("주소가 변경되었습니다. popstate");
   router();
 });
+
