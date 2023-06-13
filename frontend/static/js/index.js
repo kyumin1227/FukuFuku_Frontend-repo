@@ -42,7 +42,7 @@ const router = async () => {
     // ------------------------------------------------------------------ 회원정보 수정 ------------------------------------------------------------------
 
     if (location.pathname === "/myUserData") {
-      localStorage.setItem("userId", "userIdSomething"); // 로컬스토리지 테스트
+      sessionStorage.setItem("userId", "userIdSomething"); // 로컬스토리지 테스트
       // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
       let nicknameChkVal = false;
       const nameInput = document.querySelector("#inputName");
@@ -88,7 +88,7 @@ const router = async () => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              userId: localStorage.getItem("userId"),
+              userId: sessionStorage.getItem("userId"),
               password: inputPassword.value,
               nickname: nameInput.value,
             }),
@@ -117,21 +117,14 @@ const router = async () => {
     // -------------------------------------------------------------- < 게시판 페이지 ------------------------------------------------------------
 
     // ------------------------------------------------------------------ 게시글 생성 ------------------------------------------------------------------
-
+    // 게시판 들어왔을 때 실행
     if (location.pathname === "/bulletin") {
-      // 게시판 들어왔을 때 실행
-      // 1. 게시물 불러오기 (완료)
-      // 2. 게시물 클릭 시 해당 게시물의 (모달 생성하기) 댓글 불러오기 (진행중)
-      // 3. 댓글 작성
-
-      // 조만간 게시판 코드 리팩토링 한 번 할게요
-
       let isAdmin = false; // 임시값 입니다.
       let isUser = true;
       const userName = ""; // 임시값 입니다.
       if (
         // 관리자 여부 체크 (임시값)
-        localStorage.getItem("isAdmin") ==
+        sessionStorage.getItem("isAdmin") ==
         "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
       ) {
         isAdmin = true;
@@ -156,13 +149,13 @@ const router = async () => {
        * @param {Url []} fileNames - 이미지 url 배열
        */
       const createBoard = (title, content, boardNo, writeDate, fileNames) => {
-        const nickname = localStorage.getItem("name");
+        const nickname = sessionStorage.getItem("name");
         const div = document.createElement("div");
         div.classList = "col-md-4 board";
         div.id = boardNo;
         div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
                         data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
-                        <div class="card" style="height: 460px">
+                        <div class="card card${boardNo}" style="height: 460px">
                             <div style="height: 300px; max-height: 300px;" class="text-center">
                                 <img src="${
                                   fileNames || fileNames[0]
@@ -174,11 +167,11 @@ const router = async () => {
                                 <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
                                 ${
                                   isAdmin
-                                    ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid">Edit</a>
+                                    ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
                                     </div>`
                                     : title ==
                                       "officia delectus consequatur vero aut veniam explicabo molestias" // 로그인 한 사람 이름 (임시값)
-                                    ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid">Edit</a>
+                                    ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
                                     </div>`
                                     : `<div class="col-3 px-0">
                                     </div>`
@@ -304,10 +297,10 @@ const router = async () => {
       /**
        * 댓글 생성 함수 - 댓글을 생성 할 블록을 받은 후 해당 블록에 댓글을 생성합니다.
        *
-       * @param {게시물 아이디} name - 작성자
-       * @param {게시물 아이디} comment - 댓글 내용
-       * @param {게시물 아이디} commentDate - 댓글 등록일
-       * @param {게시물 아이디} block_comment - 댓글을 생성 할 블록
+       * @param {String} name - 작성자
+       * @param {String} comment - 댓글 내용
+       * @param {Date} commentDate - 댓글 등록일
+       * @param {Number} block_comment - 댓글을 생성 할 블록
        */
       const createComment = async (
         name,
@@ -327,7 +320,7 @@ const router = async () => {
                         ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
                     </div>`
-                        : name == localStorage.getItem("name")
+                        : name == sessionStorage.getItem("name")
                         ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
                     </div>`
@@ -340,6 +333,30 @@ const router = async () => {
                   <div class="col-12 commentValue">${comment}</div>
                 </div>`;
         block_comment.prepend(div);
+      };
+
+      /**
+       * 모달 초기화 함수 - 게시글 생성 모달, 게시글 수정 모달을 초기화 합니다.
+       *
+       * @param {input} titleElement - 모달의 제목 (type - text)
+       * @param {input} textElement - 모달의 글내용 (type - text)
+       * @param {input} imgInputElement - 모달의 이미지 (type - img)
+       * @param {div} imageList - 이미지 리스트 Div 태그
+       * @param {button} modalCloseBtn - 모달 닫기 버튼
+       */
+      const emptyModal = (
+        titleElement,
+        textElement,
+        imgInputElement,
+        imageList,
+        modalCloseBtn
+      ) => {
+        titleElement.value = "";
+        textElement.value = "";
+        imgInputElement.type = "radio";
+        imgInputElement.type = "file";
+        imageList.innerHTML = ""; // 이미지 리스트 초기화
+        modalCloseBtn.click(); // 모달 창 닫기
       };
 
       // 게시판 함수 정의
@@ -370,13 +387,7 @@ const router = async () => {
         .then((data) => {
           console.log(data);
           for (let value of data) {
-            createBoard(
-              value.title,
-              value.phone,
-              value.id,
-              writeDate,
-              value.url
-            );
+            createBoard(value.title, value.url, value.id, writeDate, value.url);
 
             createModal(
               value.title,
@@ -408,25 +419,159 @@ const router = async () => {
           console.log(id);
         }
 
-        const block_comment = document.querySelector(`#block_comment${id}`);
-        block_comment.innerHTML = ""; // 클릭 이전에 코멘트가 있다면 삭제
-        // createComment(id);
-        nowId = id;
+        // 게시글 수정
+        if (id.indexOf("edit") != -1) {
+          const editId = id.replace("edit", "");
+          const editModal = document.querySelector("#Edit_Modal"); // 게시글 수정용 모달창
+          const editModalTitle = editModal.querySelector("#uploadTitle");
+          const editModalContent = editModal.querySelector("#uploadText");
+          const nowImgCheck = editModal.querySelector("#nowImg");
+          const defaultImgCheck = editModal.querySelector("#defaultImg");
+          const editImgInput = editModal.querySelector("#editImg");
+          const editImgList = editModal.querySelector("#editImageListDiv"); // 파일 이름 표시창
+          const editBtn = editModal.querySelector("#editBtn");
+          const modalCloseBtn = editModal.querySelector("#btn-close");
 
-        // fetch를 이용해 값 가져오기 (임시 값)
-        const response = await fetch(
-          "https://jsonplaceholder.typicode.com/users",
-          {
-            method: "get",
-          }
-        );
+          const editBoard = document.querySelector(`.card${editId}`); // 수정할 게시글
+          const editBoardTitle = editBoard.querySelector(".card-title"); // 수정할 게시글 제목
+          const editBoardContent = editBoard.querySelector(".card-text"); // 수정할 게시글 글내용
 
-        // 값이 잘 전달 되었을 때 생성 (테스트 끝나면 201로 바꿔야 함)
-        if (response.status == 200) {
-          const data = await response.json();
-          for (let value of data) {
-            console.log(value);
-            createComment(value.name, value.email, id, block_comment);
+          // 수정할 게시글의 제목, 글내용 가져오기
+          editModalTitle.value = editBoardTitle.innerText;
+          editModalContent.value = editBoardContent.innerText;
+
+          // 현재 이미지 사용 선택시
+          nowImgCheck.addEventListener("change", (event) => {
+            if (event.target.checked) {
+              defaultImgCheck.checked = false;
+              editImgInput.disabled = true;
+              console.dir(editImgList);
+              editImgList.style.backgroundColor = "#E9ECEF";
+            } else {
+              editImgInput.disabled = false;
+              editImgList.style.backgroundColor = "#ffffff";
+            }
+          });
+
+          // 기본 이미지 사용 선택시
+          defaultImgCheck.addEventListener("change", (event) => {
+            if (event.target.checked) {
+              nowImgCheck.checked = false;
+              editImgInput.disabled = true;
+              editImgList.style.backgroundColor = "#E9ECEF";
+            } else {
+              editImgInput.disabled = false;
+              editImgList.style.backgroundColor = "#ffffff";
+            }
+          });
+
+          // 이미지 선택 시
+          editImgInput.addEventListener("change", () => {
+            nowImgCheck.checked = false;
+            defaultImgCheck.checked = false;
+          });
+
+          // 수정 버튼 눌렀을 경우
+          editBtn.addEventListener("click", () => {
+            // 제목, 내용이 모두 변경되었을 경우
+            if (
+              editModalTitle.value != editBoardTitle.innerText &&
+              editModalContent.value != editBoardContent.innerText
+            ) {
+              console.log("모두 변경");
+              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  boardNo: id,
+                  title: editModalTitle.value,
+                  content: editModalContent.value,
+                }),
+              });
+            } // 제목만 변경되었을 경우
+            else if (editModalTitle.value != editBoardTitle.innerText) {
+              console.log("제목 변경");
+              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  boardNo: editId,
+                  title: editModalTitle.value,
+                }),
+              });
+            } // 내용만 변경되었을 경우
+            else if (editModalContent.value != editBoardContent.innerText) {
+              console.log("내용 변경");
+              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  boardNo: editId,
+                  content: editModalContent.value,
+                }),
+              });
+            }
+            // 현재 이미지 사용을 체크했을 경우
+            if (nowImgCheck.checked == true) {
+              console.log("현재 이미지 사용");
+            } else if (defaultImgCheck.checked == true) {
+              console.log("기본 이미지 사용");
+              const formData = new FormData();
+              formData.append("boardNo", editId);
+            } else {
+              console.log("이미지 변경");
+              const formData = new FormData();
+              formData.append("boardNo", editId);
+              for (let file in editInputImage.files) {
+                formData.append("image", file);
+              }
+              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+                method: "PUT",
+                body: formData,
+              });
+            }
+
+            nowImgCheck.checked = false;
+            defaultImgCheck.checked = false;
+            editImgInput.disabled = false;
+            editImgList.style.backgroundColor = "#ffffff";
+
+            emptyModal(
+              editModalTitle,
+              editModalContent,
+              editImgInput,
+              editImgList,
+              modalCloseBtn
+            );
+          });
+        } // 댓글생성
+        else {
+          const block_comment = document.querySelector(`#block_comment${id}`);
+          block_comment.innerHTML = ""; // 클릭 이전에 코멘트가 있다면 삭제
+          // createComment(id);
+          nowId = id;
+
+          // fetch를 이용해 값 가져오기 (임시 값)
+          const response = await fetch(
+            "https://jsonplaceholder.typicode.com/users",
+            {
+              method: "get",
+            }
+          );
+
+          // 값이 잘 전달 되었을 때 생성 (테스트 끝나면 201로 바꿔야 함)
+          if (response.status == 200) {
+            const data = await response.json();
+            for (let value of data) {
+              console.log(value);
+              createComment(value.name, value.email, id, block_comment);
+            }
           }
         }
       });
@@ -461,30 +606,33 @@ const router = async () => {
             // 테스트
             console.log(block_comment);
             createComment(
-              localStorage.getItem("name"),
+              sessionStorage.getItem("name"),
               commentText.value,
               submitId,
               block_comment
             );
 
-            const response = await fetch("http://localhost:4000/test", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              cache: "no-cache",
-              body: JSON.stringify({
-                boardNo: submitId,
-                nickname: "규민",
-                comment: commentText.value,
-              }),
-            });
+            const response = await fetch(
+              "https://jsonplaceholder.typicode.com/posts",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                cache: "no-cache",
+                body: JSON.stringify({
+                  boardNo: submitId,
+                  nickname: "규민",
+                  comment: commentText.value,
+                }),
+              }
+            );
 
             // 성공적으로 생성하였을 경우
             if (response.status == 201) {
               commentText.value = "";
               createComment(
-                localStorage.getItem("name"),
+                sessionStorage.getItem("name"),
                 commentText.value,
                 id,
                 block_comment
@@ -503,14 +651,14 @@ const router = async () => {
             const nickname = comment.parentNode.children[0].innerText;
             const commentDate = comment.parentNode.children[1].innerText;
 
-            fetch("http://localhost:4000/test", {
+            fetch("https://jsonplaceholder.typicode.com/posts/1", {
               method: "DELETE",
               headers: {
-                Authorization: localStorage.getItem("access_token"),
+                Authorization: sessionStorage.getItem("access_token"),
               },
               body: JSON.stringify({
                 boardNo,
-                nickname,
+                // nickname,
                 commentDate,
               }),
             });
@@ -521,6 +669,7 @@ const router = async () => {
 
       // -------------------------------------------------------------- < 이미지 리스트 출력 ------------------------------------------------------------
 
+      // 게시물 생성 모달
       const inputImage = document.getElementById("uploadImg");
       const imageList = document.getElementById("imageList");
 
@@ -533,6 +682,22 @@ const router = async () => {
           const listItem = document.createElement("li");
           listItem.textContent = file.name; // 파일 이름을 리스트 아이템에 텍스트로 설정
           imageList.appendChild(listItem); // 리스트 아이템을 이미지 리스트에 추가
+        }
+      });
+
+      // 게시물 수정 모달
+      const editInputImage = document.getElementById("editImg");
+      const editImageList = document.getElementById("editImageList");
+
+      editInputImage.addEventListener("change", (event) => {
+        const files = event.target.files; // 선택된 이미지 파일들
+        editImageList.innerHTML = ""; // 이미지 리스트 초기화
+
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const listItem = document.createElement("li");
+          listItem.textContent = file.name; // 파일 이름을 리스트 아이템에 텍스트로 설정
+          editImageList.appendChild(listItem); // 리스트 아이템을 이미지 리스트에 추가
         }
       });
 
@@ -555,6 +720,14 @@ const router = async () => {
 
         createBoard(title, content, "124", "fsdafasdfasdfsad", images[0]); // 테스트용
         createModal(title, content, "124", "fsdafasdfasdfsad", images[0]); // 테스트용
+
+        emptyModal(
+          uploadText,
+          uploadTitle,
+          uploadImg,
+          imageList,
+          modalCloseBtn
+        );
 
         formData.append("title", title);
         formData.append("content", content);
@@ -583,12 +756,6 @@ const router = async () => {
           createModal(title, content, boardNo, writeDate, fileNames);
 
           // 모달 창 비우기
-          uploadText.value = "";
-          uploadTitle.value = "";
-          uploadImg.type = "radio";
-          uploadImg.type = "file";
-          imageList.innerHTML = ""; // 이미지 리스트 초기화
-          modalCloseBtn.click(); // 모달 창 닫기
         }
       };
 
@@ -615,7 +782,7 @@ const router = async () => {
             },
             cache: "no-cache",
             body: JSON.stringify({
-              nickname: localStorage.getItem("nikname"),
+              nickname: sessionStorage.getItem("nikname"),
               userPassword: myPassword,
             }),
           })
@@ -624,7 +791,7 @@ const router = async () => {
               console.log(data);
               // 회원 탈퇴 성공
               if (data.status == 204) {
-                localStorage.clear();
+                sessionStorage.clear();
                 alert("회원탈퇴 성공");
                 guestFunc();
                 mainLink.click();
@@ -647,7 +814,7 @@ const router = async () => {
         }
       });
 
-      localStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
+      sessionStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
     }
     if (location.pathname === "/signup") {
       // 태그 불러오기
@@ -771,12 +938,12 @@ const router = async () => {
             // 사용자 로그인 성공
             if (data.status == 200) {
               alert("로그인 성공");
-              localStorage.setItem("token", data.data.token);
-              localStorage.setItem("nickname", data.data.nickname);
+              sessionStorage.setItem("token", data.data.token);
+              sessionStorage.setItem("nickname", data.data.nickname);
               loginFunc();
               // 관리자 여부 확인
               if (data.data.isAdmin == true) {
-                localStorage.setItem(
+                sessionStorage.setItem(
                   "isAdmin",
                   "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
                 );
