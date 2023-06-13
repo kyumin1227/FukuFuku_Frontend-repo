@@ -4,46 +4,7 @@ export default class {
   }
 
   async getHtml() {
-    
-    const response = await fetch("https://jsonplaceholder.typicode.com/users");
-    const data = await response.json();
-    const userData = data.filter((item) => item.id === 1);
-    console.log(userData);
-
-    //   fetch("https://jsonplaceholder.typicode.com/users", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       userId: 1,
-    //       userPassword: password,
-    //     })
-    //   })
-    //     .then((response) => response.json())
-    //     .then((data) => console.log(data))
-    //   });
-    // });
-    
-    // destroyBtn.addEventListener('click',async () => {
-    //   const password = document.getElementById('inputPassword').value
-
-    //   fetch("https://jsonplaceholder.typicode.com/users", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       userId: 1,
-    //       userPassword: password,
-    //     })
-    //   })
-    //     .then((response) => response.json())
-    //     .then((data) => console.log(data))
-    // });
-
-
-
+    const username = localStorage.getItem('nickname');
     
     return `<div class="container">
       <div class="row ">
@@ -68,7 +29,7 @@ export default class {
             <div class="mb-4 pt-3 row">
               <label for="staticEmail" class="col-sm-2 col-form-label">ID</label>
               <div class="col-sm-10">
-                <input type="text" readonly class="form-control-plaintext" id="staticEmail" value='${userData[0].name}'>
+                <input type="text" readonly class="form-control-plaintext" id="staticEmail" value='${username}'>
               </div>
             </div>
             <!-- <div class="mb-4 border-top border-gray">
