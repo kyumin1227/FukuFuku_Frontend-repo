@@ -421,6 +421,7 @@ const router = async () => {
 
         // 게시글 수정
         if (id.indexOf("edit") != -1) {
+          let count = 0;
           const editId = id.replace("edit", "");
           const editModal = document.querySelector("#Edit_Modal"); // 게시글 수정용 모달창
           const editModalTitle = editModal.querySelector("#uploadTitle");
@@ -429,8 +430,8 @@ const router = async () => {
           const defaultImgCheck = editModal.querySelector("#defaultImg");
           const editImgInput = editModal.querySelector("#editImg");
           const editImgList = editModal.querySelector("#editImageListDiv"); // 파일 이름 표시창
-          const editBtn = editModal.querySelector("#editBtn");
           const modalCloseBtn = editModal.querySelector("#btn-close");
+          const editBtn = editModal.querySelector("#editBtn");
 
           const editBoard = document.querySelector(`.card${editId}`); // 수정할 게시글
           const editBoardTitle = editBoard.querySelector(".card-title"); // 수정할 게시글 제목
@@ -445,7 +446,6 @@ const router = async () => {
             if (event.target.checked) {
               defaultImgCheck.checked = false;
               editImgInput.disabled = true;
-              console.dir(editImgList);
               editImgList.style.backgroundColor = "#E9ECEF";
             } else {
               editImgInput.disabled = false;
@@ -473,6 +473,9 @@ const router = async () => {
 
           // 수정 버튼 눌렀을 경우
           editBtn.addEventListener("click", () => {
+            if (count != 0) {
+              return;
+            }
             // 제목, 내용이 모두 변경되었을 경우
             if (
               editModalTitle.value != editBoardTitle.innerText &&
@@ -537,6 +540,7 @@ const router = async () => {
               });
             }
 
+            // 수정 모달 초기화
             nowImgCheck.checked = false;
             defaultImgCheck.checked = false;
             editImgInput.disabled = false;
@@ -549,6 +553,7 @@ const router = async () => {
               editImgList,
               modalCloseBtn
             );
+            count++;
           });
         } // 댓글생성
         else {
@@ -737,6 +742,7 @@ const router = async () => {
         }
 
         const response = await fetch(
+          // "https://juhyeon-cors-anywhere.herokuapp.com/https://jsonplaceholder.typicode.com/posts",
           "https://jsonplaceholder.typicode.com/posts",
           {
             method: "POST",
@@ -833,7 +839,6 @@ const router = async () => {
             headers: {
               "Content-Type": "application/json",
             },
-            cache: "no-cache",
             cache: "no-cache",
             body: JSON.stringify({
               userId: userId,
