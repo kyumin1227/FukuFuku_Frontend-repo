@@ -19,7 +19,6 @@ export default class {
         </div>
 
         <button class="w-100 btn btn-lg btn-primary" id="LoginBtn">Sign Up</button>
-        <a herf="/" style="display: none;" data-link id="mainLink"></a>
 
       </div>
   
