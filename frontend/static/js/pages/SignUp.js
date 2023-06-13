@@ -9,9 +9,16 @@ export default class {
 
     <div class="w-50 m-auto">
 
-      <div class="form-floating mb-4">
-        <input type="text" class="form-control" id="InputId" placeholder="ID" maxlength="10" required>
-        <label for="floatingInput">ID</label>
+      <div class="row">
+        <div class="col-10">
+          <div class="form-floating mb-4">
+            <input type="text" class="form-control" id="InputId" placeholder="ID">
+            <label for="floatingInput">ID</label>
+          </div>
+        </div>
+        <div class="col">
+          <button class="btn btn-outline-primary" id="idConfirm" style="height: 55px;">중복확인</button>
+        </div>
       </div>
       <div class="form-floating mb-4">
         <input type="text" class="form-control" id="InputNikname" placeholder="nikname" maxlength="10" required>
