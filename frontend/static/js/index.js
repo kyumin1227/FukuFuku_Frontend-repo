@@ -966,12 +966,6 @@ const router = async () => {
               userId: userId,
             },
             cache: "no-cache",
-<<<<<<< HEAD
-=======
-            body: JSON.stringify({
-              userId: userId,
-            }),
->>>>>>> 17df9d6403cbd62a0f997805b3fe759fbbb6c395
           })
             .then((response) => response.json())
             .then((data) => {
@@ -1116,3 +1110,4 @@ window.addEventListener("popstate", () => {
   console.log("주소가 변경되었습니다. popstate");
   router();
 });
+
