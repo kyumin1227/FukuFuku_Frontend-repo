@@ -656,16 +656,12 @@ const router = async () => {
         userId = document.getElementById("InputId").value;
         console.log(userId);
         if (userId != "") {
-          fetch("http://localhost:4000/signin/idCheck", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
+          fetch("http://43.200.196.118:3000/account/idCheck/?userId=dori", {
+            method: "GET",
+            query: {
+              userId: userId,
             },
             cache: "no-cache",
-            cache: "no-cache",
-            body: JSON.stringify({
-              userId: userId,
-            }),
           })
             .then((response) => response.json())
             .then((data) => {
@@ -698,7 +694,7 @@ const router = async () => {
           if (Check) {
             if (userPassword == userConfirmPassword) {
               // 값 POST
-              fetch("http://localhost:4000/data", {
+              fetch("http://43.200.196.118:3000/account/signUp", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -787,6 +783,9 @@ const router = async () => {
 
           .catch((error) => console.log(error));
       });
+    }
+    if (location.pathname === "/MyWriteList"){
+
     }
   }
 };

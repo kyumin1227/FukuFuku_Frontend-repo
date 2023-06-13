@@ -18,7 +18,7 @@ export default class {
         </div>
     </div>
 
-    <div id="opacity-bg" class="flex h-75 bg-dark bg-opacity-75 top-0"
+    <div id="opacity-bg" class="flex h-50 bg-dark bg-opacity-75 top-0"
         style="margin-top: 10vh; position: absolute; bottom: 100px; left: 10%; width: 80%; display: flex;">
         <div class="w-100 justify-content-center flex">
             <div class="row mt-5 pb-5">
@@ -36,7 +36,7 @@ export default class {
         </div>
     </div>
 
-    <div class="container">
+    <div class="container m-auto ">
         <div class="wrap-token">
             <div class="flip-outer">
                 <div class="flip-inner">

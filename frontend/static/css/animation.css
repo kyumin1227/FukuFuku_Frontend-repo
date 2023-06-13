@@ -37,8 +37,9 @@
 .wrap-token {
   display: inline-block;
   width: 200px;
-  height: 100px;
-  position: relative;
-  top: 800px;
-  left: 100px;
+  height: 200px;
+  /* position: relative;
+  top: 100px;
+  left: 100px; */
+  /* margin: auto; */
 }
