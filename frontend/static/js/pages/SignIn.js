@@ -17,8 +17,10 @@ export default class {
           <input type="password" class="form-control" id="InputPassword" placeholder="Password">
           <label for="floatingPassword">Password</label>
         </div>
-    
-        <button class="w-100 btn btn-lg btn-primary" id="LoginBtn" type="submit">Sign Up</button>
+
+        <button class="w-100 btn btn-lg btn-primary" id="LoginBtn">Sign Up</button>
+        <a herf="/" style="display: none;" data-link id="mainLink"></a>
+
       </div>
   
     </main>

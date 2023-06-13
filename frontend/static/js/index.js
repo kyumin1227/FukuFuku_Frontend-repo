@@ -566,6 +566,8 @@ const router = async () => {
               if (data.status == 204){
                 localStorage.clear();
                 alert("회원탈퇴 성공");
+                guestFunc();
+                mainLink.click();
               } 
               // 올바르지 않은 데이터
               else if (data.status == 422){
@@ -692,11 +694,6 @@ const router = async () => {
         const inputId = InputId.value;;
         const inputPassword = InputPassword.value;
 
-        const loginFunc = () => {
-          status_login.style.display = "none";
-          status_guest.style.display = "block";
-        }
-
         // 값 POST 전달
         fetch("http://localhost:4000/login", {
           method: "POST",
@@ -721,7 +718,7 @@ const router = async () => {
             if(data.data.isAdmin != undefined){
               localStorage.setItem('isAdmin', data.data.isAdmin);
             }
-            location.reload();
+            mainLink.click();
           }
           // 로그인 실패 
           if(data.status == 400) {
