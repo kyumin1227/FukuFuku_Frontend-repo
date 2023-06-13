@@ -57,7 +57,8 @@ export default class {
             <div class="modal-header">
                 <h1 class="modal-title fs-5 border-bottom" id="exampleModalLabel"><input type="text"
                         class="form-control" style="border:0" id="uploadTitle" placeholder="title"></h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button id="btn-close" type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -78,7 +79,7 @@ export default class {
                 <!-- 등록 파일 출력 -->
                 <div class="border border-gray w-50 overflow-scroll" style="height: 100px;">
                     <ul id="imageList">
-                        
+
                     </ul>
                 </div>
                 <!-- 작성 내용 -->
@@ -96,6 +97,66 @@ export default class {
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button id="uploadBtn" type="button" class="btn btn-primary">upload</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal _ 게시글 수정 -->
+<div class="modal fade" id="Edit_Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 border-bottom" id="exampleModalLabel"><input type="text"
+                        class="form-control" style="border:0" id="uploadTitle" placeholder="title"></h1>
+                <button id="btn-close" type="button" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12 position-relative">
+                        <!-- 이미지 창 -->
+
+                        <div class="d-flex align-items-center">
+                            <form action="" method="post" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <span class="form-label ms-2">이미지 선택</span><br>
+                                    <div class="form-check ms-1 ps-0 pt-3">
+                                        <input type="checkbox" class="mb-3" id="nowImg" />
+                                        <label for="nowImg">현재 이미지 사용</label>
+                                    </div>
+                                    <div class="form-check ms-1 ps-0">
+                                        <input type="checkbox" class="mb-3" id="defaultImg" />
+                                        <label for="defaultImg">기본 이미지 사용</label>
+                                    </div>
+                                    <input class="form-control" name="filename[]" type="file" id="editImg"
+                                        multiple="multiple" accept="image/*">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- 등록 파일 출력 -->
+                <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll" style="height: 100px; background-color: #ffffff;">
+                    <ul id="editImageList">
+
+                    </ul>
+                </div>
+                <!-- 작성 내용 -->
+                <div>
+                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${localStorage.getItem(
+                      "name"
+                    )}</div>
+                </div>
+                <div class="form-floating">
+                    <textarea class="form-control mt-3" placeholder="Leave a comment here" id="uploadText"
+                        style="height: 100px" resize="none"></textarea>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="editBtn" type="button" class="btn btn-primary">Edit</button>
             </div>
         </div>
     </div>
