@@ -42,6 +42,7 @@ export default class {
 <!----------------------- 조원소개 ----------------------->
 <div class="d-flex justify-content-center ">
     <div class="bg-warning float-end " style="width:80px"></div>
+
     <div class="container-fluid row mx-5 px-5" id="member_post">
         <div class="flip-outer">
             <div class="flip-inner">
@@ -124,8 +125,16 @@ export default class {
         </div>
       </div>
     </div>
-  </div>
+</div>
 
+<div id="block_modal">
+    
+</div>
+
+<!-- Modal _ 게시글 수정 -->
+<div id="memberEdit_block">
+
+</div>
 `;
   }
 }
