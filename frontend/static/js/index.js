@@ -41,8 +41,9 @@ const router = async () => {
 
     // ------------------------------------------------------------------ 조원 소개 기능 ------------------------------------------------------------------
 
-    if (location.pathname === "/"){
+    const PATH = "http://43.200.196.118:3000";
 
+    if (location.pathname === "/") {
       const memberCBtn = document.querySelector("#uploadBtn");
       const newBtn = document.querySelector("#memberCBtn");
 
@@ -73,20 +74,20 @@ const router = async () => {
           const memberName = response.memberName;
           const introduceContent = response.introduceContent;
           const fileName = response.fileName;
-  
+
           // 작성 페이지의 제목과 글 비우기
           uploadMemberName.value = "";
           uploadMemberContent.value = "";
           uploadImg.files = null;
           createBoard(boardNo, memberName, boardNo, introduceContent, fileName);
-        }else if(response.status == 422){
+        } else if (response.status == 422) {
           alert("올바르지 않은 데이터 양식입니다");
-        }else{
+        } else {
           alert("Server Error");
         }
-      }
+      };
       memberCBtn.addEventListener("click", memberUpload);
-      
+
       let isAdmin = false; // 임시값 입니다.
 
       if (
@@ -96,8 +97,8 @@ const router = async () => {
       ) {
         isAdmin = true;
       }
-      
-      if(!isAdmin){
+
+      if (!isAdmin) {
         newBtn.style.display = "none";
       }
 
@@ -202,23 +203,13 @@ const router = async () => {
           let count = 0; // 예제 블럭 제한 걸기
           console.log(data);
           for (let value of data) {
-            createBoard(
-              value.id,
-              value.phone,
-              value.title,
-              value.url
-            );
-            createModal(
-              value.id,
-              value.phone,
-              value.title,
-              value.url
-            );
-            // 예제 블럭 6개만 뽑아쓰기
-            count++;
-            if (count === 6) {
-              break;
-            }
+            createBoard(value.title, value.phone, value.id, value.url);
+
+            // // 예제 블럭 6개만 뽑아쓰기
+            // count++;
+            // if (count === 6) {
+            //   break;
+            // }
           }
         })
         .catch((error) => console.log("fetch 에러!", error));
@@ -229,11 +220,9 @@ const router = async () => {
       // ------------------------------------------------------------------ 조원 소개 생성 > ----------------------------------------------------------------
     }
 
-
     // ------------------------------------------------------------------ 회원정보 수정 ------------------------------------------------------------------
 
     if (location.pathname === "/myUserData") {
-      sessionStorage.setItem("userId", "userIdSomething"); // 로컬스토리지 테스트
       // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
       let nicknameChkVal = false;
       const nameInput = document.querySelector("#inputName");
@@ -312,7 +301,7 @@ const router = async () => {
     if (location.pathname === "/bulletin") {
       let isAdmin = false; // 임시값 입니다.
       let isUser = true;
-      const userName = ""; // 임시값 입니다.
+      const userName = sessionStorage.getItem("nickname"); // 임시값 입니다.
       if (
         // 관리자 여부 체크 (임시값)
         sessionStorage.getItem("isAdmin") ==
@@ -777,90 +766,87 @@ const router = async () => {
 
       const block_modal = document.querySelector("#block_modal");
 
-      block_modal.addEventListener(
-        "click",
-        async (event) => {
-          console.log(event.target.id);
-          if (event.target.id.indexOf("modal_submitBtn") != -1) {
-            const commentBtnId = event.target.id;
-            // 댓글 작성 버튼을 눌렀을 경우 동작
-            const submitId = commentBtnId.replace("modal_submitBtn", "");
-            console.log("submitId = " + submitId); // 보드 넘버 ex) 0
-            const commentText = document.querySelector(
-              `#modal_commentText${submitId}`
-            );
-            if (commentText.value.trim() === "") {
-              // 댓글을 공백으로 작성 후 작성 버튼을 눌렀을 경우 동작
-              return;
+      block_modal.addEventListener("click", async (event) => {
+        console.log(event.target.id);
+        if (event.target.id.indexOf("modal_submitBtn") != -1) {
+          const commentBtnId = event.target.id;
+          // 댓글 작성 버튼을 눌렀을 경우 동작
+          const submitId = commentBtnId.replace("modal_submitBtn", "");
+          console.log("submitId = " + submitId); // 보드 넘버 ex) 0
+          const commentText = document.querySelector(
+            `#modal_commentText${submitId}`
+          );
+          if (commentText.value.trim() === "") {
+            // 댓글을 공백으로 작성 후 작성 버튼을 눌렀을 경우 동작
+            return;
+          }
+
+          const block_comment = document.querySelector(
+            `#block_comment${submitId}`
+          );
+
+          // 테스트
+          console.log(block_comment);
+          createComment(
+            sessionStorage.getItem("name"),
+            commentText.value,
+            submitId,
+            block_comment
+          );
+
+          const response = await fetch(
+            "https://jsonplaceholder.typicode.com/posts",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              cache: "no-cache",
+              body: JSON.stringify({
+                boardNo: submitId,
+                nickname: "규민",
+                comment: commentText.value,
+              }),
             }
+          );
 
-            const block_comment = document.querySelector(
-              `#block_comment${submitId}`
-            );
-
-            // 테스트
-            console.log(block_comment);
+          // 성공적으로 생성하였을 경우
+          if (response.status == 201) {
+            commentText.value = "";
             createComment(
               sessionStorage.getItem("name"),
               commentText.value,
-              submitId,
+              id,
               block_comment
             );
-
-            const response = await fetch(
-              "https://jsonplaceholder.typicode.com/posts",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                cache: "no-cache",
-                body: JSON.stringify({
-                  boardNo: submitId,
-                  nickname: "규민",
-                  comment: commentText.value,
-                }),
-              }
-            );
-
-            // 성공적으로 생성하였을 경우
-            if (response.status == 201) {
-              commentText.value = "";
-              createComment(
-                sessionStorage.getItem("name"),
-                commentText.value,
-                id,
-                block_comment
-              );
-            }
-          }
-          if (event.target.classList.contains("commentDel")) {
-            // 댓글 삭제 버튼을 눌렀을 경우 동작
-            console.log("삭제버튼");
-            console.log(nowId);
-            console.dir(event.target);
-            const boardNo = nowId;
-            let comment = event.target;
-            console.log(comment.parentNode.children[0].innerText);
-            console.log(comment.parentNode.children[1].innerText);
-            const nickname = comment.parentNode.children[0].innerText;
-            const commentDate = comment.parentNode.children[1].innerText;
-
-            fetch("https://jsonplaceholder.typicode.com/posts/1", {
-              method: "DELETE",
-              headers: {
-                Authorization: sessionStorage.getItem("access_token"),
-              },
-              body: JSON.stringify({
-                boardNo,
-                // nickname,
-                commentDate,
-              }),
-            });
           }
         }
-        // -------------------------------------------------------------- 댓글 작성 (POST), 댓글 삭제 > ------------------------------------------------------------
-      );
+        if (event.target.classList.contains("commentDel")) {
+          // 댓글 삭제 버튼을 눌렀을 경우 동작
+          console.log("삭제버튼");
+          console.log(nowId);
+          console.dir(event.target);
+          const boardNo = nowId;
+          let comment = event.target;
+          console.log(comment.parentNode.children[0].innerText);
+          console.log(comment.parentNode.children[1].innerText);
+          const nickname = comment.parentNode.children[0].innerText;
+          const commentDate = comment.parentNode.children[1].innerText;
+
+          fetch("https://jsonplaceholder.typicode.com/posts/1", {
+            method: "DELETE",
+            headers: {
+              Authorization: sessionStorage.getItem("access_token"),
+            },
+            body: JSON.stringify({
+              boardNo,
+              // nickname,
+              commentDate,
+            }),
+          });
+        }
+      });
+      // -------------------------------------------------------------- 댓글 작성 (POST), 댓글 삭제 > ------------------------------------------------------------
 
       // -------------------------------------------------------------- < 이미지 리스트 출력 ------------------------------------------------------------
 
@@ -968,71 +954,110 @@ const router = async () => {
       // 버튼 이벤트 추가
       destroyBtn.addEventListener("click", async () => {
         let myPassword = inputPassword.value;
+        let usertoken = sessionStorage.getItem("token");
+        let usernickname = sessionStorage.getItem("nickname");
 
         // 입력값이 존재할 떄
         if (myPassword != "") {
-          fetch("http://localhost:4000/user", {
-            method: "POST",
+          const response = await fetch(`${PATH}/account/withdrawal`, {
+            method: "DELETE",
             headers: {
               "Content-Type": "application/json",
+              token: usertoken,
+              nickname: usernickname,
             },
             cache: "no-cache",
             body: JSON.stringify({
-              nickname: sessionStorage.getItem("nikname"),
+              nickname: usernickname,
               userPassword: myPassword,
             }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data);
-              // 회원 탈퇴 성공
-              if (data.status == 204) {
-                sessionStorage.clear();
-                alert("회원탈퇴 성공");
-                guestFunc();
-                mainLink.click();
-              }
-              // 올바르지 않은 데이터
-              else if (data.status == 422) {
-                console.log(data.message);
-                alert("유효하지 않은 값입니다.");
-              }
-              // 서버 문제
-              else if (data.status == 500) {
-                console.log(data.message);
-                alert("서버에 문제가 생겼습니다.");
-              }
-            });
+          });
+
+          console.log("hi");
+          console.log(response);
+
+          if (response.status == 204) {
+            sessionStorage.clear();
+            alert("회원탈퇴 성공");
+            guestFunc();
+            mainLink.click();
+          }
+          // 올바르지 않은 데이터
+          // else if (response.status == 422) {
+          //   console.log(res.message);
+          //   alert("유효하지 않은 값입니다.");
+          // }
+          // // 서버 문제
+          // else if (response.status == 500) {
+          //   console.log(data.message);
+          //   alert("서버에 문제가 생겼습니다.");
+          // }
         }
         // 입력값이 존재하지 않을 경우
         else {
           alert("비밀번호를 입력해주세요.");
         }
       });
-
-      sessionStorage.setItem("isAdmin", "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"); // 회원탈퇴 페이지 방문 시 관리자로 설정하는 테스트 코드입니다.
     }
     if (location.pathname === "/signup") {
       // 태그 불러오기
       const idCheck = document.querySelector("#idConfirm");
       const addUser = document.querySelector("#addUser");
+      const LoginLink = document.querySelector("#LoginLink");
       let userId = document.getElementById("InputId").value;
       let Check = false;
 
+      document.addEventListener("keydown", (e) => {
+        if (e.key == "Enter") {
+          addUser.click();
+        }
+      });
+      
+      const username = document.getElementById("InputNickname");
+      const namealert = document.getElementById("alert");
+      
+      username.addEventListener("blur", () =>{
+        const name = document.getElementById("InputNickname").value; 
+
+        console.log(name);
+        
+        fetch(`${PATH}/account/idCheck/?nickname=${name}`, {
+          method: "GET",
+          // query: {
+          //   userId: userId,
+          // },
+          cache: "no-cache",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // 사용가능
+            console.log(data);
+            if (data.status == 200) {
+              console.log(data.message);
+              namealert.innerHTML = "";
+              namealert.innerHTML = "<a>사용가능한 닉네임 입니다.</a>"
+              Check = true;
+            }
+            // 중복
+            if (data.status == 409) {
+              console.log(data.messgae);
+              namealert.innerHTML = "";
+              namealert.innerHTML = "<a>닉네임이 이미 존재합니다.</a>"
+            }
+          });
+      })
+ㄴ
       // 이벤트 추가
       idCheck.addEventListener("click", async () => {
         userId = document.getElementById("InputId").value;
         console.log(userId);
         if (userId != "") {
-          fetch("http://localhost:4000/signin/idCheck", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+          fetch(`${PATH}/account/idCheck/?userId=${userId}`, {
+            method: "GET",
+            // query: {
+            //   userId: userId,
+            // },
             cache: "no-cache",
-            body: JSON.stringify({
-              userId: userId,
-            }),
           })
             .then((response) => response.json())
             .then((data) => {
@@ -1053,11 +1078,9 @@ const router = async () => {
       });
       // 버튼에 이벤트 추가
       addUser.addEventListener("click", async () => {
-        const username = document.getElementById("InputNikname").value;
         const userPassword = document.getElementById("InputPassword").value;
-        const userConfirmPassword = document.getElementById(
-          "InputConfirmPassword"
-        ).value;
+        const userConfirmPassword = document.getElementById("InputConfirmPassword").value;
+
 
         // 입력값이 없을 시 경고
         if (username != "" && userPassword != "" && userConfirmPassword) {
@@ -1065,7 +1088,7 @@ const router = async () => {
           if (Check) {
             if (userPassword == userConfirmPassword) {
               // 값 POST
-              fetch("http://localhost:4000/data", {
+              fetch(`${PATH}/account/signUp`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -1083,6 +1106,7 @@ const router = async () => {
                   if (data.status == 201) {
                     console.log(data.message);
                     alert("회원 가입 성공");
+                    LoginLink.click();
                   }
                   // 서버 오류
                   if (data.status == 500) {
@@ -1111,13 +1135,21 @@ const router = async () => {
     if (location.pathname === "/signin") {
       const login = document.getElementById("LoginBtn");
 
+      document.addEventListener("keydown", (e) => {
+        if (e.key == "Enter") {
+          login.click();
+        }
+      });
+
+      
+
       // 버튼에 이벤트 달기
       login.addEventListener("click", () => {
         const inputId = InputId.value;
         const inputPassword = InputPassword.value;
 
         // 값 POST 전달
-        fetch("http://localhost:4000/login", {
+        fetch(`${PATH}/account`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1153,6 +1185,372 @@ const router = async () => {
           })
 
           .catch((error) => console.log(error));
+      });
+    }
+    if (location.pathname === "/myWriteList") {
+      // 값 불러오기
+      const username = sessionStorage.getItem("nickname");
+      const token = sessionStorage.getItem("token");
+      const modal = document.querySelector("#block_modal");
+      const post = document.querySelector("#block_post");
+      post.innerHTML = "";
+
+      // 임의값
+      let isAdmin = false;
+      const writer = sessionStorage.getItem("nickname");
+      const fileName = "미야케 우동1";
+      const imgUrl = `./static/image/${fileName}.jpg`;
+      const hit = 48; // 조회수
+      const block_modal = document.querySelector("#block_modal");
+
+      console.log(username);
+
+      block_modal.addEventListener("click", async (event) => {
+        console.log(event.target.id);
+        if (event.target.id.indexOf("modal_submitBtn") != -1) {
+          const commentBtnId = event.target.id;
+          // 댓글 작성 버튼을 눌렀을 경우 동작
+          const submitId = commentBtnId.replace("modal_submitBtn", "");
+          console.log("submitId = " + submitId); // 보드 넘버 ex) 0
+          const commentText = document.querySelector(
+            `#modal_commentText${submitId}`
+          );
+          if (commentText.value.trim() === "") {
+            // 댓글을 공백으로 작성 후 작성 버튼을 눌렀을 경우 동작
+            return;
+          }
+
+          const block_comment = document.querySelector(
+            `#block_comment${submitId}`
+          );
+
+          // 테스트
+          console.log(block_comment);
+          createComment(
+            sessionStorage.getItem("name"),
+            commentText.value,
+            submitId,
+            block_comment
+          );
+
+          const response = await fetch(
+            "https://jsonplaceholder.typicode.com/posts",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              cache: "no-cache",
+              body: JSON.stringify({
+                boardNo: submitId,
+                nickname: "규민",
+                comment: commentText.value,
+              }),
+            }
+          );
+
+          // 성공적으로 생성하였을 경우
+          if (response.status == 201) {
+            commentText.value = "";
+            createComment(
+              sessionStorage.getItem("name"),
+              commentText.value,
+              id,
+              block_comment
+            );
+          }
+        }
+        if (event.target.classList.contains("commentDel")) {
+          // 댓글 삭제 버튼을 눌렀을 경우 동작
+          console.log("삭제버튼");
+          console.log(nowId);
+          console.dir(event.target);
+          const boardNo = nowId;
+          let comment = event.target;
+          console.log(comment.parentNode.children[0].innerText);
+          console.log(comment.parentNode.children[1].innerText);
+          const nickname = comment.parentNode.children[0].innerText;
+          const commentDate = comment.parentNode.children[1].innerText;
+
+          fetch("https://jsonplaceholder.typicode.com/posts/1", {
+            method: "DELETE",
+            headers: {
+              Authorization: sessionStorage.getItem("access_token"),
+            },
+            body: JSON.stringify({
+              boardNo,
+              // nickname,
+              commentDate,
+            }),
+          });
+        }
+      });
+
+      const createBoard = (title, content, boardNo, writeDate, fileNames) => {
+        const nickname = sessionStorage.getItem("name");
+        const div = document.createElement("div");
+        div.classList = "col-md-4 board";
+        div.id = boardNo;
+        div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
+          data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
+          <div class="card card${boardNo}" style="height: 460px">
+          <div style="height: 300px; max-height: 300px;" class="text-center">
+          <img src="${
+            fileNames || fileNames[0]
+          }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
+          </div>
+          <div class="card-body">
+          <h5 class="card-title text-truncate">${title}</h5>
+          <p class="card-text text-truncate mt-4">${content}</p>
+          <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
+          ${
+            isAdmin
+              ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
+            </div>`
+              : title ==
+                "officia delectus consequatur vero aut veniam explicabo molestias" // 로그인 한 사람 이름 (임시값)
+              ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
+            </div>`
+              : `<div class="col-3 px-0">
+            </div>`
+          }
+          
+          <span class="col-9 text-end px-0 align-text-top">${nickname}</span>
+          </div>
+          </div>
+          </div>
+          </a>`;
+        post.prepend(div);
+      };
+
+      const createModal = (title, content, boardNo, writeDate, fileNames) => {
+        const div = document.createElement("div");
+        div.className = "modal";
+        div.id = `modal${boardNo}`;
+        div.innerHTML = `<div class="modal-dialog modal-xl">
+          <div class="modal-content">
+          <div class="modal-header">
+          <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+          <div class="container-fluid">
+          <div class="row">
+          <div class="col-8 p-0">
+          <!-- 이미지 창 -->
+          
+          <div class="d-flex align-items-center">
+          
+          <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
+          <div class="carousel-indicators">
+          <button type="button" data-bs-target="#carouselExampleIndicators"
+          data-bs-slide-to="0" class="active" aria-current="true"
+          aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators"
+          data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#carouselExampleIndicators"
+          data-bs-slide-to="2" aria-label="Slide 3"></button>
+          </div>
+          <div class="carousel-inner">
+          <div class="carousel-item active">
+          <img src="${imgUrl}" class="d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+          <img src="./static/image/미야케 우동2.jpg" class="d-block w-100" alt="...">
+          </div>
+          <div class="carousel-item">
+          <img src="./static/image/미야케 우동3.jpg" class="d-block w-100" alt="...">
+          </div>
+          </div>
+          <button class="carousel-control-prev" type="button"
+          data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button"
+          data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+          </button>
+          </div>
+          </div>
+          </div>
+          <div class="col-4 d-flex justify-content-center" style="overflow-y: auto; height: 65vh;">
+          <!-- 댓글 창 -->
+          
+          <div id="block_comment${boardNo}" class="col-11"> <!-- 모달의 코멘트 블록 아이디 지정 -->
+          
+          </div>
+          </div>
+          </div>
+          
+          <!-- 본문, 댓글작성 창 -->
+          <div class="row">
+          
+          <!-- 본문 창 -->
+          
+          <div class="col-8 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
+          style="height: 15vh;">
+          <span>${content}</span>
+          <div class="row d-flex justify-content-end">
+          <div class="col-6">작성 일자: <span>${writeDate}</span></div>
+          <div class="col-3">작성자: <span>${writer}</span></div>
+          <div class="col-3">조회수: <span>${hit}</span></div>
+          </div>
+          </div>
+          
+          <!-- 댓글작성 창 -->
+          
+          <div class="col-4">
+          <div class="row mt-3 h-75">
+          <div class="col-12 d-flex justify-content-end">
+          <textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
+          <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+          </div>
+          </div>`;
+
+        modal.prepend(div);
+      };
+
+      // 댓글
+
+      const createComment = async (
+        name,
+        comment,
+        commentDate,
+        block_comment
+      ) => {
+        // 받아온 값을 이용하여 해당 게시물에 코멘트 추가 (임시값)
+        const div = document.createElement("div");
+        div.classList = "row border mt-3 p-1";
+        div.innerHTML = `<div class="col-12">
+            <div class="row">
+            <div class="col-5 commentWriter">${name}</div>
+            <div class="col-6 commentDate">${commentDate}</div>
+            ${
+              isAdmin
+                ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+              ❌
+              </div>`
+                : name == sessionStorage.getItem("name")
+                ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+              ❌
+              </div>`
+                : ""
+            }
+            
+            </div>
+            </div>
+            <div class="row mt-1">
+            <div class="col-12 commentValue">${comment}</div>
+            </div>`;
+        block_comment.prepend(div);
+      };
+
+      const response = fetch(`${PATH}/board/myPosts`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          token: token,
+          nickname: username,
+        },
+      });
+
+      createBoard("1", "content", "boardNo", "writeDate", "example.jpg");
+      createModal("1", "content", "boardNo", "writeDate", "example.jpg");
+
+      console.log(response);
+
+
+      block_modal.addEventListener("click", async (event) => {
+        console.log(event.target.id);
+        if (event.target.id.indexOf("modal_submitBtn") != -1) {
+          const commentBtnId = event.target.id;
+          // 댓글 작성 버튼을 눌렀을 경우 동작
+          const submitId = commentBtnId.replace("modal_submitBtn", "");
+          console.log("submitId = " + submitId); // 보드 넘버 ex) 0
+          const commentText = document.querySelector(
+            `#modal_commentText${submitId}`
+          );
+          if (commentText.value.trim() === "") {
+            // 댓글을 공백으로 작성 후 작성 버튼을 눌렀을 경우 동작
+            return;
+          }
+
+          const block_comment = document.querySelector(
+            `#block_comment${submitId}`
+          );
+
+          // 테스트
+          console.log(block_comment);
+          createComment(
+            sessionStorage.getItem("name"),
+            commentText.value,
+            submitId,
+            block_comment
+          );
+
+          const response = await fetch(
+            "https://jsonplaceholder.typicode.com/posts",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              cache: "no-cache",
+              body: JSON.stringify({
+                boardNo: submitId,
+                nickname: "규민",
+                comment: commentText.value,
+              }),
+            }
+          );
+
+          // 성공적으로 생성하였을 경우
+          if (response.status == 201) {
+            commentText.value = "";
+            createComment(
+              sessionStorage.getItem("name"),
+              commentText.value,
+              id,
+              block_comment
+            );
+          }
+        }
+        if (event.target.classList.contains("commentDel")) {
+          // 댓글 삭제 버튼을 눌렀을 경우 동작
+          console.log("삭제버튼");
+          console.log(nowId);
+          console.dir(event.target);
+          const boardNo = nowId;
+          let comment = event.target;
+          console.log(comment.parentNode.children[0].innerText);
+          console.log(comment.parentNode.children[1].innerText);
+          const nickname = comment.parentNode.children[0].innerText;
+          const commentDate = comment.parentNode.children[1].innerText;
+
+          fetch("https://jsonplaceholder.typicode.com/posts/1", {
+            method: "DELETE",
+            headers: {
+              Authorization: sessionStorage.getItem("access_token"),
+            },
+            body: JSON.stringify({
+              boardNo,
+              // nickname,
+              commentDate,
+            }),
+          });
+        }
       });
     }
   }
