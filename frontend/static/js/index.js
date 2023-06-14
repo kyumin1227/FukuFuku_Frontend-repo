@@ -39,12 +39,13 @@ const router = async () => {
     console.log("페이지 변경");
     document.querySelector("#root").innerHTML = await page.getHtml();
 
+    const PATH = "http://43.200.196.118:3000";
+    const block_alert = document.querySelector("#block_alert");
+    const isUser = sessionStorage.getItem("token") ? true : false;
+
     // ------------------------------------------------------------------ 조원 소개 기능 ------------------------------------------------------------------
 
-    const PATH = "http://43.200.196.118:3000";
-
-    if (location.pathname === "/"){
-
+    if (location.pathname === "/") {
       const memberCBtn = document.querySelector("#uploadBtn");
       const newBtn = document.querySelector("#memberCBtn");
       const memberUpload = async () => {
@@ -74,20 +75,20 @@ const router = async () => {
           const memberName = response.memberName;
           const introduceContent = response.introduceContent;
           const fileName = response.fileName;
-  
+
           // 작성 페이지의 제목과 글 비우기
           uploadMemberName.value = "";
           uploadMemberContent.value = "";
           uploadImg.files = null;
           createBoard(boardNo, memberName, boardNo, introduceContent, fileName);
-        }else if(response.status == 422){
+        } else if (response.status == 422) {
           alert("올바르지 않은 데이터 양식입니다");
-        }else{
+        } else {
           alert("Server Error");
         }
-      }
+      };
       memberCBtn.addEventListener("click", memberUpload);
-      
+
       let isAdmin = false; // 임시값 입니다.
 
       if (
@@ -97,8 +98,8 @@ const router = async () => {
       ) {
         isAdmin = true;
       }
-      
-      if(!isAdmin){
+
+      if (!isAdmin) {
         newBtn.style.display = "none";
       }
 
@@ -147,12 +148,7 @@ const router = async () => {
           let count = 0; // 예제 블럭 제한 걸기
           console.log(data);
           for (let value of data) {
-            createBoard(
-              value.title,
-              value.phone,
-              value.id,
-              value.url
-            );
+            createBoard(value.title, value.phone, value.id, value.url);
 
             // // 예제 블럭 6개만 뽑아쓰기
             // count++;
@@ -165,7 +161,6 @@ const router = async () => {
 
       // ------------------------------------------------------------------ 조원 소개 생성 > ----------------------------------------------------------------
     }
-
 
     // ------------------------------------------------------------------ 회원정보 수정 ------------------------------------------------------------------
 
@@ -248,7 +243,7 @@ const router = async () => {
     if (location.pathname === "/bulletin") {
       let isAdmin = false; // 임시값 입니다.
       let isUser = true;
-      const userName = sessionStorage.getItem('nickname'); // 임시값 입니다.
+      const userName = sessionStorage.getItem("nickname");
       if (
         // 관리자 여부 체크 (임시값)
         sessionStorage.getItem("isAdmin") ==
@@ -267,16 +262,41 @@ const router = async () => {
       // 게시판 함수 정의
 
       /**
+       * DB에서 받은 날짜(2023-06-14T10:57:17.000Z)를 변환하는 함수입니다.
+       *
+       * @param {Date} dateString - DB에서 받은 날짜
+       * @returns 변환된 날짜 (YYYY-MM-DD hh:mm)
+       */
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+      }
+
+      /**
        * 새로운 더미 게시글을 만든 후 가장 상단에 추가하는 함수입니다..
        *
        * @param {String} title - 제목
        * @param {String} content - 글 내용
        * @param {Number} boardNo - 게시물 아이디
+       * @param {String} writer - 글 작성자
        * @param {Date} writeDate - 글 작성 일자 (DB로 부터 받아옵니다.)
        * @param {Url []} fileNames - 이미지 url 배열
        */
-      const createBoard = (title, content, boardNo, writeDate, fileNames) => {
-        const nickname = sessionStorage.getItem("name");
+      const createBoard = (
+        title,
+        content,
+        boardNo,
+        writer,
+        writeDate,
+        fileNames
+      ) => {
         const div = document.createElement("div");
         div.classList = "col-md-4 board";
         div.id = boardNo;
@@ -285,7 +305,7 @@ const router = async () => {
                         <div class="card card${boardNo}" style="height: 460px">
                             <div style="height: 300px; max-height: 300px;" class="text-center">
                                 <img src="${
-                                  fileNames || fileNames[0]
+                                  fileNames[0]
                                 }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
                             </div>
                             <div class="card-body">
@@ -296,15 +316,15 @@ const router = async () => {
                                   isAdmin
                                     ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
                                     </div>`
-                                    : title ==
-                                      "officia delectus consequatur vero aut veniam explicabo molestias" // 로그인 한 사람 이름 (임시값)
+                                    : writer ==
+                                      sessionStorage.getItem("nickname") // 로그인 한 사람 이름 (임시값)
                                     ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
                                     </div>`
                                     : `<div class="col-3 px-0">
                                     </div>`
                                 }
                                     
-                                    <span class="col-9 text-end px-0 align-text-top">${nickname}</span>
+                                    <span class="col-9 text-end px-0 align-text-top">${writer}</span>
                                 </div>
                             </div>
                         </div>
@@ -318,14 +338,49 @@ const router = async () => {
        * @param {String} title - 제목
        * @param {String} content - 글 내용
        * @param {Number} boardNo - 게시물 아이디
+       * @param {String} writer - 글 작성자
        * @param {Date} writeDate - 글 작성 일자 (DB로 부터 받아옵니다.)
+       * @param {Number} hit - 조회수
        * @param {Url []} fileNames - 이미지 url 배열
        */
-      const createModal = (title, content, boardNo, writeDate, fileNames) => {
+      const createModal = (
+        title,
+        content,
+        boardNo,
+        writer,
+        writeDate,
+        hit,
+        fileNames
+      ) => {
         const div = document.createElement("div");
         div.className = "modal";
         div.id = `modal${boardNo}`;
-        div.innerHTML = `<div class="modal-dialog modal-xl">
+
+        let htmlBtn = "";
+        let htmlImg = "";
+
+        console.log(fileNames);
+        // 이미지의 개수에 맞게 이미지와 캐러셀 버튼을 설정
+        for (let i = 0; i < fileNames.length; i++) {
+          htmlBtn += `<button type="button" data-bs-target="#carousel${boardNo}"
+                                                      data-bs-slide-to="${i}" class="${
+            i == 0 ? "active" : ""
+          }" aria-current="true"
+                                                      aria-label="Slide ${
+                                                        i ==
+                                                        fileNames.length - 1
+                                                          ? 0
+                                                          : i + 1
+                                                      }"></button>`;
+
+          htmlImg += `<div class="carousel-item ${i == 0 ? "active" : ""}">
+                                                      <img src="${
+                                                        fileNames[i]
+                                                      }" class="d-block w-100" alt="...">
+                                                  </div>`;
+        }
+
+        let html = `<div class="modal-dialog modal-xl">
                   <div class="modal-content">
                       <div class="modal-header">
                           <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
@@ -339,34 +394,20 @@ const router = async () => {
 
                                       <div class="d-flex align-items-center">
 
-                                          <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
-                                              <div class="carousel-indicators">
-                                                  <button type="button" data-bs-target="#carouselExampleIndicators"
-                                                      data-bs-slide-to="0" class="active" aria-current="true"
-                                                      aria-label="Slide 1"></button>
-                                                  <button type="button" data-bs-target="#carouselExampleIndicators"
-                                                      data-bs-slide-to="1" aria-label="Slide 2"></button>
-                                                  <button type="button" data-bs-target="#carouselExampleIndicators"
-                                                      data-bs-slide-to="2" aria-label="Slide 3"></button>
+                                          <div id="carousel${boardNo}" class="carousel slide container-fluid" data-bs-ride="true">
+                                              <div class="carousel-indicators block_htmlBtn">
+                                                  ${htmlBtn}
                                               </div>
-                                              <div class="carousel-inner">
-                                                  <div class="carousel-item active">
-                                                      <img src="${imgUrl}" class="d-block w-100" alt="...">
-                                                  </div>
-                                                  <div class="carousel-item">
-                                                      <img src="./static/image/미야케 우동2.jpg" class="d-block w-100" alt="...">
-                                                  </div>
-                                                  <div class="carousel-item">
-                                                      <img src="./static/image/미야케 우동3.jpg" class="d-block w-100" alt="...">
-                                                  </div>
+                                              <div class="carousel-inner block_htmlImg">
+                                              ${htmlImg}
                                               </div>
                                               <button class="carousel-control-prev" type="button"
-                                                  data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                                  data-bs-target="#carousel${boardNo}" data-bs-slide="prev">
                                                   <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                                   <span class="visually-hidden">Previous</span>
                                               </button>
                                               <button class="carousel-control-next" type="button"
-                                                  data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                                  data-bs-target="#carousel${boardNo}" data-bs-slide="next">
                                                   <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                                   <span class="visually-hidden">Next</span>
                                               </button>
@@ -375,7 +416,10 @@ const router = async () => {
                                   </div>
                                   <div class="col-4 d-flex justify-content-center" style="overflow-y: auto; height: 65vh;">
                                       <!-- 댓글 창 -->
-                                      <div id="block_comment${boardNo}" class="col-11"> <!-- 모달의 코멘트 블록 아이디 지정 -->
+                                      <div class="col-11">
+                                        <span class="mt-5 fs-4">Comment</span>
+                                        <div id="block_comment${boardNo}" class="container-fluid">
+                                      <!-- 모달의 코멘트 블록 아이디 지정 -->
 
                                           
 
@@ -403,8 +447,14 @@ const router = async () => {
                                   <div class="col-4">
                                       <div class="row mt-3 h-75">
                                           <div class="col-12 d-flex justify-content-end">
-                                              <textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
-                                              <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>
+                                          ${
+                                            isUser
+                                              ? `<textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
+                                              <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>`
+                                              : `<textarea id="" class="form-control" style="background-color: #E9ECEF" readOnly value="회원만 작성할 수 있습니다."></textarea>
+                                              <button id="" class="btn btn-primary">작성</button>`
+                                          }
+                                              
                                           </div>
                                       </div>
                                   </div>
@@ -418,36 +468,41 @@ const router = async () => {
                   </div>
               </div>`;
 
+        div.innerHTML = html;
         modal.prepend(div);
       };
 
       /**
        * 댓글 생성 함수 - 댓글을 생성 할 블록을 받은 후 해당 블록에 댓글을 생성합니다.
        *
+       * @param {Number} commentId - 댓글 아이디
        * @param {String} name - 작성자
        * @param {String} comment - 댓글 내용
        * @param {Date} commentDate - 댓글 등록일
        * @param {Number} block_comment - 댓글을 생성 할 블록
        */
       const createComment = async (
+        commentId,
         name,
         comment,
         commentDate,
         block_comment
       ) => {
         // 받아온 값을 이용하여 해당 게시물에 코멘트 추가 (임시값)
+        const date = formatDate(commentDate);
         const div = document.createElement("div");
         div.classList = "row border mt-3 p-1";
         div.innerHTML = `<div class="col-12">
                   <div class="row">
                     <div class="col-5 commentWriter">${name}</div>
-                    <div class="col-6 commentDate">${commentDate}</div>
+                    <div class="col-6 commentDate">${date}</div>
+                    <div style="display: none;">${commentId}</div>
                     ${
                       isAdmin
                         ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
                     </div>`
-                        : name == sessionStorage.getItem("name")
+                        : name == sessionStorage.getItem("nickname")
                         ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
                       ❌
                     </div>`
@@ -497,35 +552,61 @@ const router = async () => {
       const modal = document.querySelector("#block_modal");
       console.log(modal);
       modal.innerHTML = "";
-      const fileName = "미야케 우동1";
-      const imgUrl = `./static/image/${fileName}.jpg`;
-      const writer = "규민";
-      let writeDate = "2023.06.02 00:09";
-      const hit = 48;
 
       // fetch를 이용해 값 가져오기 (임시 값)
-      await fetch(
-        "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
+      const response = await fetch(
+        // "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
+        `${PATH}/board?page=1`,
         {
           method: "get",
+          headers: {
+            token: sessionStorage.getItem("token"),
+            nickname: sessionStorage.getItem("nickname"),
+          },
         }
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          for (let value of data) {
-            createBoard(value.title, value.url, value.id, writeDate, value.url);
+      );
 
-            createModal(
-              value.title,
-              value.phone,
-              value.id,
-              writeDate,
-              value.url
-            );
-          }
-        })
-        .catch((error) => console.log("fetch 에러!", error));
+      if (response.status == 200) {
+        const jsonData = await response.json();
+        const data = JSON.parse(jsonData.data);
+        for (let value of data) {
+          createBoard(
+            value.title,
+            value.content,
+            value.boardNo,
+            value.writer,
+            value.writeDate,
+            value.fileName
+          );
+
+          createModal(
+            value.title,
+            value.content,
+            value.boardNo,
+            value.writer,
+            value.writeDate,
+            value.hit,
+            value.fileName
+          );
+        }
+      } else if (response.status == 422) {
+        block_alert.innerHTML = `
+          <div
+            class="alert alert-warning alert-dismissible fade show"
+            role="alert"
+          >
+          <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <strong>에러코드 : 422</strong> 올바른 데이터를 전달해주세요!!
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>`;
+      } else if (response.status == 500) {
+        console.log("서버 오류");
+      }
 
       // ------------------------------------------------------------------ 게시글, 모달 생성 > ----------------------------------------------------------------
 
@@ -538,12 +619,12 @@ const router = async () => {
       boardList.addEventListener("click", async (event) => {
         let path = event.target;
         let id = path.id;
+        let countWhile = 0; // 게시글이 아닌 공백(마진) 클릭을 확인하기 위한 값
         while (!id) {
+          countWhile++;
           // 게시글의 id 찾기
-          console.log("count");
           path = path.parentElement;
           id = path.id;
-          console.log(id);
         }
 
         // 게시글 수정
@@ -609,7 +690,7 @@ const router = async () => {
               editModalContent.value != editBoardContent.innerText
             ) {
               console.log("모두 변경");
-              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+              fetch(`${PATH}/board/post`, {
                 method: "PUT",
                 headers: {
                   "Content-Type": "application/json",
@@ -623,7 +704,7 @@ const router = async () => {
             } // 제목만 변경되었을 경우
             else if (editModalTitle.value != editBoardTitle.innerText) {
               console.log("제목 변경");
-              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+              fetch(`${PATH}/board/post`, {
                 method: "PUT",
                 headers: {
                   "Content-Type": "application/json",
@@ -636,7 +717,7 @@ const router = async () => {
             } // 내용만 변경되었을 경우
             else if (editModalContent.value != editBoardContent.innerText) {
               console.log("내용 변경");
-              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+              fetch(`${PATH}/board/post`, {
                 method: "PUT",
                 headers: {
                   "Content-Type": "application/json",
@@ -661,7 +742,7 @@ const router = async () => {
               for (let file in editInputImage.files) {
                 formData.append("image", file);
               }
-              fetch("https://jsonplaceholder.typicode.com/posts/1", {
+              fetch(`${PATH}/board/post/image`, {
                 method: "PUT",
                 body: formData,
               });
@@ -683,26 +764,38 @@ const router = async () => {
             count++;
           });
         } // 댓글생성
-        else {
+        else if (countWhile != 0) {
           const block_comment = document.querySelector(`#block_comment${id}`);
           block_comment.innerHTML = ""; // 클릭 이전에 코멘트가 있다면 삭제
-          // createComment(id);
           nowId = id;
 
           // fetch를 이용해 값 가져오기 (임시 값)
-          const response = await fetch(
-            "https://jsonplaceholder.typicode.com/users",
-            {
-              method: "get",
-            }
-          );
+          const response = await fetch(`${PATH}/comment?boardNo=${id}`, {
+            method: "get",
+          });
 
           // 값이 잘 전달 되었을 때 생성 (테스트 끝나면 201로 바꿔야 함)
           if (response.status == 200) {
-            const data = await response.json();
-            for (let value of data) {
-              console.log(value);
-              createComment(value.name, value.email, id, block_comment);
+            const jsonData = await response.json();
+            const data = JSON.parse(jsonData.data);
+            console.log(data);
+            // data가 없는 경우
+            if (data.length == 0) {
+              block_comment.innerHTML = `
+              <br><br><span>현재 게시글에 댓글이 없습니다.</span>`;
+            } // data가 존재하는 경우
+            else {
+              for (let value of data) {
+                console.log(value);
+
+                createComment(
+                  value.id,
+                  value.nickname,
+                  value.comment,
+                  value.commentDate,
+                  block_comment
+                );
+              }
             }
           }
         }
@@ -735,40 +828,57 @@ const router = async () => {
               `#block_comment${submitId}`
             );
 
-            // 테스트
-            console.log(block_comment);
-            createComment(
-              sessionStorage.getItem("name"),
-              commentText.value,
-              submitId,
-              block_comment
-            );
-
-            const response = await fetch(
-              "https://jsonplaceholder.typicode.com/posts",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                cache: "no-cache",
-                body: JSON.stringify({
-                  boardNo: submitId,
-                  nickname: "규민",
-                  comment: commentText.value,
-                }),
-              }
-            );
+            const response = await fetch(`${PATH}/comment`, {
+              method: "POST",
+              headers: {
+                token: sessionStorage.getItem("token"),
+                nickname: sessionStorage.getItem("nickname"),
+                "Content-Type": "application/json",
+              },
+              cache: "no-cache",
+              body: JSON.stringify({
+                boardNo: submitId,
+                // nickname: "규민",
+                comment: commentText.value,
+              }),
+            });
 
             // 성공적으로 생성하였을 경우
-            if (response.status == 201) {
-              commentText.value = "";
+            if (response.status == 200) {
+              const jsonData = await response.json();
+              const data = JSON.parse(jsonData.data);
+              if (
+                block_comment.innerHTML.indexOf(
+                  "<span>현재 게시글에 댓글이 없습니다.</span>"
+                ) != -1
+              ) {
+                block_comment.innerHTML = "";
+              }
+              console.log(block_comment);
+
               createComment(
-                sessionStorage.getItem("name"),
+                data.id,
+                sessionStorage.getItem("nickname"),
                 commentText.value,
-                id,
+                data.commentDate,
                 block_comment
               );
+              commentText.value = "";
+            } else if (response.status == 500) {
+              block_alert.innerHTML = `
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+          <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <strong>에러코드 : 500</strong> 잠시 후에 다시 시도해주세요!!
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>`;
             }
           }
           if (event.target.classList.contains("commentDel")) {
@@ -777,23 +887,32 @@ const router = async () => {
             console.log(nowId);
             console.dir(event.target);
             const boardNo = nowId;
-            let comment = event.target;
-            console.log(comment.parentNode.children[0].innerText);
-            console.log(comment.parentNode.children[1].innerText);
-            const nickname = comment.parentNode.children[0].innerText;
-            const commentDate = comment.parentNode.children[1].innerText;
+            let commentDel = event.target;
+            console.log(commentDel.parentNode.children[0].innerText);
+            console.log(commentDel.parentNode.children[1].innerText);
+            const nickname = commentDel.parentNode.children[0].innerText;
+            const commentDate = commentDel.parentNode.children[1].innerText;
+            const commentId = commentDel.parentNode.children[2].innerText;
+            const comment =
+              commentDel.parentElement.parentElement.parentElement;
 
-            fetch("https://jsonplaceholder.typicode.com/posts/1", {
+            const { status } = await fetch(`${PATH}/comment`, {
               method: "DELETE",
               headers: {
-                Authorization: sessionStorage.getItem("access_token"),
+                token: sessionStorage.getItem("token"),
+                nickname: sessionStorage.getItem("nickname"),
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                boardNo,
+                id: commentId,
                 // nickname,
-                commentDate,
+                // commentDate,
               }),
             });
+
+            if (status == 204) {
+              comment.parentNode.removeChild(comment);
+            }
           }
         }
         // -------------------------------------------------------------- 댓글 작성 (POST), 댓글 삭제 > ------------------------------------------------------------
@@ -850,17 +969,6 @@ const router = async () => {
         const images = uploadImg.files;
         const formData = new FormData();
 
-        createBoard(title, content, "124", "fsdafasdfasdfsad", images[0]); // 테스트용
-        createModal(title, content, "124", "fsdafasdfasdfsad", images[0]); // 테스트용
-
-        emptyModal(
-          uploadText,
-          uploadTitle,
-          uploadImg,
-          imageList,
-          modalCloseBtn
-        );
-
         formData.append("title", title);
         formData.append("content", content);
         for (let i = 0; i < images.length; i++) {
@@ -870,9 +978,13 @@ const router = async () => {
 
         const response = await fetch(
           // "https://juhyeon-cors-anywhere.herokuapp.com/https://jsonplaceholder.typicode.com/posts",
-          "https://jsonplaceholder.typicode.com/posts",
+          `${PATH}/board/post`,
           {
             method: "POST",
+            headers: {
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
+            },
             body: formData,
           }
         );
@@ -881,14 +993,36 @@ const router = async () => {
 
         // status 코드가 201일 경우 (정상적으로 생성)
         if (response.status == 201) {
-          const boardNo = response.boardNo;
-          const writeDate = response.writeDate;
-          const fileNames = response.fileName;
+          // json 값 파싱
+          const jsonData = await response.json();
+          const data = JSON.parse(jsonData.data);
+          console.log(data);
 
-          createBoard(title, content, boardNo, writeDate, fileNames);
-          createModal(title, content, boardNo, writeDate, fileNames);
+          const boardNo = data.boardNo;
+          const writeDate = data.writeDate;
+          const writer = sessionStorage.getItem("nickname");
+          const fileNames = data.fileName;
+          const hit = data.hit;
+
+          createBoard(title, content, boardNo, writer, writeDate, fileNames);
+          createModal(
+            title,
+            content,
+            boardNo,
+            writer,
+            writeDate,
+            hit,
+            fileNames
+          );
 
           // 모달 창 비우기
+          emptyModal(
+            uploadText,
+            uploadTitle,
+            uploadImg,
+            imageList,
+            modalCloseBtn
+          );
         }
       };
 
@@ -946,7 +1080,6 @@ const router = async () => {
           alert("비밀번호를 입력해주세요.");
         }
       });
-
     }
     if (location.pathname === "/signup") {
       // 태그 불러오기
@@ -1088,8 +1221,7 @@ const router = async () => {
           .catch((error) => console.log(error));
       });
     }
-    if (location.pathname === "/MyWriteList"){
-
+    if (location.pathname === "/MyWriteList") {
     }
   }
 };
@@ -1110,4 +1242,3 @@ window.addEventListener("popstate", () => {
   console.log("주소가 변경되었습니다. popstate");
   router();
 });
-
