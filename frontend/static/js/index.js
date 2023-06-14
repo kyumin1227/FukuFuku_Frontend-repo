@@ -203,13 +203,13 @@ const router = async () => {
           let count = 0; // 예제 블럭 제한 걸기
           console.log(data);
           for (let value of data) {
-            createBoard(value.title, value.phone, value.id, value.url);
-
+            createBoard(value.id, value.phone, value.title, value.url);
+            createModal(value.id, value.phone, value.title, value.url);
             // // 예제 블럭 6개만 뽑아쓰기
-            // count++;
-            // if (count === 6) {
-            //   break;
-            // }
+            count++;
+            if (count === 6) {
+              break;
+            }
           }
         })
         .catch((error) => console.log("fetch 에러!", error));
