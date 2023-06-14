@@ -46,6 +46,7 @@ const router = async () => {
     if (location.pathname === "/") {
       const memberCBtn = document.querySelector("#uploadBtn");
       const newBtn = document.querySelector("#memberCBtn");
+
       const memberUpload = async () => {
         const memberName = uploadMemberName.value;
         const introduceContent = uploadMemberContent.value;
@@ -117,7 +118,7 @@ const router = async () => {
         div.classList = "col-4 mt-5";
         div.id = boardNo;
         div.innerHTML = `
-                          <div class="flip-outer m-auto">
+                          <div class="flip-outer m-auto" data-bs-toggle="modal" data-bs-target="#modal${boardNo}" >
                               <div class="flip-inner">
                                   <img src="${fileName}" class="front shadow-lg" />
                                   <div class="back shadow-lg">
@@ -128,11 +129,67 @@ const router = async () => {
                           </div>
                         `;
         post.prepend(div);
+        
+      };
+
+       /**
+       * 조원의 더미 모달 페이지를 만든 후 추가하는 함수입니다.
+       *
+       * @param {Number} boardNo - 소개란 번호
+       * @param {String} memberName - 조원 명
+       * @param {String} introduceContent - 소개 내용
+       * @param {Url} fileName - 이미지 url
+       */
+       const createModal = (boardNo, memberName, introduceContent, fileName) => {
+        const div = document.createElement("div");
+        div.className = "modal";
+        div.id = `modal${boardNo}`;
+        div.innerHTML = `<div class="modal-dialog modal-l">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h1 class="modal-title fs-5" >#${boardNo} ${memberName}</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="container-fluid">
+                              <div class="row mb-3">
+                                  <div class="col-12 p-0">
+                                      <!-- 이미지 창 -->
+
+                                      <div class="d-flex align-items-center">
+
+                                      <div class="carousel-item active">
+                                      <img src="${fileName}" class="d-block w-100" alt="...">
+                                      </div>
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <!-- 본문, 댓글작성 창 -->
+                              <div class="row">
+                                  <!-- 본문 창 -->
+                                  <div class="col-12 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
+                                      style="height: 15vh;">
+                                      <span>${introduceContent}</span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" id="memberModifyBtn" class="btn btn-primary">Modify</button>
+                          <button type="button" id="memberDeleteBtn" class="btn btn-danger">Delete</button>
+                      </div>
+                  </div>
+              </div>`;
+
+        modal.prepend(div);
       };
 
       // ------------------------------------------------------------------ < 조원 소개 생성 ------------------------------------------------------------------
 
       const post = document.querySelector("#member_post");
+      const modal = document.querySelector("#memberEdit_block");
       post.innerHTML = "";
       // fetch를 이용해 값 가져오기 (임시 값)
       await fetch(
@@ -146,16 +203,19 @@ const router = async () => {
           let count = 0; // 예제 블럭 제한 걸기
           console.log(data);
           for (let value of data) {
-            createBoard(value.title, value.phone, value.id, value.url);
-
+            createBoard(value.id, value.phone, value.title, value.url);
+            createModal(value.id, value.phone, value.title, value.url);
             // // 예제 블럭 6개만 뽑아쓰기
-            // count++;
-            // if (count === 6) {
-            //   break;
-            // }
+            count++;
+            if (count === 6) {
+              break;
+            }
           }
         })
         .catch((error) => console.log("fetch 에러!", error));
+
+      
+
 
       // ------------------------------------------------------------------ 조원 소개 생성 > ----------------------------------------------------------------
     }
@@ -524,7 +584,6 @@ const router = async () => {
 
       // ------------------------------------------------------------------ < 댓글 생성 ------------------------------------------------------------------
       console.log("bullet");
-
       const boardList = document.querySelector("#board-list");
       // 게시물 중 아무 게시물을 선택해도 어떤 게시물인지 알아서 확인(게시물 마다 이벤트 리스너와 태그 선택자 만들 필요 X)
 
