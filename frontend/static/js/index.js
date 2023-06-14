@@ -987,7 +987,6 @@ const router = async () => {
             }
           });
       })
-ㄴ
       // 이벤트 추가
       idCheck.addEventListener("click", async () => {
         userId = document.getElementById("InputId").value;
