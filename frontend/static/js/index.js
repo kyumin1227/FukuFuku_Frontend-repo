@@ -1166,6 +1166,7 @@ const router = async () => {
               alert("로그인 성공");
               sessionStorage.setItem("token", data.data.token);
               sessionStorage.setItem("nickname", data.data.nickname);
+              sessionStorage.setItem("userId", data.data.userId);
               loginFunc();
               // 관리자 여부 확인
               if (data.data.isAdmin == true) {
