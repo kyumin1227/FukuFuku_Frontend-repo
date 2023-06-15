@@ -226,28 +226,29 @@ const router = async () => {
       const modifyBtn = document.querySelector("#modifyBtn");
 
       nicknameChkBtn.addEventListener("click", () => {
+        const username = nameInput.value;
         if (nameInput.value === "") {
           alert("변경할 닉네임을 입력해주세요!");
         } else {
-          fetch(`${PATH}/`, {
-            method: "POST",
+          fetch(`${PATH}/signin/nicknameCheck/?nickname=${username}`, {
+            method: "GET",
             headers: {
               "Content-Type": "application/json",
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
             },
-            body: JSON.stringify({
-              nickname: nameInput.value,
-            }),
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              // found 값에 따라 True 또는 False 전달
-              if (data.status == 200) {
-                alert("사용할 수 있는 닉네임입니다!");
-                nicknameChkVal = true;
-              } else {
-                alert("이미 사용중인 닉네임입니다!");
-              }
-            });
+          });
+          console.log(200);
+          // .then((response) => response.json())
+          // .then((data) => {
+          //   // found 값에 따라 True 또는 False 전달
+          //   if (data.status == 200) {
+          //     alert("사용할 수 있는 닉네임입니다!");
+          //     nicknameChkVal = true;
+          //   } else {
+          //     alert("이미 사용중인 닉네임입니다!");
+          //   }
+          // });
         }
       });
 
@@ -1283,7 +1284,7 @@ const router = async () => {
         // 입력값이 존재할 떄
         if (myPassword != "") {
           console.log(myPassword);
-          const response = await fetch(`${PATH}/account/withdrawal`, {
+          const { status } = await fetch(`${PATH}/account/withdrawal`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -1296,12 +1297,8 @@ const router = async () => {
               userPassword: myPassword,
             }),
           });
-
-          const data = await response.json();
-          console.log(response);
-          console.log(data);
-
-          if (response.status == 204) {
+          console.log(status);
+          if (status == 204) {
             sessionStorage.clear();
             alert("회원탈퇴 성공");
             guestFunc();
@@ -1311,16 +1308,17 @@ const router = async () => {
           else if (data.status == 401) {
             console.log(data.message);
             alert("비밀번호가 다릅니다.");
+            console.log(401);
           }
           //올바르지 않은 데이터
-          else if (data.status == 422) {
-            console.log(data.message);
+          else if (status == 422) {
             alert("유효하지 않은 값입니다.");
+            console.log(422);
           }
           // 서버 문제
           else if (data.status == 500) {
-            console.log(data.message);
             alert("서버에 문제가 생겼습니다.");
+            console.log(500);
           }
         }
         // 입력값이 존재하지 않을 경우
