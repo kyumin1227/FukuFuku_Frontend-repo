@@ -30,28 +30,31 @@ export default class {
           
           <!-- USER_DATA -->
           <div class="col border-top border-bottom border-primary">
-            <div class="mb-4 pt-3 row">
-              <label for="staticEmail" class="col-sm-2 col-form-label">ID</label>
-              <div class="col-sm-10">
-                <input type="text" readonly class="form-control-plaintext" id="staticEmail" value=${userId}>
+          <div class="mb-4 row mt-4">
+          <label for="inputPassword" class="col-sm-2 col-form-label">ID</label>
+          <div class="col-sm-10">
+            <div class="row">
+              <div class="col">
+                <input type="name" class="form-control" id="inputId" placeholder=${userId}>
+              </div>
+              <!-- 필요 여부에 따라 변동 -->
+              <div class="col-sm-4">
+                <button type="button" id="idChkBtn" class="btn btn-primary">Confirm</button>
               </div>
             </div>
+          </div>
+          </div>
+
+
   
             <!-- DATA 전달 -->
-            <form class="row" action="" method="post">
               <div class="mb-4 row">
-                <label for="inputPassword" class="col-sm-2 col-form-label">Name</label>
-                <div class="col-sm-10">
-                  <div class="row">
-                    <div class="col">
-                      <input type="name" class="form-control" id="inputName" placeholder=${userName}>
-                    </div>
-                    <!-- 필요 여부에 따라 변동 -->
-                    <div class="col-sm-4">
-                      <button type="button" id="idChkBtn" class="btn btn-primary">Confirm</button>
-                    </div>
+                <div class="mb-4 pt-3 row">
+                  <label for="staticEmail" class="col-sm-2 col-form-label">Nickname</label>
+                  <div class="col-sm-10">
+                    <input type="text" readonly class="form-control-plaintext" id="staticEmail" value=${userName}>
                   </div>
-                  </div>
+                </div>
               </div>
               <div class="mb-4 row">
                 <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
@@ -64,8 +67,6 @@ export default class {
               <div>
                 <button type="button" id="modifyBtn" class="btn btn-outline-primary float-end me-4">Modify</button>
               </div>
-  
-            </form>  
   
           </div>
   

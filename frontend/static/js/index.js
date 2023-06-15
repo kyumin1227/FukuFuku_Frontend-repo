@@ -221,16 +221,17 @@ const router = async () => {
     if (location.pathname === "/myUserData") {
       // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
       let nicknameChkVal = false;
-      const nameInput = document.querySelector("#inputName");
+      const idInput = document.querySelector("#inputId");
       const nicknameChkBtn = document.querySelector("#idChkBtn");
       const modifyBtn = document.querySelector("#modifyBtn");
 
-      nicknameChkBtn.addEventListener("click", () => {
-        const username = nameInput.value;
-        if (nameInput.value === "") {
-          alert("변경할 닉네임을 입력해주세요!");
+      nicknameChkBtn.addEventListener("click", async() => {
+        const userId = idInput.value;
+        if (idInput.value === "") {
+          alert("변경할 ID을 입력해주세요!");
         } else {
-          fetch(`${PATH}/signin/nicknameCheck/?nickname=${username}`, {
+          console.log(userId);
+          await fetch(`${PATH}/account/idCheck/?userId=${userId}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -238,55 +239,74 @@ const router = async () => {
               nickname: sessionStorage.getItem("nickname"),
             },
           })
-          console.log(200);
-            // .then((response) => response.json())
-            // .then((data) => {
-            //   // found 값에 따라 True 또는 False 전달
-            //   if (data.status == 200) {
-            //     alert("사용할 수 있는 닉네임입니다!");
-            //     nicknameChkVal = true;
-            //   } else {
-            //     alert("이미 사용중인 닉네임입니다!");
-            //   }
-            // });
-        }
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("20");
+              // found 값에 따라 True 또는 False 전달
+              if (data.status == 200) {
+                alert("사용할 수 있는 ID입니다!");
+                nicknameChkVal = true;
+              } else if (data.status == 422){
+                alert("query 값이 존재하지 않습니다.");
+              } else if (data.status == 409){
+                alert("이미 사용하고 있는 ID 입니다.");
+              }
+            });
+        };
       });
-
       // modify 버튼으로 닉네임 중복여부를 확인하고
       // 확인되면 비밀번호 값과 nickname 값을 post 로 보내서
       // 비밀번호가 일치하면 post로 보낸 nickname 값으로 닉네임을 변경한다
       // 만약, 비밀번호가 일치하지 않으면 alert 창 떠서 꺼지게 만든다!
       modifyBtn.addEventListener("click", () => {
         if (nicknameChkVal) {
-          fetch("https://my-json-server.typicode.com/typicode/demo/posts", {
+          const userId = idInput.value;
+          fetch(`${PATH}/account/updateUserId`, {
             // fetch에는 웹서버/updateNickname 으로 보내기
-            method: "POST",
+            method: "PUT",
             headers: {
               "Content-Type": "application/json",
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
             },
             body: JSON.stringify({
-              userId: sessionStorage.getItem("userId"),
-              password: inputPassword.value,
-              nickname: nameInput.value,
+              // userId: sessionStorage.getItem("userId"),
+              // password: inputPassword.value,
+              userId: userId,
             }),
             // 변경할 닉네임 + (입력했던 pw와 로컬 스토리지에 있는 nickname 값 보내기)
           })
             // 해당 처리 결과반환
             .then((response) => response.json())
             .then((data) => {
-              if (data.status == 200) {
+              console.log(data);
+              if (data.status == 201) {
                 // 일치 여부에 따른 결과값
                 // TRUE / FALSE
-                alert("닉네임이 성공적으로 변경되었습니다!");
-              } else {
-                alert("비밀번호가 일치하지 않습니다!");
+                alert("ID이 성공적으로 변경되었습니다!");
+                sessionStorage.removeItem('userId');
+                sessionStorage.setItem("userId", userId);
+              } 
+              // 권한이 없는 경우
+              else if (data.status == 401){
+                alert("권한이 없습니다.");
+                console.log(data.message);
+              }
+              // 요청시 올바른 데이터를 전달하지 않은 경우
+              else if (data.status == 422){
+                alert("올바른 값이 아닙니다.");
+                console.log(data.message);
+              }
+              else if (data.status == 500){
+                alert("서버에 문제가 생겼습니다.");
+                console.log(data.message);
               }
             })
             .catch((error) => {
               console.log(error);
             });
         } else {
-          alert("닉네임 중복 체크를 해주세요!");
+          alert("ID 중복 체크를 해주세요!");
         }
       });
     }
@@ -1148,8 +1168,8 @@ const router = async () => {
       // 버튼 이벤트 추가
       destroyBtn.addEventListener("click", async () => {
         let myPassword = inputPassword.value;
-        let usertoken = sessionStorage.getItem("token");
-        let usernickname = sessionStorage.getItem("nickname");
+        let userToken = sessionStorage.getItem("token");
+        let userNickname = sessionStorage.getItem("nickname");
         console.log("hi")
 
         // 입력값이 존재할 떄
@@ -1159,12 +1179,12 @@ const router = async () => {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
-              token: usertoken,
-              nickname: usernickname,
+              token: userToken,
+              nickname: userNickname,
             },
             // cache: "no-cache",
             body: JSON.stringify({
-              nickname: usernickname,
+              nickname: userNickname,
               userPassword: myPassword,
             }),
           })
@@ -1214,7 +1234,7 @@ const router = async () => {
       });
 
       const username = document.getElementById("InputNickname");
-      const namealert = document.getElementById("alert");
+      const nameAlert = document.getElementById("alert");
 
       username.addEventListener("blur", () => {
         const name = document.getElementById("InputNickname").value;
@@ -1234,15 +1254,15 @@ const router = async () => {
             console.log(data);
             if (data.status == 200) {
               console.log(data.message);
-              namealert.innerHTML = "";
-              namealert.innerHTML = "<a>사용가능한 닉네임 입니다.</a>";
+              nameAlert.innerHTML = "";
+              nameAlert.innerHTML = "<a>사용가능한 닉네임 입니다.</a>";
               Check = true;
             }
             // 중복
             if (data.status == 409) {
               console.log(data.messgae);
-              namealert.innerHTML = "";
-              namealert.innerHTML = "<a>닉네임이 이미 존재합니다.</a>";
+              nameAlert.innerHTML = "";
+              nameAlert.innerHTML = "<a>닉네임이 이미 존재합니다.</a>";
             }
           });
       });
@@ -1400,6 +1420,7 @@ const router = async () => {
       const token = sessionStorage.getItem("token");
       const modal = document.querySelector("#block_modal");
       const post = document.querySelector("#block_post");
+      const boardList = document.querySelector("#board-list")
       post.innerHTML = "";
 
       // 임의값
@@ -1409,6 +1430,7 @@ const router = async () => {
       const imgUrl = `./static/image/${fileName}.jpg`;
       const hit = 48; // 조회수
       const block_modal = document.querySelector("#block_modal");
+      let nowId = null;
 
       console.log(username);
 
@@ -1685,88 +1707,57 @@ const router = async () => {
       createBoard("1", "content", "boardNo", "writeDate", "example.jpg");
       createModal("1", "content", "boardNo", "writeDate", "example.jpg");
 
-      console.log(response);
 
-      block_modal.addEventListener("click", async (event) => {
-        console.log(event.target.id);
-        if (event.target.id.indexOf("modal_submitBtn") != -1) {
-          const commentBtnId = event.target.id;
-          // 댓글 작성 버튼을 눌렀을 경우 동작
-          const submitId = commentBtnId.replace("modal_submitBtn", "");
-          console.log("submitId = " + submitId); // 보드 넘버 ex) 0
-          const commentText = document.querySelector(
-            `#modal_commentText${submitId}`
-          );
-          if (commentText.value.trim() === "") {
-            // 댓글을 공백으로 작성 후 작성 버튼을 눌렀을 경우 동작
-            return;
+      
+      boardList.addEventListener("click", async () => {
+        let path = event.target;
+          let id = path.id;
+          let countWhile = 0; // 게시글이 아닌 공백(마진) 클릭을 확인하기 위한 값
+          while (!id) {
+            countWhile++;
+            // 게시글의 id 찾기
+            path = path.parentElement;
+            id = path.id;
           }
-
-          const block_comment = document.querySelector(
-            `#block_comment${submitId}`
-          );
-
-          // 테스트
-          console.log(block_comment);
-          createComment(
-            sessionStorage.getItem("name"),
-            commentText.value,
-            submitId,
-            block_comment
-          );
-
-          const response = await fetch(
-            "https://jsonplaceholder.typicode.com/posts",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              cache: "no-cache",
-              body: JSON.stringify({
-                boardNo: submitId,
-                nickname: "규민",
-                comment: commentText.value,
-              }),
-            }
-          );
-
-          // 성공적으로 생성하였을 경우
-          if (response.status == 201) {
-            commentText.value = "";
-            createComment(
-              sessionStorage.getItem("name"),
-              commentText.value,
-              id,
-              block_comment
-            );
-          }
-        }
-        if (event.target.classList.contains("commentDel")) {
-          // 댓글 삭제 버튼을 눌렀을 경우 동작
-          console.log("삭제버튼");
-          console.log(nowId);
-          console.dir(event.target);
-          const boardNo = nowId;
-          let comment = event.target;
-          console.log(comment.parentNode.children[0].innerText);
-          console.log(comment.parentNode.children[1].innerText);
-          const nickname = comment.parentNode.children[0].innerText;
-          const commentDate = comment.parentNode.children[1].innerText;
-
-          fetch("https://jsonplaceholder.typicode.com/posts/1", {
-            method: "DELETE",
-            headers: {
-              Authorization: sessionStorage.getItem("access_token"),
-            },
-            body: JSON.stringify({
-              boardNo,
-              // nickname,
-              commentDate,
-            }),
+        if (countWhile != 0) {
+          const block_comment = document.querySelector(`#block_comment${id}`);
+          block_comment.innerHTML = ""; // 클릭 이전에 코멘트가 있다면 삭제
+          nowId = id;
+  
+          // fetch를 이용해 값 가져오기
+          const response = await fetch(`${PATH}/comment?boardNo=${id}`, {
+            method: "get",
           });
+  
+          // 값이 잘 전달 되었을 때 생성
+          if (response.status == 200) {
+            const jsonData = await response.json();
+            const data = JSON.parse(jsonData.data);
+            console.log(data);
+            // data가 없는 경우
+            if (data.length == 0) {
+              block_comment.innerHTML = `
+              <br><br><span>현재 게시글에 댓글이 없습니다.</span>`;
+            } // data가 존재하는 경우
+            else {
+              for (let value of data) {
+                console.log(value);
+  
+                createComment(
+                  value.id,
+                  value.nickname,
+                  value.comment,
+                  value.commentDate,
+                  block_comment
+                );
+              }
+            }
+          }
         }
-      });
+
+      })
+
+                
     }
   }
 };
