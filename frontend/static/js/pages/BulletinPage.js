@@ -84,8 +84,8 @@ export default class {
                 </div>
                 <!-- 작성 내용 -->
                 <div>
-                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${localStorage.getItem(
-                      "name"
+                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${sessionStorage.getItem(
+                      "nickname"
                     )}</div>
                 </div>
                 <div class="form-floating">
@@ -144,8 +144,8 @@ export default class {
                 </div>
                 <!-- 작성 내용 -->
                 <div>
-                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${localStorage.getItem(
-                      "name"
+                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${sessionStorage.getItem(
+                      "nickname"
                     )}</div>
                 </div>
                 <div class="form-floating">

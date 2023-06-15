@@ -73,8 +73,8 @@
                 </div>
                 <!-- 작성 내용 -->
                 <div>
-                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${localStorage.getItem(
-                        "name"
+                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${sessionStorage.getItem(
+                        "nickname"
                         )}</div>
                 </div>
                 <div class="form-floating">
@@ -126,15 +126,16 @@
                     </div>
                 </div>
                 <!-- 등록 파일 출력 -->
-                <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll" style="height: 100px; background-color: #ffffff;">
+                <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll"
+                    style="height: 100px; background-color: #ffffff;">
                     <ul id="editImageList">
 
                     </ul>
                 </div>
                 <!-- 작성 내용 -->
                 <div>
-                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${localStorage.getItem(
-                        "name"
+                    <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${sessionStorage.getItem(
+                        "nickname"
                         )}</div>
                 </div>
                 <div class="form-floating">
