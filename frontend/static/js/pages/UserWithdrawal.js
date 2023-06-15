@@ -29,7 +29,7 @@ export default class {
             <div class="mb-4 pt-3 row">
               <label for="staticEmail" class="col-sm-2 col-form-label">ID</label>
               <div class="col-sm-10">
-                <input type="text" readonly class="form-control-plaintext" id="staticEmail" value='${username}'>
+                <input type="text" readonly class="form-control-plaintext" id="staticEmail" value='${userId}'>
               </div>
             </div>
             <!-- <div class="mb-4 border-top border-gray">

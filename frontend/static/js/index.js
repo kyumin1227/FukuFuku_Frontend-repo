@@ -229,7 +229,7 @@ const router = async () => {
         if (nameInput.value === "") {
           alert("변경할 닉네임을 입력해주세요!");
         } else {
-          fetch("https://my-json-server.typicode.com/typicode/demo/posts", {
+          fetch(`${PATH}/`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -1094,9 +1094,11 @@ const router = async () => {
         let myPassword = inputPassword.value;
         let usertoken = sessionStorage.getItem("token");
         let usernickname = sessionStorage.getItem("nickname");
+        console.log("hi")
 
         // 입력값이 존재할 떄
         if (myPassword != "") {
+          console.log(myPassword);
           const response = await fetch(`${PATH}/account/withdrawal`, {
             method: "DELETE",
             headers: {
@@ -1104,15 +1106,16 @@ const router = async () => {
               token: usertoken,
               nickname: usernickname,
             },
-            cache: "no-cache",
+            // cache: "no-cache",
             body: JSON.stringify({
               nickname: usernickname,
               userPassword: myPassword,
             }),
           });
 
-          console.log("hi");
+          const data = await response.json();
           console.log(response);
+          console.log(data);
 
           if (response.status == 204) {
             sessionStorage.clear();
@@ -1120,16 +1123,21 @@ const router = async () => {
             guestFunc();
             mainLink.click();
           }
-          // 올바르지 않은 데이터
-          // else if (response.status == 422) {
-          //   console.log(res.message);
-          //   alert("유효하지 않은 값입니다.");
-          // }
-          // // 서버 문제
-          // else if (response.status == 500) {
-          //   console.log(data.message);
-          //   alert("서버에 문제가 생겼습니다.");
-          // }
+          // 비밀번호가 틀릴경우
+          else if ( data.status == 401){
+            console.log(data.message);
+            alert("비밀번호가 다릅니다.");
+          }
+          //올바르지 않은 데이터
+          else if (data.status == 422) {
+            console.log(data.message);
+            alert("유효하지 않은 값입니다.");
+          }
+          // 서버 문제
+          else if (data.status == 500) {
+            console.log(data.message);
+            alert("서버에 문제가 생겼습니다.");
+          }
         }
         // 입력값이 존재하지 않을 경우
         else {
@@ -1216,7 +1224,7 @@ const router = async () => {
       });
       // 버튼에 이벤트 추가
       addUser.addEventListener("click", async () => {
-        const username = document.getElementById("InputNikname").value;
+        const username = document.getElementById("InputNickname").value;
         const userPassword = document.getElementById("InputPassword").value;
         const userConfirmPassword = document.getElementById(
           "InputConfirmPassword"
@@ -1286,44 +1294,50 @@ const router = async () => {
         const inputId = InputId.value;
         const inputPassword = InputPassword.value;
 
-        // 값 POST 전달
-        fetch(`${PATH}/account`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: inputId,
-            userPassword: inputPassword,
-          }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log(data);
-            // 사용자 로그인 성공
-            if (data.status == 200) {
-              alert("로그인 성공");
-              sessionStorage.setItem("token", data.data.token);
-              sessionStorage.setItem("nickname", data.data.nickname);
-              sessionStorage.setItem("userId", data.data.userId);
-              loginFunc();
-              // 관리자 여부 확인
-              if (data.data.isAdmin == true) {
-                sessionStorage.setItem(
-                  "isAdmin",
-                  "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
-                );
-              }
-              mainLink.click();
-            }
-            // 로그인 실패
-            if (data.status == 400) {
-              console.log(data.message);
-              alert("로그인 실패");
-            }
-          })
+        if(inputId != "" && inputPassword){
+          
+                  // 값 POST 전달
+                  fetch(`${PATH}/account`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      userId: inputId,
+                      userPassword: inputPassword,
+                    }),
+                  })
+                    .then((response) => response.json())
+                    .then((data) => {
+                      console.log(data);
+                      // 사용자 로그인 성공
+                      if (data.status == 200) {
+                        alert("로그인 성공");
+                        sessionStorage.setItem("token", data.data.token);
+                        sessionStorage.setItem("nickname", data.data.nickname);
+                        sessionStorage.setItem("userId", data.data.userId);
+                        loginFunc();
+                        // 관리자 여부 확인
+                        if (data.data.isAdmin == true) {
+                          sessionStorage.setItem(
+                            "isAdmin",
+                            "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
+                          );
+                        }
+                        mainLink.click();
+                      }
+                      // 로그인 실패
+                      if (data.status == 400) {
+                        console.log(data.message);
+                        alert("로그인 실패");
+                      }
+                    })
+          
+                    .catch((error) => console.log(error));
 
-          .catch((error) => console.log(error));
+        } else {
+          alert("아이디와 비밀번호를 입력해주세요");
+        }
       });
     }
     if (location.pathname === "/myWriteList") {
@@ -1596,14 +1610,23 @@ const router = async () => {
         block_comment.prepend(div);
       };
 
-      const response = fetch(`${PATH}/board/myPosts`, {
+      // fetch로 값 불러오기
+      fetch(`${PATH}/board/myPosts`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           token: token,
           nickname: username,
         },
-      });
+      })
+        .then((response) => {
+          response.json()
+          
+          if(response.status){
+
+          }
+        })
+
 
       createBoard("1", "content", "boardNo", "writeDate", "example.jpg");
       createModal("1", "content", "boardNo", "writeDate", "example.jpg");

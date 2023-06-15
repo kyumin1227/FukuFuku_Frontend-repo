@@ -1,10 +1,10 @@
 module.exports = (token, nickname,isAdmin,userId) => (method, body) => {
-  hearders.nickname = "asdasd"
-  hearders.isAdmin = true
+  headers.nickname = "asdasd"
+  headers.isAdmin = true
   const _headers = hearders
   fetch(path, {
     method: method,
-    headers: hearders,
+    headers: headers,
     body:body
   })
 }

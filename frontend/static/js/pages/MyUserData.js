@@ -6,7 +6,7 @@ export default class {
     }
     async getHtml() {
       const userId = sessionStorage.getItem('userId');
-      const userName = sessionStorage.getItem('username');
+      const userName = sessionStorage.getItem('nickname');
 
       return `
               <!-- TITLE -->
