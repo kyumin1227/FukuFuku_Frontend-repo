@@ -20,6 +20,7 @@ export default class {
         <div class="row py-lg-5">
             <div class="col-lg-6 col-md-8 mx-auto">
                 <h1 class="fw-bold">현지 おすすめ 장소</h1>
+                <a href="/bulletin" style="display: none;" data-link id="bulletinLink"></a> <!-- 값 재요청 용 링크 -->
             </div>
         </div>
     </section>
@@ -121,6 +122,7 @@ export default class {
                             <form action="" method="post" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <span class="form-label ms-2">이미지 선택</span><br>
+                                    <span id="alert-span" class="ms-2"></span>
                                     <div class="form-check ms-1 ps-0 pt-3">
                                         <input type="checkbox" class="mb-3" id="nowImg" />
                                         <label for="nowImg">현재 이미지 사용</label>
@@ -137,7 +139,8 @@ export default class {
                     </div>
                 </div>
                 <!-- 등록 파일 출력 -->
-                <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll" style="height: 100px; background-color: #ffffff;">
+                <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll"
+                    style="height: 100px; background-color: #ffffff;">
                     <ul id="editImageList">
 
                     </ul>

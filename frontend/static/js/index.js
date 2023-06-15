@@ -370,16 +370,19 @@ const router = async () => {
                                 ${
                                   isAdmin
                                     ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
+                                    </div>
+                                    <div id="delete${boardNo}" class="col-3 px-0 ms-2"><a class="btn btn-danger container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Delete</a>
                                     </div>`
                                     : writer ==
                                       sessionStorage.getItem("nickname") // 로그인 한 사람 이름 (임시값)
                                     ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
+                                    </div>
+                                    <div id="delete${boardNo}" class="col-3 px-0 ms-2"><a class="btn btn-danger container-fluid">Delete</a>
                                     </div>`
-                                    : `<div class="col-3 px-0">
-                                    </div>`
+                                    : `<div class="col-3 px-0"></div>
+                                    <div class="col-3 px-0 ms-2"></div>`
                                 }
-                                    
-                                    <span class="col-9 text-end px-0 align-text-top">${writer}</span>
+                                    <span class="col-5 flex-grow-1 text-end px-0 align-middle">${writer}</span>
                                 </div>
                             </div>
                         </div>
@@ -414,7 +417,6 @@ const router = async () => {
         let htmlBtn = "";
         let htmlImg = "";
 
-        console.log(fileNames);
         // 이미지의 개수에 맞게 이미지와 캐러셀 버튼을 설정
         for (let i = 0; i < fileNames.length; i++) {
           htmlBtn += `<button type="button" data-bs-target="#carousel${boardNo}"
@@ -489,7 +491,7 @@ const router = async () => {
 
                                   <div class="col-8 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
                                       style="height: 15vh;">
-                                      <span>${content}</span>
+                                      <span class="modal-text">${content}</span>
                                       <div class="row d-flex justify-content-end">
                                           <div class="col-6">작성 일자: <span>${writeDate}</span></div>
                                           <div class="col-3">작성자: <span>${writer}</span></div>
@@ -665,7 +667,7 @@ const router = async () => {
 
       // ------------------------------------------------------------------ 게시글, 모달 생성 > ----------------------------------------------------------------
 
-      // ------------------------------------------------------------------ < 댓글 생성 ------------------------------------------------------------------
+      // ------------------------------------------------------------------ < 댓글 생성, 게시글 수정, 삭제 ------------------------------------------------------------------
       console.log("bullet");
       const boardList = document.querySelector("#board-list");
       // 게시물 중 아무 게시물을 선택해도 어떤 게시물인지 알아서 확인(게시물 마다 이벤트 리스너와 태그 선택자 만들 필요 X)
@@ -684,6 +686,7 @@ const router = async () => {
         // 게시글 수정
         if (id.indexOf("edit") != -1) {
           let count = 0;
+          let imgChange = false;
           const editId = id.replace("edit", "");
           const editModal = document.querySelector("#Edit_Modal"); // 게시글 수정용 모달창
           const editModalTitle = editModal.querySelector("#uploadTitle");
@@ -694,10 +697,20 @@ const router = async () => {
           const editImgList = editModal.querySelector("#editImageListDiv"); // 파일 이름 표시창
           const modalCloseBtn = editModal.querySelector("#btn-close");
           const editBtn = editModal.querySelector("#editBtn");
+          const alertSpan = editModal.querySelector("#alert-span"); // 모달 내부 경고 창
 
           const editBoard = document.querySelector(`.card${editId}`); // 수정할 게시글
           const editBoardTitle = editBoard.querySelector(".card-title"); // 수정할 게시글 제목
           const editBoardContent = editBoard.querySelector(".card-text"); // 수정할 게시글 글내용
+
+          const editTargetModal = document.querySelector(`#modal${editId}`);
+          const editTargetModalTitle =
+            editTargetModal.querySelector(".modal-title");
+          const editTargetModalContent =
+            editTargetModal.querySelector(".modal-text");
+
+          // 경고창 비우기
+          alertSpan.innerText = "";
 
           // 수정할 게시글의 제목, 글내용 가져오기
           editModalTitle.value = editBoardTitle.innerText;
@@ -734,8 +747,17 @@ const router = async () => {
           });
 
           // 수정 버튼 눌렀을 경우
-          editBtn.addEventListener("click", () => {
+          editBtn.addEventListener("click", async () => {
             if (count != 0) {
+              return;
+            }
+            // 이미지를 선택을 하지 않았을 경우
+            if (
+              nowImgCheck.checked == false &&
+              defaultImgCheck.checked == false &&
+              editImgInput.files.length == 0
+            ) {
+              alertSpan.innerText = "필수 선택 항목입니다.";
               return;
             }
             // 제목, 내용이 모두 변경되었을 경우
@@ -744,13 +766,15 @@ const router = async () => {
               editModalContent.value != editBoardContent.innerText
             ) {
               console.log("모두 변경");
-              fetch(`${PATH}/board/post`, {
+              const response = await fetch(`${PATH}/board/post`, {
                 method: "PUT",
                 headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  boardNo: id,
+                  boardNo: editId,
                   title: editModalTitle.value,
                   content: editModalContent.value,
                 }),
@@ -758,9 +782,11 @@ const router = async () => {
             } // 제목만 변경되었을 경우
             else if (editModalTitle.value != editBoardTitle.innerText) {
               console.log("제목 변경");
-              fetch(`${PATH}/board/post`, {
+              const response = await fetch(`${PATH}/board/post`, {
                 method: "PUT",
                 headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -771,9 +797,11 @@ const router = async () => {
             } // 내용만 변경되었을 경우
             else if (editModalContent.value != editBoardContent.innerText) {
               console.log("내용 변경");
-              fetch(`${PATH}/board/post`, {
+              const response = await fetch(`${PATH}/board/post`, {
                 method: "PUT",
                 headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -787,17 +815,23 @@ const router = async () => {
               console.log("현재 이미지 사용");
             } else if (defaultImgCheck.checked == true) {
               console.log("기본 이미지 사용");
+              imgChange = true;
               const formData = new FormData();
               formData.append("boardNo", editId);
             } else {
               console.log("이미지 변경");
+              imgChange = true;
               const formData = new FormData();
               formData.append("boardNo", editId);
-              for (let file in editInputImage.files) {
-                formData.append("image", file);
+              for (let i = 0; i < editInputImage.files.length; i++) {
+                formData.append("image", editInputImage.files[i]);
               }
-              fetch(`${PATH}/board/post/image`, {
+              const response = await fetch(`${PATH}/board/post/image`, {
                 method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                },
                 body: formData,
               });
             }
@@ -816,19 +850,40 @@ const router = async () => {
               modalCloseBtn
             );
             count++;
+
+            if (imgChange) {
+              const bulletinLink = document.querySelector("#bulletinLink");
+              bulletinLink.click();
+            }
+
+            editTargetModalTitle.innerText = editModalTitle.value;
+            editTargetModalContent.innerText = editModalContent.value;
           });
+        } // 삭제 버튼 눌렀을 경우
+        else if (id.indexOf("delete") != -1) {
+          const deleteId = id.replace("delete", "");
+          console.log("delete!");
+          console.log(deleteId);
+          const { status } = await fetch(`${PATH}/board/post`, {
+            method: "DELETE",
+            headers: {
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
+            },
+          });
+          console.log(status);
         } // 댓글생성
         else if (countWhile != 0) {
           const block_comment = document.querySelector(`#block_comment${id}`);
           block_comment.innerHTML = ""; // 클릭 이전에 코멘트가 있다면 삭제
           nowId = id;
 
-          // fetch를 이용해 값 가져오기 (임시 값)
+          // fetch를 이용해 값 가져오기
           const response = await fetch(`${PATH}/comment?boardNo=${id}`, {
             method: "get",
           });
 
-          // 값이 잘 전달 되었을 때 생성 (테스트 끝나면 201로 바꿔야 함)
+          // 값이 잘 전달 되었을 때 생성
           if (response.status == 200) {
             const jsonData = await response.json();
             const data = JSON.parse(jsonData.data);
@@ -855,7 +910,7 @@ const router = async () => {
         }
       });
 
-      // ------------------------------------------------------------------ 댓글 생성 > ------------------------------------------------------------------
+      // ------------------------------------------------------------------ 댓글 생성, 게시글 수정, 삭제 > ------------------------------------------------------------------
 
       // -------------------------------------------------------------- < 댓글 작성 (POST), 댓글 삭제 ------------------------------------------------------------
 
