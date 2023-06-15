@@ -119,14 +119,14 @@ const router = async () => {
       const createBoard = (boardNo, memberName, introduceContent, fileName) => {
         const div = document.createElement("div");
         div.classList = "col-4 mt-5";
-        div.id = boardNo;
+        div.id = `board${boardNo}`;
         div.innerHTML = `
                           <div class="flip-outer m-auto" data-bs-toggle="modal" data-bs-target="#modal${boardNo}" >
                               <div class="flip-inner">
                                   <img src="${fileName}" class="front shadow-lg" />
                                   <div class="back shadow-lg">
-                                      <h4 class="p-5">${memberName}</h4>
-                                      <h4>${introduceContent}</h4>
+                                      <h4 class="p-5" id="boardMemberName">${memberName}</h4>
+                                      <h4 id="boardMemberContent">${introduceContent}</h4>
                                   </div>
                               </div>
                           </div>
@@ -149,7 +149,7 @@ const router = async () => {
         div.innerHTML = `<div class="modal-dialog modal-l">
                   <div class="modal-content">
                       <div class="modal-header">
-                          <h1 class="modal-title fs-5" >#${boardNo} ${memberName}</h1>
+                          <h1 class="modal-title fs-5" id="modalMemberName" >${memberName}</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
@@ -171,7 +171,7 @@ const router = async () => {
                               <div class="row">
                                   <!-- 본문 창 -->
                                   <div class="col-12 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
-                                      style="height: 15vh;">
+                                      style="height: 15vh;" id="modalMemberContent">
                                       <span>${introduceContent}</span>
                                   </div>
                               </div>
@@ -179,7 +179,7 @@ const router = async () => {
                       </div>
                       <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="button" data-bs-toggle="modal" data-bs-target="#modalEdit${boardNo}" id="memberModifyBtn" class="btn btn-primary">Modify</button>
+                          <button type="button" data-bs-toggle="modal" data-bs-target="#modalEdit${boardNo}" id="modal${boardNo}edit" class="btn btn-primary">Modify</button>
                           <button type="button" id="memberDeleteBtn" class="btn btn-danger">Delete</button>
                       </div>
                   </div>
@@ -216,6 +216,7 @@ const router = async () => {
                                     <form action="" method="post" enctype="multipart/form-data">
                                         <div class="mb-3">
                                             <span class="form-label ms-2">이미지 선택</span><br>
+                                            <span id="alert-span" class="ms-2"></span>
                                             <div class="form-check ms-1 ps-0 pt-3">
                                                 <input type="checkbox" class="mb-3" id="nowImg" />
                                                 <label for="nowImg">현재 이미지 사용</label>
@@ -265,6 +266,208 @@ const router = async () => {
       const modal = document.querySelector("#memberRead_block");
       const editMemberModal = document.querySelector("#memberEdit_block");
       post.innerHTML = "";
+      modal.addEventListener("click", async (event) => {
+        let path = event.target;
+        let id = path.id;
+        let countWhile = 0; // 게시글이 아닌 공백(마진) 클릭을 확인하기 위한 값
+        while (!id) {
+          countWhile++;
+          // 게시글의 id 찾기
+          path = path.parentElement;
+          id = path.id;
+        }
+        if (id.indexOf("edit") != -1) {
+          let count = 0;
+          let imgChange = false;
+          const editIdId = id.replace("edit", "");
+          const editModalId = editIdId.replace("modal", "modalEdit");
+          const editModal = document.querySelector(`#${editModalId}`); // 게시글 수정용 모달창
+          const editModalTitle = editModal.querySelector("#uploadTitle");
+          const editModalContent = editModal.querySelector("#uploadText");
+          const nowImgCheck = editModal.querySelector("#nowImg");
+          const defaultImgCheck = editModal.querySelector("#defaultImg");
+          const editImgInput = editModal.querySelector("#editImg");
+          const editImgList = editModal.querySelector("#editImageListDiv"); // 파일 이름 표시창
+          const modalCloseBtn = editModal.querySelector("#btn-close");
+          const editBtn = editModal.querySelector("#editBtn");
+          const alertSpan = editModal.querySelector("#alert-span"); // 모달 내부 경고 창
+          
+          const editBoardId = editIdId.replace("modal", "");
+          const editBoard = document.querySelector(`#board${editBoardId}`); // 수정할 게시글
+          const editBoardTitle = editBoard.querySelector("#boardMemberName"); // 수정할 게시글 제목
+          const editBoardContent = editBoard.querySelector("#boardMemberContent"); // 수정할 게시글 글내용
+          
+          const editTargetModal = document.querySelector(`#${editIdId}`);
+          const editTargetModalTitle =
+            editTargetModal.querySelector("#modalMemberName");
+          const editTargetModalContent =
+            editTargetModal.querySelector("#modalMemberContent");
+
+          // 경고창 비우기
+          alertSpan.innerText = "";
+
+          // 수정할 게시글의 제목, 글내용 가져오기
+          editModalTitle.value = editBoardTitle.innerText;
+          editModalContent.value = editBoardContent.innerText;
+
+          // 현재 이미지 사용 선택시
+          nowImgCheck.addEventListener("change", (event) => {
+            if (event.target.checked) {
+              defaultImgCheck.checked = false;
+              editImgInput.disabled = true;
+              editImgList.style.backgroundColor = "#E9ECEF";
+            } else {
+              editImgInput.disabled = false;
+              editImgList.style.backgroundColor = "#ffffff";
+            }
+          });
+
+          // 기본 이미지 사용 선택시
+          defaultImgCheck.addEventListener("change", (event) => {
+            if (event.target.checked) {
+              nowImgCheck.checked = false;
+              editImgInput.disabled = true;
+              editImgList.style.backgroundColor = "#E9ECEF";
+            } else {
+              editImgInput.disabled = false;
+              editImgList.style.backgroundColor = "#ffffff";
+            }
+          });
+
+          // 이미지 선택 시
+          editImgInput.addEventListener("change", () => {
+            nowImgCheck.checked = false;
+            defaultImgCheck.checked = false;
+          });
+
+          // 수정 버튼 눌렀을 경우
+          editBtn.addEventListener("click", async () => {
+            if (count != 0) {
+              return;
+            }
+            // 이미지를 선택을 하지 않았을 경우
+            if (
+              nowImgCheck.checked == false &&
+              defaultImgCheck.checked == false &&
+              editImgInput.files.length == 0
+            ) {
+              alertSpan.innerText = "필수 선택 항목입니다.";
+              return;
+            }
+            // 제목, 내용이 모두 변경되었을 경우
+            if (
+              editModalTitle.value != editBoardTitle.innerText &&
+              editModalContent.value != editBoardContent.innerText
+            ) {
+              console.log("모두 변경");
+              const response = await fetch(`${PATH}/board/post`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  boardNo: editId,
+                  title: editModalTitle.value,
+                  content: editModalContent.value,
+                }),
+              });
+            } // 제목만 변경되었을 경우
+            else if (editModalTitle.value != editBoardTitle.innerText) {
+              console.log("제목 변경");
+              const response = await fetch(`${PATH}/board/post`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  boardNo: editId,
+                  title: editModalTitle.value,
+                }),
+              });
+            } // 내용만 변경되었을 경우
+            else if (editModalContent.value != editBoardContent.innerText) {
+              console.log("내용 변경");
+              const response = await fetch(`${PATH}/board/post`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  boardNo: editId,
+                  content: editModalContent.value,
+                }),
+              });
+            }
+            // 현재 이미지 사용을 체크했을 경우
+            if (nowImgCheck.checked == true) {
+              console.log("현재 이미지 사용");
+            } else if (defaultImgCheck.checked == true) {
+              console.log("기본 이미지 사용");
+              imgChange = true;
+              const formData = new FormData();
+              formData.append("boardNo", editId);
+            } else {
+              console.log("이미지 변경");
+              imgChange = true;
+              const formData = new FormData();
+              formData.append("boardNo", editId);
+              for (let i = 0; i < editInputImage.files.length; i++) {
+                formData.append("image", editInputImage.files[i]);
+              }
+              const response = await fetch(`${PATH}/board/post/image`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                },
+                body: formData,
+              });
+            }
+
+            // 수정 모달 초기화
+            nowImgCheck.checked = false;
+            defaultImgCheck.checked = false;
+            editImgInput.disabled = false;
+            editImgList.style.backgroundColor = "#ffffff";
+
+            emptyModal(
+              editModalTitle,
+              editModalContent,
+              editImgInput,
+              editImgList,
+              modalCloseBtn
+            );
+            count++;
+
+            if (imgChange) {
+              const bulletinLink = document.querySelector("#bulletinLink");
+              bulletinLink.click();
+            }
+
+            editTargetModalTitle.innerText = editModalTitle.value;
+            editTargetModalContent.innerText = editModalContent.value;
+          });
+        } // 삭제 버튼 눌렀을 경우
+        else if (id.indexOf("delete") != -1) {
+          const deleteId = id.replace("delete", "");
+          console.log("delete!");
+          console.log(deleteId);
+          const { status } = await fetch(`${PATH}/board/post`, {
+            method: "DELETE",
+            headers: {
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
+            },
+          });
+          console.log(status);
+        }
+      })
       // fetch를 이용해 값 가져오기 (임시 값)
       await fetch(
         "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
