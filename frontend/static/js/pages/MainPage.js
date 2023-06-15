@@ -131,7 +131,11 @@ export default class {
     
 </div>
 
-<!-- Modal _ 게시글 수정 -->
+<!-- Modal _ 게시글 Read 기능 -->
+<div id="memberRead_block">
+
+</div>
+<!-- Modal _ 게시글 Modify 기능 -->
 <div id="memberEdit_block">
 
 </div>

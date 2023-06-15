@@ -79,7 +79,10 @@ const router = async () => {
           uploadMemberName.value = "";
           uploadMemberContent.value = "";
           uploadImg.files = null;
-          createBoard(boardNo, memberName, boardNo, introduceContent, fileName);
+          createBoard(boardNo, memberName,introduceContent, fileName);
+          createModal(boardNo, memberName,introduceContent, fileName);
+          createEditModal(boardNo);
+
         } else if (response.status == 422) {
           alert("올바르지 않은 데이터 양식입니다");
         } else {
@@ -176,7 +179,7 @@ const router = async () => {
                       </div>
                       <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="button" id="memberModifyBtn" class="btn btn-primary">Modify</button>
+                          <button type="button" data-bs-toggle="modal" data-bs-target="#modalEdit${boardNo}" id="memberModifyBtn" class="btn btn-primary">Modify</button>
                           <button type="button" id="memberDeleteBtn" class="btn btn-danger">Delete</button>
                       </div>
                   </div>
@@ -185,10 +188,82 @@ const router = async () => {
         modal.prepend(div);
       };
 
+      /**
+       * 조원모달의 수정 페이지를 만든 후 추가하는 함수입니다.
+       *
+       * @param {Number} boardNo - 소개란 번호
+       * @param {String} memberName - 조원 명
+       */
+      const createEditModal = (boardNo, memberName) => {
+        const div = document.createElement("div");
+        div.className = "modal";
+        div.id = `modalEdit${boardNo}`;
+        div.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5 border-bottom" id="exampleModalLabel"><input type="text"
+                                class="form-control" style="border:0" id="uploadTitle" placeholder="${memberName}"></h1>
+                        <button id="btn-close" type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 position-relative">
+                                <!-- 이미지 창 -->
+        
+                                <div class="d-flex align-items-center">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        <div class="mb-3">
+                                            <span class="form-label ms-2">이미지 선택</span><br>
+                                            <div class="form-check ms-1 ps-0 pt-3">
+                                                <input type="checkbox" class="mb-3" id="nowImg" />
+                                                <label for="nowImg">현재 이미지 사용</label>
+                                            </div>
+                                            <div class="form-check ms-1 ps-0">
+                                                <input type="checkbox" class="mb-3" id="defaultImg" />
+                                                <label for="defaultImg">기본 이미지 사용</label>
+                                            </div>
+                                            <input class="form-control" name="filename[]" type="file" id="editImg"
+                                                multiple="multiple" accept="image/*">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 등록 파일 출력 -->
+                        <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll" style="height: 100px; background-color: #ffffff;">
+                            <ul id="editImageList">
+        
+                            </ul>
+                        </div>
+                        <!-- 작성 내용 -->
+                        <div>
+                            <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${sessionStorage.getItem(
+                              "nickname"
+                            )}</div>
+                        </div>
+                        <div class="form-floating">
+                            <textarea class="form-control mt-3" placeholder="Leave a comment here" id="uploadText"
+                                style="height: 100px" resize="none"></textarea>
+        
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="editBtn" type="button" class="btn btn-primary">Edit</button>
+                    </div>
+                </div>
+            </div>`;
+
+        editMemberModal.prepend(div);
+      };
+
       // ------------------------------------------------------------------ < 조원 소개 생성 ------------------------------------------------------------------
 
       const post = document.querySelector("#member_post");
-      const modal = document.querySelector("#memberEdit_block");
+      const modal = document.querySelector("#memberRead_block");
+      const editMemberModal = document.querySelector("#memberEdit_block");
       post.innerHTML = "";
       // fetch를 이용해 값 가져오기 (임시 값)
       await fetch(
@@ -196,7 +271,7 @@ const router = async () => {
         {
           method: "get",
         }
-      )
+      ) 
         .then((response) => response.json())
         .then((data) => {
           let count = 0; // 예제 블럭 제한 걸기
@@ -204,6 +279,7 @@ const router = async () => {
           for (let value of data) {
             createBoard(value.id, value.phone, value.title, value.url);
             createModal(value.id, value.phone, value.title, value.url);
+            createEditModal(value.id, value.phone);
             // // 예제 블럭 6개만 뽑아쓰기
             count++;
             if (count === 6) {
