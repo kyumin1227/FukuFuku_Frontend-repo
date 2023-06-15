@@ -373,7 +373,7 @@ const router = async () => {
         fileNames
       ) => {
         const div = document.createElement("div");
-        div.classList = "col-md-4 board";
+        div.classList = `col-md-4 board${boardNo}`;
         div.id = boardNo;
         div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
                         data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
@@ -729,6 +729,32 @@ const router = async () => {
           const editTargetModalContent =
             editTargetModal.querySelector(".modal-text");
 
+          // 파일 업로드 개수 제한
+          editImgInput.addEventListener("change", (e) => {
+            const selectedFiles = e.target.files;
+            const maxFiles = 5; // 최대 파일 개수
+
+            if (selectedFiles.length > maxFiles) {
+              // 파일 개수가 최대 개수를 초과하는 경우
+              alertSpan.innerHTML = `<div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 파일은 최대 5개까지 선택할 수 있습니다.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+              // 파일 초기화
+              editImgInput.type = "radio";
+              editImgInput.type = "file";
+              editImgList.innerHTML = "";
+            }
+          });
+
           // 경고창 비우기
           alertSpan.innerText = "";
 
@@ -771,18 +797,70 @@ const router = async () => {
             if (count != 0) {
               return;
             }
+
+            // 제목이 비어있는 경우
+            if (
+              editModalTitle.value == undefined ||
+              editModalTitle.value.trim() == ""
+            ) {
+              alertSpan.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 제목을 입력해주세요.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+              return;
+            } // 내용이 비어있는 경우
+            else if (
+              editModalContent.value == undefined ||
+              editModalContent.value.trim() == ""
+            ) {
+              alertSpan.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 내용을 입력해주세요.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+              return;
+            }
             // 이미지를 선택을 하지 않았을 경우
             if (
               nowImgCheck.checked == false &&
               defaultImgCheck.checked == false &&
               editImgInput.files.length == 0
             ) {
-              alertSpan.innerText = "필수 선택 항목입니다.";
+              alertSpan.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 이미지 선택은 필수 항목입니다.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
               return;
             }
             // 제목, 내용이 모두 변경되었을 경우
             if (
-              editModalTitle.value != editBoardTitle.innerText &&
+              editModalTitle.value != editBoardTitle.innerText ||
               editModalContent.value != editBoardContent.innerText
             ) {
               console.log("모두 변경");
@@ -791,41 +869,11 @@ const router = async () => {
                 headers: {
                   token: sessionStorage.getItem("token"),
                   nickname: sessionStorage.getItem("nickname"),
+                  boardNo: editId,
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  boardNo: editId,
                   title: editModalTitle.value,
-                  content: editModalContent.value,
-                }),
-              });
-            } // 제목만 변경되었을 경우
-            else if (editModalTitle.value != editBoardTitle.innerText) {
-              console.log("제목 변경");
-              const response = await fetch(`${PATH}/board/post`, {
-                method: "PUT",
-                headers: {
-                  token: sessionStorage.getItem("token"),
-                  nickname: sessionStorage.getItem("nickname"),
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  boardNo: editId,
-                  title: editModalTitle.value,
-                }),
-              });
-            } // 내용만 변경되었을 경우
-            else if (editModalContent.value != editBoardContent.innerText) {
-              console.log("내용 변경");
-              const response = await fetch(`${PATH}/board/post`, {
-                method: "PUT",
-                headers: {
-                  token: sessionStorage.getItem("token"),
-                  nickname: sessionStorage.getItem("nickname"),
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  boardNo: editId,
                   content: editModalContent.value,
                 }),
               });
@@ -844,13 +892,15 @@ const router = async () => {
               const formData = new FormData();
               formData.append("boardNo", editId);
               for (let i = 0; i < editInputImage.files.length; i++) {
+                console.log(editInputImage.files[i]);
                 formData.append("image", editInputImage.files[i]);
               }
-              const response = await fetch(`${PATH}/board/post/image`, {
+              const responseImg = await fetch(`${PATH}/board/post/image`, {
                 method: "PUT",
                 headers: {
                   token: sessionStorage.getItem("token"),
                   nickname: sessionStorage.getItem("nickname"),
+                  boardNo: editId,
                 },
                 body: formData,
               });
@@ -862,6 +912,20 @@ const router = async () => {
             editImgInput.disabled = false;
             editImgList.style.backgroundColor = "#ffffff";
 
+            // 이미지가 변경되었을 경우 게시판 페이지로 이동하여 값 재요청
+            if (imgChange) {
+              const bulletinLink = document.querySelector("#bulletinLink");
+              bulletinLink.click();
+            }
+
+            editTargetModalTitle.innerText =
+              `#${editId} ` + editModalTitle.value;
+            editTargetModalContent.innerText = editModalContent.value;
+            editBoardTitle.innerText = editModalTitle.value;
+            editBoardContent.innerText = editModalContent.value;
+            console.log(editTargetModalTitle);
+            console.log(editTargetModalContent);
+
             emptyModal(
               editModalTitle,
               editModalContent,
@@ -871,13 +935,7 @@ const router = async () => {
             );
             count++;
 
-            if (imgChange) {
-              const bulletinLink = document.querySelector("#bulletinLink");
-              bulletinLink.click();
-            }
-
-            editTargetModalTitle.innerText = editModalTitle.value;
-            editTargetModalContent.innerText = editModalContent.value;
+            console.log("Edit!");
           });
         } // 삭제 버튼 눌렀을 경우
         else if (id.indexOf("delete") != -1) {
@@ -889,8 +947,17 @@ const router = async () => {
             headers: {
               token: sessionStorage.getItem("token"),
               nickname: sessionStorage.getItem("nickname"),
+              boardNo: deleteId,
             },
           });
+
+          if (status == 204) {
+            const deleteBoard = document.querySelector(`.board${deleteId}`);
+            const deleteModal = document.querySelector(`#modal${deleteId}`);
+
+            deleteBoard.parentNode.removeChild(deleteBoard);
+            deleteModal.parentNode.removeChild(deleteModal);
+          }
           console.log(status);
         } // 댓글생성
         else if (countWhile != 0) {
@@ -1089,7 +1156,36 @@ const router = async () => {
       const uploadText = document.querySelector("#uploadText");
       const uploadTitle = document.querySelector("#uploadTitle");
       const uploadImg = document.querySelector("#uploadImg");
+      const imgList = document.querySelector("#imageList");
       const modalCloseBtn = document.querySelector("#btn-close");
+      const modalAlert = document.querySelector("#modal-alert");
+
+      // 파일 업로드 개수 제한
+      uploadImg.addEventListener("change", (e) => {
+        const selectedFiles = e.target.files;
+        const maxFiles = 5; // 최대 파일 개수
+
+        if (selectedFiles.length > maxFiles) {
+          // 파일 개수가 최대 개수를 초과하는 경우
+          modalAlert.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 파일은 최대 5개까지 선택할 수 있습니다.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+          // 파일 초기화
+          uploadImg.type = "radio";
+          uploadImg.type = "file";
+          imgList.innerHTML = "";
+        }
+      });
 
       // Upload 버튼을 눌렀을 경우
       const handleUpload = async () => {
@@ -1098,6 +1194,39 @@ const router = async () => {
         const images = uploadImg.files;
         const formData = new FormData();
 
+        console.log(title);
+
+        if (title == undefined || title.trim() == "") {
+          modalAlert.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 제목을 입력해주세요.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+          return;
+        } else if (content == undefined || content.trim() == "") {
+          modalAlert.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 내용을 입력해주세요.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+          return;
+        }
         formData.append("title", title);
         formData.append("content", content);
         for (let i = 0; i < images.length; i++) {
@@ -1175,7 +1304,7 @@ const router = async () => {
         // 입력값이 존재할 떄
         if (myPassword != "") {
           console.log(myPassword);
-          const {status} = await fetch(`${PATH}/account/withdrawal`, {
+          const { status } = await fetch(`${PATH}/account/withdrawal`, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
@@ -1187,7 +1316,7 @@ const router = async () => {
               nickname: userNickname,
               userPassword: myPassword,
             }),
-          })
+          });
           console.log(status);
           if (status == 204) {
             sessionStorage.clear();
@@ -1196,7 +1325,8 @@ const router = async () => {
             mainLink.click();
           }
           // 비밀번호가 틀릴경우
-          else if ( status == 401){
+          else if (data.status == 401) {
+            console.log(data.message);
             alert("비밀번호가 다릅니다.");
             console.log(401);
           }
@@ -1210,8 +1340,6 @@ const router = async () => {
             alert("서버에 문제가 생겼습니다.");
             console.log(500);
           }
-            
-
         }
         // 입력값이 존재하지 않을 경우
         else {
@@ -1368,47 +1496,45 @@ const router = async () => {
         const inputId = InputId.value;
         const inputPassword = InputPassword.value;
 
-        if(inputId != "" && inputPassword){
-          
-                  // 값 POST 전달
-                  fetch(`${PATH}/account`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      userId: inputId,
-                      userPassword: inputPassword,
-                    }),
-                  })
-                    .then((response) => response.json())
-                    .then((data) => {
-                      console.log(data);
-                      // 사용자 로그인 성공
-                      if (data.status == 200) {
-                        alert("로그인 성공");
-                        sessionStorage.setItem("token", data.data.token);
-                        sessionStorage.setItem("nickname", data.data.nickname);
-                        sessionStorage.setItem("userId", data.data.userId);
-                        loginFunc();
-                        // 관리자 여부 확인
-                        if (data.data.isAdmin == true) {
-                          sessionStorage.setItem(
-                            "isAdmin",
-                            "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
-                          );
-                        }
-                        mainLink.click();
-                      }
-                      // 로그인 실패
-                      if (data.status == 400) {
-                        console.log(data.message);
-                        alert("로그인 실패");
-                      }
-                    })
-          
-                    .catch((error) => console.log(error));
+        if (inputId != "" && inputPassword) {
+          // 값 POST 전달
+          fetch(`${PATH}/account`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: inputId,
+              userPassword: inputPassword,
+            }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              // 사용자 로그인 성공
+              if (data.status == 200) {
+                alert("로그인 성공");
+                sessionStorage.setItem("token", data.data.token);
+                sessionStorage.setItem("nickname", data.data.nickname);
+                sessionStorage.setItem("userId", data.data.userId);
+                loginFunc();
+                // 관리자 여부 확인
+                if (data.data.isAdmin == true) {
+                  sessionStorage.setItem(
+                    "isAdmin",
+                    "jehwfuilaegmkdfzvjioaewj9r8rl34t934u"
+                  );
+                }
+                mainLink.click();
+              }
+              // 로그인 실패
+              if (data.status == 400) {
+                console.log(data.message);
+                alert("로그인 실패");
+              }
+            })
 
+            .catch((error) => console.log(error));
         } else {
           alert("아이디와 비밀번호를 입력해주세요");
         }
@@ -1694,15 +1820,12 @@ const router = async () => {
           token: token,
           nickname: username,
         },
-      })
-        .then((response) => {
-          response.json()
-          
-          if(response.status){
+      }).then((response) => {
+        response.json();
 
-          }
-        })
-
+        if (response.status) {
+        }
+      });
 
       createBoard("1", "content", "boardNo", "writeDate", "example.jpg");
       createModal("1", "content", "boardNo", "writeDate", "example.jpg");

@@ -61,6 +61,7 @@ export default class {
                 <button id="btn-close" type="button" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
+            <div id="modal-alert"></div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-12 position-relative">
@@ -113,6 +114,7 @@ export default class {
                 <button id="btn-close" type="button" class="btn-close" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
+            <div id="alert-span"></div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-12 position-relative">
@@ -122,7 +124,6 @@ export default class {
                             <form action="" method="post" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <span class="form-label ms-2">이미지 선택</span><br>
-                                    <span id="alert-span" class="ms-2"></span>
                                     <div class="form-check ms-1 ps-0 pt-3">
                                         <input type="checkbox" class="mb-3" id="nowImg" />
                                         <label for="nowImg">현재 이미지 사용</label>
