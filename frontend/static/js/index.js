@@ -703,7 +703,7 @@ const router = async () => {
                                   isAdmin
                                     ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
                                     </div>
-                                    <div id="delete${boardNo}" class="col-3 px-0 ms-2"><a class="btn btn-danger container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Delete</a>
+                                    <div id="delete${boardNo}" class="col-3 px-0 ms-2"><a class="btn btn-danger container-fluid">Delete</a>
                                     </div>`
                                     : writer ==
                                       sessionStorage.getItem("nickname") // 로그인 한 사람 이름 (임시값)
@@ -1170,12 +1170,11 @@ const router = async () => {
             </div>`;
               return;
             }
-            // 제목, 내용이 모두 변경되었을 경우
+            // 제목, 내용이 변경되었을 경우
             if (
               editModalTitle.value != editBoardTitle.innerText ||
               editModalContent.value != editBoardContent.innerText
             ) {
-              console.log("모두 변경");
               const response = await fetch(`${PATH}/board/post`, {
                 method: "PUT",
                 headers: {
@@ -1189,16 +1188,37 @@ const router = async () => {
                   content: editModalContent.value,
                 }),
               });
+
+              // 제목, 내용 수정 실패
+              if (response.status != 201) {
+                alertSpan.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 수정에 실패했습니다. (${response.status})
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+                return;
+              }
             }
-            // 현재 이미지 사용을 체크했을 경우
+            console.log("876");
+            // 현재 이미지 사용 체크
             if (nowImgCheck.checked == true) {
               console.log("현재 이미지 사용");
-            } else if (defaultImgCheck.checked == true) {
+            } // 기본 이미지 사용 체크
+            else if (defaultImgCheck.checked == true) {
               console.log("기본 이미지 사용");
               imgChange = true;
               const formData = new FormData();
               formData.append("boardNo", editId);
-            } else {
+            } // 이미지 변경
+            else {
               console.log("이미지 변경");
               imgChange = true;
               const formData = new FormData();
@@ -1216,9 +1236,27 @@ const router = async () => {
                 },
                 body: formData,
               });
+
+              // 이미지 수정 실패
+              if (responseImg.status != 201) {
+                alertSpan.innerHTML = `
+            <div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 이미지 수정에 실패했습니다. (${response.status})
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+                return;
+              }
             }
 
-            // 수정 모달 초기화
+            // 수정 모달의 이미지 선택 초기화
             nowImgCheck.checked = false;
             defaultImgCheck.checked = false;
             editImgInput.disabled = false;
@@ -1230,6 +1268,7 @@ const router = async () => {
               bulletinLink.click();
             }
 
+            // 글 수정
             editTargetModalTitle.innerText =
               `#${editId} ` + editModalTitle.value;
             editTargetModalContent.innerText = editModalContent.value;
@@ -1238,6 +1277,7 @@ const router = async () => {
             console.log(editTargetModalTitle);
             console.log(editTargetModalContent);
 
+            // 수정 모달 초기화
             emptyModal(
               editModalTitle,
               editModalContent,
@@ -1263,14 +1303,30 @@ const router = async () => {
             },
           });
 
-          if (status == 204) {
-            const deleteBoard = document.querySelector(`.board${deleteId}`);
-            const deleteModal = document.querySelector(`#modal${deleteId}`);
-
-            deleteBoard.parentNode.removeChild(deleteBoard);
-            deleteModal.parentNode.removeChild(deleteModal);
+          // 삭제 실패
+          if (status != 204) {
+            block_alert.innerHTML = `
+          <div
+            class="alert alert-warning alert-dismissible fade show"
+            role="alert"
+          >
+          <div class="container">
+            <strong>오류!</strong> 게시글 삭제에 실패했습니다. (${status})
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+          </div>`;
+            return;
           }
-          console.log(status);
+          const deleteBoard = document.querySelector(`.board${deleteId}`);
+          const deleteModal = document.querySelector(`#modal${deleteId}`);
+
+          deleteBoard.parentNode.removeChild(deleteBoard);
+          deleteModal.parentNode.removeChild(deleteModal);
         } // 댓글생성
         else if (countWhile != 0) {
           const block_comment = document.querySelector(`#block_comment${id}`);
