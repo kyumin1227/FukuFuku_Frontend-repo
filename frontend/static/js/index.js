@@ -46,46 +46,57 @@ const router = async () => {
     if (location.pathname === "/") {
       const memberCBtn = document.querySelector("#uploadBtn");
       const newBtn = document.querySelector("#memberCBtn");
+      const modalCloseBtn = document.querySelector("#btn-close");
+      let count = 1;
 
       const memberUpload = async () => {
         const memberName = uploadMemberName.value;
         const introduceContent = uploadMemberContent.value;
         const fileName = uploadImg.files;
         const formData = new FormData();
-        console.log(memberName);
-
-        formData.append("memberName", memberName);
-        formData.append("introduceContent", introduceContent);
         formData.append("fileName", fileName);
-        console.log(formData.memberName);
+        formData.append("memberName", memberName);
+        formData.append("introduceContent",introduceContent);
 
         const response = await fetch(
-          "https://jsonplaceholder.typicode.com/posts",
+          `${PATH}/member`,
+          // "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
           {
             method: "POST",
-            body: formData,
+            headers: {
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
+              // memberName,
+              // introduceContent,
+              "Content-Type": "application/json",
+            },
+            // body: formData,
+            body: JSON.stringify({
+              // memberName: memberName,
+              // introduceContent: introduceContent,
+              formData,
+            })
           }
         );
-        console.log(response.body);
         if (response.status == 201) {
           alert("조원 등록 성공!");
+
           // 값이 잘 전달 되었을 때 생성
-          const boardNo = response.boardNo;
-          const memberName = response.memberName;
-          const introduceContent = response.introduceContent;
-          const fileName = response.fileName;
+          const boardNo = count
+          createBoard(boardNo, memberName,introduceContent, fileName);
+          createModal(boardNo, memberName,introduceContent, fileName);
+          createEditModal(boardNo, memberName);
 
           // 작성 페이지의 제목과 글 비우기
-          uploadMemberName.value = "";
-          uploadMemberContent.value = "";
-          uploadImg.files = null;
-          createBoard(boardNo, memberName, boardNo, introduceContent, fileName);
+          emptyModal(boardNo, memberName,introduceContent, fileName, modalCloseBtn);
+
         } else if (response.status == 422) {
           alert("올바르지 않은 데이터 양식입니다");
         } else {
           alert("Server Error");
         }
       };
+
       memberCBtn.addEventListener("click", memberUpload);
 
       let isAdmin = false; // 임시값 입니다.
@@ -116,14 +127,14 @@ const router = async () => {
       const createBoard = (boardNo, memberName, introduceContent, fileName) => {
         const div = document.createElement("div");
         div.classList = "col-4 mt-5";
-        div.id = boardNo;
+        div.id = `board${boardNo}`;
         div.innerHTML = `
                           <div class="flip-outer m-auto" data-bs-toggle="modal" data-bs-target="#modal${boardNo}" >
                               <div class="flip-inner">
                                   <img src="${fileName}" class="front shadow-lg" />
                                   <div class="back shadow-lg">
-                                      <h4 class="p-5">${memberName}</h4>
-                                      <h4>${introduceContent}</h4>
+                                      <h4 class="p-5" id="boardMemberName">${memberName}</h4>
+                                      <h4 id="boardMemberContent">${introduceContent}</h4>
                                   </div>
                               </div>
                           </div>
@@ -146,7 +157,7 @@ const router = async () => {
         div.innerHTML = `<div class="modal-dialog modal-l">
                   <div class="modal-content">
                       <div class="modal-header">
-                          <h1 class="modal-title fs-5" >#${boardNo} ${memberName}</h1>
+                          <h1 class="modal-title fs-5" id="modalMemberName" >${memberName}</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
@@ -168,7 +179,7 @@ const router = async () => {
                               <div class="row">
                                   <!-- 본문 창 -->
                                   <div class="col-12 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
-                                      style="height: 15vh;">
+                                      style="height: 15vh;" id="modalMemberContent">
                                       <span>${introduceContent}</span>
                                   </div>
                               </div>
@@ -176,8 +187,8 @@ const router = async () => {
                       </div>
                       <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="button" id="memberModifyBtn" class="btn btn-primary">Modify</button>
-                          <button type="button" id="memberDeleteBtn" class="btn btn-danger">Delete</button>
+                          <button type="button" data-bs-toggle="modal" data-bs-target="#modalEdit${boardNo}" id="modal${boardNo}edit" class="btn btn-primary">Modify</button>
+                          <button type="button" id="${boardNo}delete" class="btn btn-danger">Delete</button>
                       </div>
                   </div>
               </div>`;
@@ -185,28 +196,329 @@ const router = async () => {
         modal.prepend(div);
       };
 
+      /**
+       * 조원모달의 수정 페이지를 만든 후 추가하는 함수입니다.
+       *
+       * @param {Number} boardNo - 소개란 번호
+       * @param {String} memberName - 조원 명
+       */
+      const createEditModal = (boardNo, memberName) => {
+        const div = document.createElement("div");
+        div.className = "modal";
+        div.id = `modalEdit${boardNo}`;
+        div.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5 border-bottom" id="exampleModalLabel"><input type="text"
+                                class="form-control" style="border:0" id="uploadTitle" placeholder="${memberName}"></h1>
+                        <button id="btn-close" type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 position-relative">
+                                <!-- 이미지 창 -->
+        
+                                <div class="d-flex align-items-center">
+                                    <form action="" method="post" enctype="multipart/form-data">
+                                        <div class="mb-3">
+                                            <span class="form-label ms-2">이미지 선택</span><br>
+                                            <span id="alert-span" class="ms-2"></span>
+                                            <div class="form-check ms-1 ps-0 pt-3">
+                                                <input type="checkbox" class="mb-3" id="nowImg" />
+                                                <label for="nowImg">현재 이미지 사용</label>
+                                            </div>
+                                            <div class="form-check ms-1 ps-0">
+                                                <input type="checkbox" class="mb-3" id="defaultImg" />
+                                                <label for="defaultImg">기본 이미지 사용</label>
+                                            </div>
+                                            <input class="form-control" name="filename[]" type="file" id="editImg"
+                                                multiple="multiple" accept="image/*">
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 등록 파일 출력 -->
+                        <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll" style="height: 100px; background-color: #ffffff;">
+                            <ul id="editImageList">
+        
+                            </ul>
+                        </div>
+                        <!-- 작성 내용 -->
+                        <div>
+                            <div class="border-bottom border-secondary ms-1 mt-5">작성자 : ${sessionStorage.getItem(
+                              "nickname"
+                            )}</div>
+                        </div>
+                        <div class="form-floating">
+                            <textarea class="form-control mt-3" placeholder="Leave a comment here" id="uploadText"
+                                style="height: 100px" resize="none"></textarea>
+        
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button id="editBtn" type="button" class="btn btn-primary">Edit</button>
+                    </div>
+                </div>
+            </div>`;
+
+        editMemberModal.prepend(div);
+      };
+      const emptyModal = (boardNo, memberName, introduceContent, fileName, modalCloseBtn) => {
+        boardNo.value = "";
+        memberName.value = "";
+        introduceContent.value = "";
+        fileName.innerHTML = ""; // 이미지 리스트 초기화
+        modalCloseBtn.click(); // 모달 창 닫기
+      };
+
       // ------------------------------------------------------------------ < 조원 소개 생성 ------------------------------------------------------------------
 
       const post = document.querySelector("#member_post");
-      const modal = document.querySelector("#memberEdit_block");
+      const modal = document.querySelector("#memberRead_block");
+      const editMemberModal = document.querySelector("#memberEdit_block");
       post.innerHTML = "";
+      modal.addEventListener("click", async (event) => {
+        let path = event.target;
+        let id = path.id;
+        let countWhile = 0; // 게시글이 아닌 공백(마진) 클릭을 확인하기 위한 값
+        while (!id) {
+          countWhile++;
+          // 게시글의 id 찾기
+          path = path.parentElement;
+          id = path.id;
+        }
+        if (id.indexOf("edit") != -1) {
+          let count = 0;
+          let imgChange = false;
+          const editIdId = id.replace("edit", "");
+          const editId = editIdId;
+          const editModalId = editIdId.replace("modal", "modalEdit");
+          const editModal = document.querySelector(`#${editModalId}`); // 게시글 수정용 모달창
+          const editModalTitle = editModal.querySelector("#uploadTitle");
+          const editModalContent = editModal.querySelector("#uploadText");
+          const nowImgCheck = editModal.querySelector("#nowImg");
+          const defaultImgCheck = editModal.querySelector("#defaultImg");
+          const editImgInput = editModal.querySelector("#editImg");
+          const editImgList = editModal.querySelector("#editImageListDiv"); // 파일 이름 표시창
+          const modalCloseBtn = editModal.querySelector("#btn-close");
+          const editBtn = editModal.querySelector("#editBtn");
+          const alertSpan = editModal.querySelector("#alert-span"); // 모달 내부 경고 창
+          
+          const editBoardId = editIdId.replace("modal", "");
+          const editBoard = document.querySelector(`#board${editBoardId}`); // 수정할 게시글
+          const editBoardTitle = editBoard.querySelector("#boardMemberName"); // 수정할 게시글 제목
+          const editBoardContent = editBoard.querySelector("#boardMemberContent"); // 수정할 게시글 글내용
+          
+          const editTargetModal = document.querySelector(`#${editIdId}`);
+          const editTargetModalTitle =
+            editTargetModal.querySelector("#modalMemberName");
+          const editTargetModalContent =
+            editTargetModal.querySelector("#modalMemberContent");
+
+          // 파일 업로드 개수 제한
+          editImgInput.addEventListener("change", (e) => {
+            const selectedFiles = e.target.files;
+            const maxFiles = 1; // 최대 파일 개수
+
+            if (selectedFiles.length > maxFiles) {
+              // 파일 개수가 최대 개수를 초과하는 경우
+              alertSpan.innerHTML = `<div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 파일은 1개만 선택할 수 있습니다.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+              // 파일 초기화
+              editImgInput.type = "radio";
+              editImgInput.type = "file";
+              editImgList.innerHTML = "";
+            }
+          });
+
+          // 경고창 비우기
+          alertSpan.innerText = "";
+
+          // 수정할 게시글의 제목, 글내용 가져오기
+          editModalTitle.value = editBoardTitle.innerText;
+          editModalContent.value = editBoardContent.innerText;
+
+          // 현재 이미지 사용 선택시
+          nowImgCheck.addEventListener("change", (event) => {
+            if (event.target.checked) {
+              defaultImgCheck.checked = false;
+              editImgInput.disabled = true;
+              editImgList.style.backgroundColor = "#E9ECEF";
+            } else {
+              editImgInput.disabled = false;
+              editImgList.style.backgroundColor = "#ffffff";
+            }
+          });
+
+          // 기본 이미지 사용 선택시
+          defaultImgCheck.addEventListener("change", (event) => {
+            if (event.target.checked) {
+              nowImgCheck.checked = false;
+              editImgInput.disabled = true;
+              editImgList.style.backgroundColor = "#E9ECEF";
+            } else {
+              editImgInput.disabled = false;
+              editImgList.style.backgroundColor = "#ffffff";
+            }
+          });
+
+          // 이미지 선택 시
+          editImgInput.addEventListener("change", () => {
+            nowImgCheck.checked = false;
+            defaultImgCheck.checked = false;
+          });
+
+          // 수정 버튼 눌렀을 경우
+          editBtn.addEventListener("click", async () => {
+            if (count != 0) {
+              return;
+            }
+            // 이미지를 선택을 하지 않았을 경우
+            if (
+              nowImgCheck.checked == false &&
+              defaultImgCheck.checked == false &&
+              editImgInput.files.length == 0
+            ) {
+              alertSpan.innerText = "필수 선택 항목입니다.";
+              return;
+            }
+            // 제목, 내용이 모두 변경되었을 경우
+            if (
+              editModalTitle.value != editBoardTitle.innerText &&
+              editModalContent.value != editBoardContent.innerText
+            ) {
+              console.log("모두 변경");
+              const response = await fetch(`${PATH}/member`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                  editBoard,
+                  editBoardTitle,
+                  editBoardContent,
+                  "Content-Type": "application/json",
+                },
+              });
+            } // 제목만 변경되었을 경우
+            else if (editModalTitle.value != editBoardTitle.innerText) {
+              console.log("제목 변경");
+              const response = await fetch(`${PATH}/member`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                  "Content-Type": "application/json",
+                  editBoard,
+                  editBoardTitle,
+                },
+              });
+            } // 내용만 변경되었을 경우
+            else if (editModalContent.value != editBoardContent.innerText) {
+              console.log("내용 변경");
+              const response = await fetch(`${PATH}/member`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                  "Content-Type": "application/json",
+                  editBoard,
+                  editBoardContent,
+                },
+              });
+            }
+            // 현재 이미지 사용을 체크했을 경우
+            if (nowImgCheck.checked == true) {
+              console.log("현재 이미지 사용");
+            } else if (defaultImgCheck.checked == true) {
+              console.log("기본 이미지 사용");
+              imgChange = true;
+              const formData = new FormData();
+              formData.append("boardNo", editId);
+            } else {
+              console.log("이미지 변경");
+              imgChange = true;
+              const formData = new FormData();
+              formData.append("boardNo", editId);
+              for (let i = 0; i < editInputImage.files.length; i++) {
+                formData.append("image", editInputImage.files[i]);
+              }
+              const response = await fetch(`${PATH}/member/image`, {
+                method: "PUT",
+                headers: {
+                  token: sessionStorage.getItem("token"),
+                  nickname: sessionStorage.getItem("nickname"),
+                },
+                body: formData,
+              });
+            }
+
+            // 수정 모달 초기화
+            nowImgCheck.checked = false;
+            defaultImgCheck.checked = false;
+            editImgInput.disabled = false;
+            editImgList.style.backgroundColor = "#ffffff";
+
+            emptyModal(
+              editModal,
+              editModalTitle,
+              editModalContent,
+              editImgInput,
+              modalCloseBtn
+            );
+            count++;
+
+            if (imgChange) {
+              const mainLink = document.querySelector("#mainLink");
+              mainLink.click();
+            }
+
+            editTargetModalTitle.innerText = editModalTitle.value;
+            editTargetModalContent.innerText = editModalContent.value;
+          });
+        } // 삭제 버튼 눌렀을 경우
+        else if (id.indexOf("delete") != -1) {
+          const deleteId = id.replace("delete", "");
+          const { status } = await fetch(`${PATH}/`, {
+            method: "DELETE",
+            headers: {
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
+              deleteId,
+            },
+          });
+          console.log(status);
+        }
+      })
       // fetch를 이용해 값 가져오기 (임시 값)
       await fetch(
-        "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
+        `${PATH}/`,
+        // "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
         {
           method: "get",
         }
-      )
+      ) 
         .then((response) => response.json())
         .then((data) => {
-          let count = 0; // 예제 블럭 제한 걸기
-          console.log(data);
           for (let value of data) {
-            createBoard(value.id, value.phone, value.title, value.url);
-            createModal(value.id, value.phone, value.title, value.url);
-            // // 예제 블럭 6개만 뽑아쓰기
+            createBoard(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+            createModal(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+            createEditModal(value.memberBoardNo, value.memberName);
             count++;
-            if (count === 6) {
+            if(count == 7){
               break;
             }
           }

@@ -92,7 +92,7 @@ export default class {
     <div class="modal-dialog modal-l">
     <div class="modal-content">
         <div class="modal-header">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <!-- 모달 내용물 -->
         <div class="modal-body">
@@ -131,7 +131,11 @@ export default class {
     
 </div>
 
-<!-- Modal _ 게시글 수정 -->
+<!-- Modal _ 게시글 Read 기능 -->
+<div id="memberRead_block">
+
+</div>
+<!-- Modal _ 게시글 Modify 기능 -->
 <div id="memberEdit_block">
 
 </div>
