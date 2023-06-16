@@ -533,72 +533,92 @@ const router = async () => {
     if (location.pathname === "/myUserData") {
       // confirm 버튼으로 닉네임 중복 여부 확인을 post로 보내고, 변경작업도 post로 보내는 과정 실행
       let nicknameChkVal = false;
-      const nameInput = document.querySelector("#inputName");
+      const idInput = document.querySelector("#inputId");
       const nicknameChkBtn = document.querySelector("#idChkBtn");
       const modifyBtn = document.querySelector("#modifyBtn");
 
-      nicknameChkBtn.addEventListener("click", () => {
-        const username = nameInput.value;
-        if (nameInput.value === "") {
-          alert("변경할 닉네임을 입력해주세요!");
+      nicknameChkBtn.addEventListener("click", async() => {
+        const userId = idInput.value;
+        if (idInput.value === "") {
+          alert("변경할 ID을 입력해주세요!");
         } else {
-          fetch(`${PATH}/signin/nicknameCheck/?nickname=${username}`, {
+          console.log(userId);
+          await fetch(`${PATH}/account/idCheck/?userId=${userId}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
               token: sessionStorage.getItem("token"),
               nickname: sessionStorage.getItem("nickname"),
             },
-          });
-          console.log(200);
-          // .then((response) => response.json())
-          // .then((data) => {
-          //   // found 값에 따라 True 또는 False 전달
-          //   if (data.status == 200) {
-          //     alert("사용할 수 있는 닉네임입니다!");
-          //     nicknameChkVal = true;
-          //   } else {
-          //     alert("이미 사용중인 닉네임입니다!");
-          //   }
-          // });
-        }
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("20");
+              // found 값에 따라 True 또는 False 전달
+              if (data.status == 200) {
+                alert("사용할 수 있는 ID입니다!");
+                nicknameChkVal = true;
+              } else if (data.status == 422){
+                alert("query 값이 존재하지 않습니다.");
+              } else if (data.status == 409){
+                alert("이미 사용하고 있는 ID 입니다.");
+              }
+            });
+        };
       });
-
       // modify 버튼으로 닉네임 중복여부를 확인하고
       // 확인되면 비밀번호 값과 nickname 값을 post 로 보내서
       // 비밀번호가 일치하면 post로 보낸 nickname 값으로 닉네임을 변경한다
       // 만약, 비밀번호가 일치하지 않으면 alert 창 떠서 꺼지게 만든다!
       modifyBtn.addEventListener("click", () => {
         if (nicknameChkVal) {
-          fetch("https://my-json-server.typicode.com/typicode/demo/posts", {
+          const userId = idInput.value;
+          fetch(`${PATH}/account/updateUserId`, {
             // fetch에는 웹서버/updateNickname 으로 보내기
-            method: "POST",
+            method: "PUT",
             headers: {
               "Content-Type": "application/json",
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
             },
             body: JSON.stringify({
-              userId: sessionStorage.getItem("userId"),
-              password: inputPassword.value,
-              nickname: nameInput.value,
+              // userId: sessionStorage.getItem("userId"),
+              // password: inputPassword.value,
+              userId: userId,
             }),
             // 변경할 닉네임 + (입력했던 pw와 로컬 스토리지에 있는 nickname 값 보내기)
           })
             // 해당 처리 결과반환
             .then((response) => response.json())
             .then((data) => {
-              if (data.status == 200) {
+              console.log(data);
+              if (data.status == 201) {
                 // 일치 여부에 따른 결과값
                 // TRUE / FALSE
-                alert("닉네임이 성공적으로 변경되었습니다!");
-              } else {
-                alert("비밀번호가 일치하지 않습니다!");
+                alert("ID이 성공적으로 변경되었습니다!");
+                sessionStorage.removeItem('userId');
+                sessionStorage.setItem("userId", userId);
+              } 
+              // 권한이 없는 경우
+              else if (data.status == 401){
+                alert("권한이 없습니다.");
+                console.log(data.message);
+              }
+              // 요청시 올바른 데이터를 전달하지 않은 경우
+              else if (data.status == 422){
+                alert("올바른 값이 아닙니다.");
+                console.log(data.message);
+              }
+              else if (data.status == 500){
+                alert("서버에 문제가 생겼습니다.");
+                console.log(data.message);
               }
             })
             .catch((error) => {
               console.log(error);
             });
         } else {
-          alert("닉네임 중복 체크를 해주세요!");
+          alert("ID 중복 체크를 해주세요!");
         }
       });
     }
@@ -1589,9 +1609,9 @@ const router = async () => {
       // 버튼 이벤트 추가
       destroyBtn.addEventListener("click", async () => {
         let myPassword = inputPassword.value;
-        let usertoken = sessionStorage.getItem("token");
-        let usernickname = sessionStorage.getItem("nickname");
-        console.log("hi");
+        let userToken = sessionStorage.getItem("token");
+        let userNickname = sessionStorage.getItem("nickname");
+        console.log("hi")
 
         // 입력값이 존재할 떄
         if (myPassword != "") {
@@ -1600,12 +1620,12 @@ const router = async () => {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json",
-              token: usertoken,
-              nickname: usernickname,
+              token: userToken,
+              nickname: userNickname,
             },
             // cache: "no-cache",
             body: JSON.stringify({
-              nickname: usernickname,
+              nickname: userNickname,
               userPassword: myPassword,
             }),
           });
@@ -1654,7 +1674,7 @@ const router = async () => {
       });
 
       const username = document.getElementById("InputNickname");
-      const namealert = document.getElementById("alert");
+      const nameAlert = document.getElementById("alert");
 
       username.addEventListener("blur", () => {
         const name = document.getElementById("InputNickname").value;
@@ -1674,15 +1694,15 @@ const router = async () => {
             console.log(data);
             if (data.status == 200) {
               console.log(data.message);
-              namealert.innerHTML = "";
-              namealert.innerHTML = "<a>사용가능한 닉네임 입니다.</a>";
+              nameAlert.innerHTML = "";
+              nameAlert.innerHTML = "<a>사용가능한 닉네임 입니다.</a>";
               Check = true;
             }
             // 중복
             if (data.status == 409) {
               console.log(data.messgae);
-              namealert.innerHTML = "";
-              namealert.innerHTML = "<a>닉네임이 이미 존재합니다.</a>";
+              nameAlert.innerHTML = "";
+              nameAlert.innerHTML = "<a>닉네임이 이미 존재합니다.</a>";
             }
           });
       });
@@ -1838,6 +1858,7 @@ const router = async () => {
       const token = sessionStorage.getItem("token");
       const modal = document.querySelector("#block_modal");
       const post = document.querySelector("#block_post");
+      const boardList = document.querySelector("#board-list")
       post.innerHTML = "";
 
       // 임의값
@@ -1847,6 +1868,7 @@ const router = async () => {
       const imgUrl = `./static/image/${fileName}.jpg`;
       const hit = 48; // 조회수
       const block_modal = document.querySelector("#block_modal");
+      let nowId = null;
 
       console.log(username);
 
@@ -1931,277 +1953,295 @@ const router = async () => {
         }
       });
 
-      const createBoard = (title, content, boardNo, writeDate, fileNames) => {
-        const nickname = sessionStorage.getItem("name");
+      const createBoard = (
+        title,
+        content,
+        boardNo,
+        writer,
+        writeDate,
+        fileNames
+      ) => {
         const div = document.createElement("div");
-        div.classList = "col-md-4 board";
+        div.classList = ` col-md-4 board${boardNo}`;
         div.id = boardNo;
         div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
-          data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
-          <div class="card card${boardNo}" style="height: 460px">
-          <div style="height: 300px; max-height: 300px;" class="text-center">
-          <img src="${
-            fileNames || fileNames[0]
-          }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
-          </div>
-          <div class="card-body">
-          <h5 class="card-title text-truncate">${title}</h5>
-          <p class="card-text text-truncate mt-4">${content}</p>
-          <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
-          ${
-            isAdmin
-              ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
-            </div>`
-              : title ==
-                "officia delectus consequatur vero aut veniam explicabo molestias" // 로그인 한 사람 이름 (임시값)
-              ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
-            </div>`
-              : `<div class="col-3 px-0">
-            </div>`
-          }
-          
-          <span class="col-9 text-end px-0 align-text-top">${nickname}</span>
-          </div>
-          </div>
-          </div>
-          </a>`;
+                        data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
+                        <div class="card card${boardNo}" style="height: 460px">
+                            <div style="height: 300px; max-height: 300px;" class="text-center">
+                                <img src="${
+                                  fileNames[0]
+                                }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">${title}</h5>
+                                <p class="card-text text-truncate mt-4">${content}</p>
+                                <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
+                                ${
+                                  isAdmin
+                                    ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
+                                    </div>
+                                    <div id="delete${boardNo}" class="col-3 px-0 ms-2"><a class="btn btn-danger container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Delete</a>
+                                    </div>`
+                                    : `<div class="col-3 px-0"></div>
+                                    <div class="col-3 px-0 ms-2"></div>`
+                                }
+                                    <span class="col-5 flex-grow-1 text-end px-0 align-middle">${writer}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>`;
         post.prepend(div);
       };
 
-      const createModal = (title, content, boardNo, writeDate, fileNames) => {
+
+      const createModal = (
+        title,
+        content,
+        boardNo,
+        writer,
+        writeDate,
+        hit,
+        fileNames
+      ) => {
         const div = document.createElement("div");
         div.className = "modal";
         div.id = `modal${boardNo}`;
-        div.innerHTML = `<div class="modal-dialog modal-xl">
-          <div class="modal-content">
-          <div class="modal-header">
-          <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-          <div class="container-fluid">
-          <div class="row">
-          <div class="col-8 p-0">
-          <!-- 이미지 창 -->
-          
-          <div class="d-flex align-items-center">
-          
-          <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
-          <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carouselExampleIndicators"
-          data-bs-slide-to="0" class="active" aria-current="true"
-          aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#carouselExampleIndicators"
-          data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#carouselExampleIndicators"
-          data-bs-slide-to="2" aria-label="Slide 3"></button>
-          </div>
-          <div class="carousel-inner">
-          <div class="carousel-item active">
-          <img src="${imgUrl}" class="d-block w-100" alt="...">
-          </div>
-          <div class="carousel-item">
-          <img src="./static/image/미야케 우동2.jpg" class="d-block w-100" alt="...">
-          </div>
-          <div class="carousel-item">
-          <img src="./static/image/미야케 우동3.jpg" class="d-block w-100" alt="...">
-          </div>
-          </div>
-          <button class="carousel-control-prev" type="button"
-          data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button"
-          data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-          </button>
-          </div>
-          </div>
-          </div>
-          <div class="col-4 d-flex justify-content-center" style="overflow-y: auto; height: 65vh;">
-          <!-- 댓글 창 -->
-          
-          <div id="block_comment${boardNo}" class="col-11"> <!-- 모달의 코멘트 블록 아이디 지정 -->
-          
-          </div>
-          </div>
-          </div>
-          
-          <!-- 본문, 댓글작성 창 -->
-          <div class="row">
-          
-          <!-- 본문 창 -->
-          
-          <div class="col-8 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
-          style="height: 15vh;">
-          <span>${content}</span>
-          <div class="row d-flex justify-content-end">
-          <div class="col-6">작성 일자: <span>${writeDate}</span></div>
-          <div class="col-3">작성자: <span>${writer}</span></div>
-          <div class="col-3">조회수: <span>${hit}</span></div>
-          </div>
-          </div>
-          
-          <!-- 댓글작성 창 -->
-          
-          <div class="col-4">
-          <div class="row mt-3 h-75">
-          <div class="col-12 d-flex justify-content-end">
-          <textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
-          <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
-          <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-          </div>
-          </div>`;
 
+        let htmlBtn = "";
+        let htmlImg = "";
+
+        // 이미지의 개수에 맞게 이미지와 캐러셀 버튼을 설정
+        for (let i = 0; i < fileNames.length; i++) {
+          htmlBtn += `<button type="button" data-bs-target="#carousel${boardNo}"
+                                                      data-bs-slide-to="${i}" class="${
+            i == 0 ? "active" : ""
+          }" aria-current="true"
+                                                      aria-label="Slide ${
+                                                        i ==
+                                                        fileNames.length - 1
+                                                          ? 0
+                                                          : i + 1
+                                                      }"></button>`;
+
+          htmlImg += `<div class="carousel-item ${i == 0 ? "active" : ""}">
+                                                      <img src="${
+                                                        fileNames[i]
+                                                      }" class="d-block w-100" alt="...">
+                                                  </div>`;
+        }
+
+        let html = `<div class="modal-dialog modal-xl">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="container-fluid">
+                              <div class="row">
+                                  <div class="col-8 p-0">
+                                      <!-- 이미지 창 -->
+
+                                      <div class="d-flex align-items-center">
+
+                                          <div id="carousel${boardNo}" class="carousel slide container-fluid" data-bs-ride="true">
+                                              <div class="carousel-indicators block_htmlBtn">
+                                                  ${htmlBtn}
+                                              </div>
+                                              <div class="carousel-inner block_htmlImg">
+                                              ${htmlImg}
+                                              </div>
+                                              <button class="carousel-control-prev" type="button"
+                                                  data-bs-target="#carousel${boardNo}" data-bs-slide="prev">
+                                                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                  <span class="visually-hidden">Previous</span>
+                                              </button>
+                                              <button class="carousel-control-next" type="button"
+                                                  data-bs-target="#carousel${boardNo}" data-bs-slide="next">
+                                                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                  <span class="visually-hidden">Next</span>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-4 d-flex justify-content-center" style="overflow-y: auto; height: 65vh;">
+                                      <!-- 댓글 창 -->
+                                      <div class="col-11">
+                                        <span class="mt-5 fs-4">Comment</span>
+                                        <div id="block_comment${boardNo}" class="container-fluid">
+                                      <!-- 모달의 코멘트 블록 아이디 지정 -->
+
+                                          
+
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <!-- 본문, 댓글작성 창 -->
+                              <div class="row">
+
+                                  <!-- 본문 창 -->
+
+                                  <div class="col-8 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
+                                      style="height: 15vh;">
+                                      <span class="modal-text">${content}</span>
+                                      <div class="row d-flex justify-content-end">
+                                          <div class="col-6">작성 일자: <span>${writeDate}</span></div>
+                                          <div class="col-3">작성자: <span>${writer}</span></div>
+                                          <div class="col-3">조회수: <span>${hit}</span></div>
+                                      </div>
+                                  </div>
+
+                                  <!-- 댓글작성 창 -->
+
+                                  <div class="col-4">
+                                      <div class="row mt-3 h-75">
+                                          <div class="col-12 d-flex justify-content-end">
+                                          ${
+                                            isUser
+                                              ? `<textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
+                                              <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>`
+                                              : `<textarea id="" class="form-control" style="background-color: #E9ECEF" readOnly value="회원만 작성할 수 있습니다."></textarea>
+                                              <button id="" class="btn btn-primary">작성</button>`
+                                          }
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                  </div>
+              </div>`;
+
+        div.innerHTML = html;
         modal.prepend(div);
       };
 
       // 댓글
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+      }
 
       const createComment = async (
+        commentId,
         name,
         comment,
         commentDate,
         block_comment
       ) => {
         // 받아온 값을 이용하여 해당 게시물에 코멘트 추가 (임시값)
+        const date = formatDate(commentDate);
         const div = document.createElement("div");
         div.classList = "row border mt-3 p-1";
         div.innerHTML = `<div class="col-12">
-            <div class="row">
-            <div class="col-5 commentWriter">${name}</div>
-            <div class="col-6 commentDate">${commentDate}</div>
-            ${
-              isAdmin
-                ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
-              ❌
-              </div>`
-                : name == sessionStorage.getItem("name")
-                ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
-              ❌
-              </div>`
-                : ""
-            }
-            
-            </div>
-            </div>
-            <div class="row mt-1">
-            <div class="col-12 commentValue">${comment}</div>
-            </div>`;
+                  <div class="row">
+                    <div class="col-5 commentWriter">${name}</div>
+                    <div class="col-6 commentDate">${date}</div>
+                    <div style="display: none;">${commentId}</div>
+                    ${
+                      isAdmin
+                        ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+                      ❌
+                    </div>`
+                        : name == sessionStorage.getItem("nickname")
+                        ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+                      ❌
+                    </div>`
+                        : ""
+                    }
+                    
+                  </div>
+                </div>
+                <div class="row mt-1">
+                  <div class="col-12 commentValue">${comment}</div>
+                </div>`;
         block_comment.prepend(div);
       };
 
       // fetch로 값 불러오기
-      fetch(`${PATH}/board/myPosts`, {
+      const response = await fetch(`${PATH}/board/myPosts`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           token: token,
           nickname: username,
         },
-      }).then((response) => {
-        response.json();
-
-        if (response.status) {
-        }
       });
 
-      createBoard("1", "content", "boardNo", "writeDate", "example.jpg");
-      createModal("1", "content", "boardNo", "writeDate", "example.jpg");
+      const jsonData = await response.json();
+      const data = JSON.parse(jsonData.data);
+      console.log(data);
 
-      console.log(response);
+      for( let i = 0; i < data.length; i++ ) {
+        createBoard(data[i].title, data[i].content, data[i].boardNo, data[i].writer, data[i].writeDate, data[i].fileName);
+        createModal(data[i].title, data[i].content, data[i].boardNo, data[i].writer, data[i].
+          writeDate, data[i].hit, data[i].fileName);
+      }
 
-      block_modal.addEventListener("click", async (event) => {
-        console.log(event.target.id);
-        if (event.target.id.indexOf("modal_submitBtn") != -1) {
-          const commentBtnId = event.target.id;
-          // 댓글 작성 버튼을 눌렀을 경우 동작
-          const submitId = commentBtnId.replace("modal_submitBtn", "");
-          console.log("submitId = " + submitId); // 보드 넘버 ex) 0
-          const commentText = document.querySelector(
-            `#modal_commentText${submitId}`
-          );
-          if (commentText.value.trim() === "") {
-            // 댓글을 공백으로 작성 후 작성 버튼을 눌렀을 경우 동작
-            return;
+
+      
+      boardList.addEventListener("click", async () => {
+        let path = event.target;
+          let id = path.id;
+          let countWhile = 0; // 게시글이 아닌 공백(마진) 클릭을 확인하기 위한 값
+          while (!id) {
+            countWhile++;
+            // 게시글의 id 찾기
+            path = path.parentElement;
+            id = path.id;
           }
-
-          const block_comment = document.querySelector(
-            `#block_comment${submitId}`
-          );
-
-          // 테스트
-          console.log(block_comment);
-          createComment(
-            sessionStorage.getItem("name"),
-            commentText.value,
-            submitId,
-            block_comment
-          );
-
-          const response = await fetch(
-            "https://jsonplaceholder.typicode.com/posts",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              cache: "no-cache",
-              body: JSON.stringify({
-                boardNo: submitId,
-                nickname: "규민",
-                comment: commentText.value,
-              }),
-            }
-          );
-
-          // 성공적으로 생성하였을 경우
-          if (response.status == 201) {
-            commentText.value = "";
-            createComment(
-              sessionStorage.getItem("name"),
-              commentText.value,
-              id,
-              block_comment
-            );
-          }
-        }
-        if (event.target.classList.contains("commentDel")) {
-          // 댓글 삭제 버튼을 눌렀을 경우 동작
-          console.log("삭제버튼");
-          console.log(nowId);
-          console.dir(event.target);
-          const boardNo = nowId;
-          let comment = event.target;
-          console.log(comment.parentNode.children[0].innerText);
-          console.log(comment.parentNode.children[1].innerText);
-          const nickname = comment.parentNode.children[0].innerText;
-          const commentDate = comment.parentNode.children[1].innerText;
-
-          fetch("https://jsonplaceholder.typicode.com/posts/1", {
-            method: "DELETE",
-            headers: {
-              Authorization: sessionStorage.getItem("access_token"),
-            },
-            body: JSON.stringify({
-              boardNo,
-              // nickname,
-              commentDate,
-            }),
+        if (countWhile != 0) {
+          const block_comment = document.querySelector(`#block_comment${id}`);
+          block_comment.innerHTML = ""; // 클릭 이전에 코멘트가 있다면 삭제
+          nowId = id;
+  
+          // fetch를 이용해 값 가져오기
+          const response = await fetch(`${PATH}/comment?boardNo=${id}`, {
+            method: "get",
           });
+  
+          // 값이 잘 전달 되었을 때 생성
+          if (response.status == 200) {
+            const jsonData = await response.json();
+            const data = JSON.parse(jsonData.data);
+            console.log(data);
+            // data가 없는 경우
+            if (data.length == 0) {
+              block_comment.innerHTML = `
+              <br><br><span>현재 게시글에 댓글이 없습니다.</span>`;
+            } // data가 존재하는 경우
+            else {
+              for (let value of data) {
+                console.log(value);
+  
+                createComment(
+                  value.id,
+                  value.nickname,
+                  value.comment,
+                  value.commentDate,
+                  block_comment
+                );
+              }
+            }
+          }
         }
-      });
+
+      })
+
+                
     }
   }
 };
