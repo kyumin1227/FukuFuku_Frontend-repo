@@ -24,8 +24,8 @@ export default class {
         </div>
         
         <!-- MY_WRITE_LIST -->
-        <div class="col border-top border-bottom border-primary" >
-            <div id="board-list" class="container">
+        <div class="col border-top border-bottom border-primary">
+            <div id="board-list" class="container overflow-auto py-4" style="height: 500px;">
 
                 <!-- 게시글 블록입니다. -->
 

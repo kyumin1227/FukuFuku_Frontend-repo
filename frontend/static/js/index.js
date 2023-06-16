@@ -1641,194 +1641,232 @@ const router = async () => {
         }
       });
 
-      const createBoard = (title, content, boardNo, writeDate, fileNames) => {
-        const nickname = sessionStorage.getItem("name");
+      const createBoard = (
+        title,
+        content,
+        boardNo,
+        writer,
+        writeDate,
+        fileNames
+      ) => {
         const div = document.createElement("div");
-        div.classList = "col-md-4 board";
+        div.classList = ` col-md-4 board${boardNo}`;
         div.id = boardNo;
         div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
-          data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
-          <div class="card card${boardNo}" style="height: 460px">
-          <div style="height: 300px; max-height: 300px;" class="text-center">
-          <img src="${
-            fileNames || fileNames[0]
-          }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
-          </div>
-          <div class="card-body">
-          <h5 class="card-title text-truncate">${title}</h5>
-          <p class="card-text text-truncate mt-4">${content}</p>
-          <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
-          ${
-            isAdmin
-              ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
-            </div>`
-              : title ==
-                "officia delectus consequatur vero aut veniam explicabo molestias" // 로그인 한 사람 이름 (임시값)
-              ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
-            </div>`
-              : `<div class="col-3 px-0">
-            </div>`
-          }
-          
-          <span class="col-9 text-end px-0 align-text-top">${nickname}</span>
-          </div>
-          </div>
-          </div>
-          </a>`;
+                        data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
+                        <div class="card card${boardNo}" style="height: 460px">
+                            <div style="height: 300px; max-height: 300px;" class="text-center">
+                                <img src="${
+                                  fileNames[0]
+                                }" style="height: 300px; max-height: 300px;" class="img-fluid Center">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">${title}</h5>
+                                <p class="card-text text-truncate mt-4">${content}</p>
+                                <div class="container-fluid row mt-3 px-0 box-wrap ms-0">
+                                ${
+                                  isAdmin
+                                    ? `<div id="edit${boardNo}" class="col-3 px-0"><a class="btn btn-primary container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Edit</a>
+                                    </div>
+                                    <div id="delete${boardNo}" class="col-3 px-0 ms-2"><a class="btn btn-danger container-fluid" data-bs-toggle="modal" data-bs-target="#Edit_Modal">Delete</a>
+                                    </div>`
+                                    : `<div class="col-3 px-0"></div>
+                                    <div class="col-3 px-0 ms-2"></div>`
+                                }
+                                    <span class="col-5 flex-grow-1 text-end px-0 align-middle">${writer}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>`;
         post.prepend(div);
       };
 
-      const createModal = (title, content, boardNo, writeDate, fileNames) => {
+
+      const createModal = (
+        title,
+        content,
+        boardNo,
+        writer,
+        writeDate,
+        hit,
+        fileNames
+      ) => {
         const div = document.createElement("div");
         div.className = "modal";
         div.id = `modal${boardNo}`;
-        div.innerHTML = `<div class="modal-dialog modal-xl">
-          <div class="modal-content">
-          <div class="modal-header">
-          <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-          <div class="container-fluid">
-          <div class="row">
-          <div class="col-8 p-0">
-          <!-- 이미지 창 -->
-          
-          <div class="d-flex align-items-center">
-          
-          <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
-          <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carouselExampleIndicators"
-          data-bs-slide-to="0" class="active" aria-current="true"
-          aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#carouselExampleIndicators"
-          data-bs-slide-to="1" aria-label="Slide 2"></button>
-          <button type="button" data-bs-target="#carouselExampleIndicators"
-          data-bs-slide-to="2" aria-label="Slide 3"></button>
-          </div>
-          <div class="carousel-inner">
-          <div class="carousel-item active">
-          <img src="${imgUrl}" class="d-block w-100" alt="...">
-          </div>
-          <div class="carousel-item">
-          <img src="./static/image/미야케 우동2.jpg" class="d-block w-100" alt="...">
-          </div>
-          <div class="carousel-item">
-          <img src="./static/image/미야케 우동3.jpg" class="d-block w-100" alt="...">
-          </div>
-          </div>
-          <button class="carousel-control-prev" type="button"
-          data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-          </button>
-          <button class="carousel-control-next" type="button"
-          data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-          </button>
-          </div>
-          </div>
-          </div>
-          <div class="col-4 d-flex justify-content-center" style="overflow-y: auto; height: 65vh;">
-          <!-- 댓글 창 -->
-          
-          <div id="block_comment${boardNo}" class="col-11"> <!-- 모달의 코멘트 블록 아이디 지정 -->
-          
-          </div>
-          </div>
-          </div>
-          
-          <!-- 본문, 댓글작성 창 -->
-          <div class="row">
-          
-          <!-- 본문 창 -->
-          
-          <div class="col-8 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
-          style="height: 15vh;">
-          <span>${content}</span>
-          <div class="row d-flex justify-content-end">
-          <div class="col-6">작성 일자: <span>${writeDate}</span></div>
-          <div class="col-3">작성자: <span>${writer}</span></div>
-          <div class="col-3">조회수: <span>${hit}</span></div>
-          </div>
-          </div>
-          
-          <!-- 댓글작성 창 -->
-          
-          <div class="col-4">
-          <div class="row mt-3 h-75">
-          <div class="col-12 d-flex justify-content-end">
-          <textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
-          <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
-          </div>
-          <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-          </div>
-          </div>`;
 
+        let htmlBtn = "";
+        let htmlImg = "";
+
+        // 이미지의 개수에 맞게 이미지와 캐러셀 버튼을 설정
+        for (let i = 0; i < fileNames.length; i++) {
+          htmlBtn += `<button type="button" data-bs-target="#carousel${boardNo}"
+                                                      data-bs-slide-to="${i}" class="${
+            i == 0 ? "active" : ""
+          }" aria-current="true"
+                                                      aria-label="Slide ${
+                                                        i ==
+                                                        fileNames.length - 1
+                                                          ? 0
+                                                          : i + 1
+                                                      }"></button>`;
+
+          htmlImg += `<div class="carousel-item ${i == 0 ? "active" : ""}">
+                                                      <img src="${
+                                                        fileNames[i]
+                                                      }" class="d-block w-100" alt="...">
+                                                  </div>`;
+        }
+
+        let html = `<div class="modal-dialog modal-xl">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                          <div class="container-fluid">
+                              <div class="row">
+                                  <div class="col-8 p-0">
+                                      <!-- 이미지 창 -->
+
+                                      <div class="d-flex align-items-center">
+
+                                          <div id="carousel${boardNo}" class="carousel slide container-fluid" data-bs-ride="true">
+                                              <div class="carousel-indicators block_htmlBtn">
+                                                  ${htmlBtn}
+                                              </div>
+                                              <div class="carousel-inner block_htmlImg">
+                                              ${htmlImg}
+                                              </div>
+                                              <button class="carousel-control-prev" type="button"
+                                                  data-bs-target="#carousel${boardNo}" data-bs-slide="prev">
+                                                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                  <span class="visually-hidden">Previous</span>
+                                              </button>
+                                              <button class="carousel-control-next" type="button"
+                                                  data-bs-target="#carousel${boardNo}" data-bs-slide="next">
+                                                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                  <span class="visually-hidden">Next</span>
+                                              </button>
+                                          </div>
+                                      </div>
+                                  </div>
+                                  <div class="col-4 d-flex justify-content-center" style="overflow-y: auto; height: 65vh;">
+                                      <!-- 댓글 창 -->
+                                      <div class="col-11">
+                                        <span class="mt-5 fs-4">Comment</span>
+                                        <div id="block_comment${boardNo}" class="container-fluid">
+                                      <!-- 모달의 코멘트 블록 아이디 지정 -->
+
+                                          
+
+                                      </div>
+                                  </div>
+                              </div>
+
+                              <!-- 본문, 댓글작성 창 -->
+                              <div class="row">
+
+                                  <!-- 본문 창 -->
+
+                                  <div class="col-8 bg-secondary bg-opacity-50 rounded-1 d-flex justify-content-between flex-column p-3"
+                                      style="height: 15vh;">
+                                      <span class="modal-text">${content}</span>
+                                      <div class="row d-flex justify-content-end">
+                                          <div class="col-6">작성 일자: <span>${writeDate}</span></div>
+                                          <div class="col-3">작성자: <span>${writer}</span></div>
+                                          <div class="col-3">조회수: <span>${hit}</span></div>
+                                      </div>
+                                  </div>
+
+                                  <!-- 댓글작성 창 -->
+
+                                  <div class="col-4">
+                                      <div class="row mt-3 h-75">
+                                          <div class="col-12 d-flex justify-content-end">
+                                          ${
+                                            isUser
+                                              ? `<textarea id="modal_commentText${boardNo}" class="form-control"></textarea>
+                                              <button id="modal_submitBtn${boardNo}" class="btn btn-primary">작성</button>`
+                                              : `<textarea id="" class="form-control" style="background-color: #E9ECEF" readOnly value="회원만 작성할 수 있습니다."></textarea>
+                                              <button id="" class="btn btn-primary">작성</button>`
+                                          }
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>
+                  </div>
+              </div>`;
+
+        div.innerHTML = html;
         modal.prepend(div);
       };
 
       // 댓글
 
       const createComment = async (
+        commentId,
         name,
         comment,
         commentDate,
         block_comment
       ) => {
         // 받아온 값을 이용하여 해당 게시물에 코멘트 추가 (임시값)
+        const date = formatDate(commentDate);
         const div = document.createElement("div");
         div.classList = "row border mt-3 p-1";
         div.innerHTML = `<div class="col-12">
-            <div class="row">
-            <div class="col-5 commentWriter">${name}</div>
-            <div class="col-6 commentDate">${commentDate}</div>
-            ${
-              isAdmin
-                ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
-              ❌
-              </div>`
-                : name == sessionStorage.getItem("name")
-                ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
-              ❌
-              </div>`
-                : ""
-            }
-            
-            </div>
-            </div>
-            <div class="row mt-1">
-            <div class="col-12 commentValue">${comment}</div>
-            </div>`;
+                  <div class="row">
+                    <div class="col-5 commentWriter">${name}</div>
+                    <div class="col-6 commentDate">${date}</div>
+                    <div style="display: none;">${commentId}</div>
+                    ${
+                      isAdmin
+                        ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+                      ❌
+                    </div>`
+                        : name == sessionStorage.getItem("nickname")
+                        ? `<div class="btn btn-warning col-1 text-center m-0 p-0 commentDel">
+                      ❌
+                    </div>`
+                        : ""
+                    }
+                    
+                  </div>
+                </div>
+                <div class="row mt-1">
+                  <div class="col-12 commentValue">${comment}</div>
+                </div>`;
         block_comment.prepend(div);
       };
 
       // fetch로 값 불러오기
-      fetch(`${PATH}/board/myPosts`, {
+      const response = await fetch(`${PATH}/board/myPosts`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           token: token,
           nickname: username,
         },
-      }).then((response) => {
-        response.json();
-
-        if (response.status) {
-        }
       });
 
-      createBoard("1", "content", "boardNo", "writeDate", "example.jpg");
-      createModal("1", "content", "boardNo", "writeDate", "example.jpg");
+      const jsonData = await response.json();
+      const data = JSON.parse(jsonData.data);
+      console.log(data);
+
+      for( let i = 0; i < data.length; i++ ) {
+        createBoard(data[i].title, data[i].content, data[i].boardNo, data[i].writer, data[i].writeDate, data[i].fileName);
+        createModal(data[i].title, data[i].content, data[i].boardNo, data[i].writer, data[i].
+          writeDate, data[i].hit, data[i].fileName);
+      }
 
 
       
