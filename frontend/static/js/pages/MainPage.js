@@ -92,7 +92,7 @@ export default class {
     <div class="modal-dialog modal-l">
     <div class="modal-content">
         <div class="modal-header">
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" id="btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <!-- 모달 내용물 -->
         <div class="modal-body">

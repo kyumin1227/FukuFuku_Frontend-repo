@@ -46,42 +46,49 @@ const router = async () => {
     if (location.pathname === "/") {
       const memberCBtn = document.querySelector("#uploadBtn");
       const newBtn = document.querySelector("#memberCBtn");
+      const modalCloseBtn = document.querySelector("#btn-close");
+      let count = 1;
 
       const memberUpload = async () => {
         const memberName = uploadMemberName.value;
         const introduceContent = uploadMemberContent.value;
         const fileName = uploadImg.files;
         const formData = new FormData();
-        console.log(memberName);
-
-        formData.append("memberName", memberName);
-        formData.append("introduceContent", introduceContent);
         formData.append("fileName", fileName);
-        console.log(formData.memberName);
+        formData.append("memberName", memberName);
+        formData.append("introduceContent",introduceContent);
 
         const response = await fetch(
-          "https://jsonplaceholder.typicode.com/posts",
+          `${PATH}/member`,
+          // "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
           {
             method: "POST",
-            body: formData,
+            headers: {
+              token: sessionStorage.getItem("token"),
+              nickname: sessionStorage.getItem("nickname"),
+              // memberName,
+              // introduceContent,
+              "Content-Type": "application/json",
+            },
+            // body: formData,
+            body: JSON.stringify({
+              // memberName: memberName,
+              // introduceContent: introduceContent,
+              formData,
+            })
           }
         );
-        console.log(response.body);
         if (response.status == 201) {
           alert("조원 등록 성공!");
-          // 값이 잘 전달 되었을 때 생성
-          const boardNo = response.boardNo;
-          const memberName = response.memberName;
-          const introduceContent = response.introduceContent;
-          const fileName = response.fileName;
 
-          // 작성 페이지의 제목과 글 비우기
-          uploadMemberName.value = "";
-          uploadMemberContent.value = "";
-          uploadImg.files = null;
+          // 값이 잘 전달 되었을 때 생성
+          const boardNo = count
           createBoard(boardNo, memberName,introduceContent, fileName);
           createModal(boardNo, memberName,introduceContent, fileName);
-          createEditModal(boardNo);
+          createEditModal(boardNo, memberName);
+
+          // 작성 페이지의 제목과 글 비우기
+          emptyModal(boardNo, memberName,introduceContent, fileName, modalCloseBtn);
 
         } else if (response.status == 422) {
           alert("올바르지 않은 데이터 양식입니다");
@@ -89,6 +96,7 @@ const router = async () => {
           alert("Server Error");
         }
       };
+
       memberCBtn.addEventListener("click", memberUpload);
 
       let isAdmin = false; // 임시값 입니다.
@@ -180,7 +188,7 @@ const router = async () => {
                       <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                           <button type="button" data-bs-toggle="modal" data-bs-target="#modalEdit${boardNo}" id="modal${boardNo}edit" class="btn btn-primary">Modify</button>
-                          <button type="button" id="memberDeleteBtn" class="btn btn-danger">Delete</button>
+                          <button type="button" id="${boardNo}delete" class="btn btn-danger">Delete</button>
                       </div>
                   </div>
               </div>`;
@@ -259,6 +267,13 @@ const router = async () => {
 
         editMemberModal.prepend(div);
       };
+      const emptyModal = (boardNo, memberName, introduceContent, fileName, modalCloseBtn) => {
+        boardNo.value = "";
+        memberName.value = "";
+        introduceContent.value = "";
+        fileName.innerHTML = ""; // 이미지 리스트 초기화
+        modalCloseBtn.click(); // 모달 창 닫기
+      };
 
       // ------------------------------------------------------------------ < 조원 소개 생성 ------------------------------------------------------------------
 
@@ -280,6 +295,7 @@ const router = async () => {
           let count = 0;
           let imgChange = false;
           const editIdId = id.replace("edit", "");
+          const editId = editIdId;
           const editModalId = editIdId.replace("modal", "modalEdit");
           const editModal = document.querySelector(`#${editModalId}`); // 게시글 수정용 모달창
           const editModalTitle = editModal.querySelector("#uploadTitle");
@@ -302,6 +318,32 @@ const router = async () => {
             editTargetModal.querySelector("#modalMemberName");
           const editTargetModalContent =
             editTargetModal.querySelector("#modalMemberContent");
+
+          // 파일 업로드 개수 제한
+          editImgInput.addEventListener("change", (e) => {
+            const selectedFiles = e.target.files;
+            const maxFiles = 1; // 최대 파일 개수
+
+            if (selectedFiles.length > maxFiles) {
+              // 파일 개수가 최대 개수를 초과하는 경우
+              alertSpan.innerHTML = `<div
+              class="alert alert-warning alert-dismissible fade show"
+              role="alert"
+            >
+              <strong>오류!</strong> 파일은 1개만 선택할 수 있습니다.
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>`;
+              // 파일 초기화
+              editImgInput.type = "radio";
+              editImgInput.type = "file";
+              editImgList.innerHTML = "";
+            }
+          });
 
           // 경고창 비우기
           alertSpan.innerText = "";
@@ -360,48 +402,42 @@ const router = async () => {
               editModalContent.value != editBoardContent.innerText
             ) {
               console.log("모두 변경");
-              const response = await fetch(`${PATH}/board/post`, {
+              const response = await fetch(`${PATH}/member`, {
                 method: "PUT",
                 headers: {
                   token: sessionStorage.getItem("token"),
                   nickname: sessionStorage.getItem("nickname"),
+                  editBoard,
+                  editBoardTitle,
+                  editBoardContent,
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                  boardNo: editId,
-                  title: editModalTitle.value,
-                  content: editModalContent.value,
-                }),
               });
             } // 제목만 변경되었을 경우
             else if (editModalTitle.value != editBoardTitle.innerText) {
               console.log("제목 변경");
-              const response = await fetch(`${PATH}/board/post`, {
+              const response = await fetch(`${PATH}/member`, {
                 method: "PUT",
                 headers: {
                   token: sessionStorage.getItem("token"),
                   nickname: sessionStorage.getItem("nickname"),
                   "Content-Type": "application/json",
+                  editBoard,
+                  editBoardTitle,
                 },
-                body: JSON.stringify({
-                  boardNo: editId,
-                  title: editModalTitle.value,
-                }),
               });
             } // 내용만 변경되었을 경우
             else if (editModalContent.value != editBoardContent.innerText) {
               console.log("내용 변경");
-              const response = await fetch(`${PATH}/board/post`, {
+              const response = await fetch(`${PATH}/member`, {
                 method: "PUT",
                 headers: {
                   token: sessionStorage.getItem("token"),
                   nickname: sessionStorage.getItem("nickname"),
                   "Content-Type": "application/json",
+                  editBoard,
+                  editBoardContent,
                 },
-                body: JSON.stringify({
-                  boardNo: editId,
-                  content: editModalContent.value,
-                }),
               });
             }
             // 현재 이미지 사용을 체크했을 경우
@@ -420,7 +456,7 @@ const router = async () => {
               for (let i = 0; i < editInputImage.files.length; i++) {
                 formData.append("image", editInputImage.files[i]);
               }
-              const response = await fetch(`${PATH}/board/post/image`, {
+              const response = await fetch(`${PATH}/member/image`, {
                 method: "PUT",
                 headers: {
                   token: sessionStorage.getItem("token"),
@@ -437,17 +473,17 @@ const router = async () => {
             editImgList.style.backgroundColor = "#ffffff";
 
             emptyModal(
+              editModal,
               editModalTitle,
               editModalContent,
               editImgInput,
-              editImgList,
               modalCloseBtn
             );
             count++;
 
             if (imgChange) {
-              const bulletinLink = document.querySelector("#bulletinLink");
-              bulletinLink.click();
+              const mainLink = document.querySelector("#mainLink");
+              mainLink.click();
             }
 
             editTargetModalTitle.innerText = editModalTitle.value;
@@ -456,13 +492,12 @@ const router = async () => {
         } // 삭제 버튼 눌렀을 경우
         else if (id.indexOf("delete") != -1) {
           const deleteId = id.replace("delete", "");
-          console.log("delete!");
-          console.log(deleteId);
-          const { status } = await fetch(`${PATH}/board/post`, {
+          const { status } = await fetch(`${PATH}/`, {
             method: "DELETE",
             headers: {
               token: sessionStorage.getItem("token"),
               nickname: sessionStorage.getItem("nickname"),
+              deleteId,
             },
           });
           console.log(status);
@@ -470,22 +505,20 @@ const router = async () => {
       })
       // fetch를 이용해 값 가져오기 (임시 값)
       await fetch(
-        "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
+        `${PATH}/`,
+        // "https://jsonplaceholder.typicode.com/photos?albumId=1&albumId=2",
         {
           method: "get",
         }
       ) 
         .then((response) => response.json())
         .then((data) => {
-          let count = 0; // 예제 블럭 제한 걸기
-          console.log(data);
           for (let value of data) {
-            createBoard(value.id, value.phone, value.title, value.url);
-            createModal(value.id, value.phone, value.title, value.url);
-            createEditModal(value.id, value.phone);
-            // // 예제 블럭 6개만 뽑아쓰기
+            createBoard(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+            createModal(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+            createEditModal(value.memberBoardNo, value.memberName);
             count++;
-            if (count === 6) {
+            if(count == 7){
               break;
             }
           }
