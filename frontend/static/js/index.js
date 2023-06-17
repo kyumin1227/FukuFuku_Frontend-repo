@@ -840,7 +840,7 @@ const router = async () => {
         fileNames
       ) => {
         // 이미지가 비어있을 경우(기본 이미지)
-        if (fileNames.length == 0) {
+        if (!fileNames || fileNames.length == 0) {
           fileNames = ["./static/image/logo.jpg"];
           console.log("empty");
         }
@@ -903,7 +903,7 @@ const router = async () => {
         fileNames
       ) => {
         // 이미지가 비어있을 경우(기본 이미지)
-        if (fileNames.length == 0) {
+        if (!fileNames || fileNames.length == 0) {
           fileNames = ["./static/image/기본-이미지.jpg"];
           console.log("empty");
         }
