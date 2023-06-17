@@ -103,7 +103,7 @@ export default class {
               <div class="d-flex align-items-center">
                 <div class="mb-3">
                   <label for="formFile" class="form-label ms-2">이미지</label>
-                  <input class="form-control" type="file" id="uploadImg" accept="image/*">
+                  <input class="form-control" type="file" id="newUploadImg" accept="image/*">
                 </div>
               </div>
               <!--------------->
@@ -115,7 +115,7 @@ export default class {
               <textarea class="form-control mt-3" placeholder="조원명" id="uploadMemberName" style="height: 100px" resize="none"></textarea>
           </div>
           <div class="form-floating">
-              <textarea class="form-control mt-3" placeholder="Leave a comment here" id="uploadMemberContent" style="height: 100px" resize="none"></textarea>
+              <textarea class="form-control mt-3" placeholder="조원소개내용" id="uploadMemberContent" style="height: 100px" resize="none"></textarea>
           </div>
         </div>
         <!---------------->
