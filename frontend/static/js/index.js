@@ -56,7 +56,7 @@ const router = async () => {
         console.log(image);
         formData.append("image", image);
         formData.append("memberName", memberName);
-        formData.append("introduceContent",introduceContent);
+        formData.append("introduceContent", introduceContent);
         console.log(formData);
 
         const response = await fetch(
@@ -85,16 +85,25 @@ const router = async () => {
           const data = JSON.parse(jsonData.data);
 
           // 값이 잘 전달 되었을 때 생성
-          createBoard(data.memberBoardNo, data.memberName, data.introduceContent, data.fileName);
-          createModal(data.memberBoardNo, data.memberName, data.introduceContent, data.fileName);
+          createBoard(
+            data.memberBoardNo,
+            data.memberName,
+            data.introduceContent,
+            data.fileName
+          );
+          createModal(
+            data.memberBoardNo,
+            data.memberName,
+            data.introduceContent,
+            data.fileName
+          );
           createEditModal(data.memberBoardNo, data.memberName);
 
           // 작성 페이지의 제목과 글 비우기
           document.querySelector("#newUploadImg").value = null;
-          document.querySelector("#uploadMemberName").value='';
-          document.querySelector("#uploadMemberContent").value='';
+          document.querySelector("#uploadMemberName").value = "";
+          document.querySelector("#uploadMemberContent").value = "";
           modalCloseBtn.click();
-
         } else if (response.status == 422) {
           alert("올바르지 않은 데이터 양식입니다");
         } else {
@@ -268,7 +277,13 @@ const router = async () => {
 
         editMemberModal.prepend(div);
       };
-      const emptyModal = (boardNo, memberName, introduceContent, image, modalCloseBtn) => {
+      const emptyModal = (
+        boardNo,
+        memberName,
+        introduceContent,
+        image,
+        modalCloseBtn
+      ) => {
         boardNo.value = "";
         memberName.value = "";
         introduceContent.value = "";
@@ -293,7 +308,7 @@ const router = async () => {
           id = path.id;
         }
         if (id.indexOf("edit") != -1) {
-          if(!isAdmin){
+          if (!isAdmin) {
             alert("권한이 없습니다..!");
             post.innerHTML = "";
             modal.innerHTML = "";
@@ -301,20 +316,27 @@ const router = async () => {
             document.querySelector(".modal-backdrop").remove();
             document.body.className = "";
             document.body.style = "";
-  
+
             // fetch를 이용해 값 가져오기 (임시 값)
-            await fetch(
-              `${PATH}/`,
-              {
-                method: "get",
-              }
-            ) 
+            await fetch(`${PATH}/`, {
+              method: "get",
+            })
               .then((response) => response.json())
               .then((data) => {
                 console.log(data);
                 for (let value of data) {
-                  createBoard(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
-                  createModal(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+                  createBoard(
+                    value.memberBoardNo,
+                    value.memberName,
+                    value.introduceContent,
+                    value.fileName
+                  );
+                  createModal(
+                    value.memberBoardNo,
+                    value.memberName,
+                    value.introduceContent,
+                    value.fileName
+                  );
                   createEditModal(value.memberBoardNo, value.memberName);
                 }
               })
@@ -323,7 +345,7 @@ const router = async () => {
           let count = 0;
           let imgChange = false;
           let memberChange = false;
-          const editId = id.replace("edit", "");   // 현재 모달창 id
+          const editId = id.replace("edit", ""); // 현재 모달창 id
           const editModalId = editId.replace("modal", "modalEdit"); // 수정 모달창 id
 
           // 조원소개 수정용 모달창
@@ -338,11 +360,13 @@ const router = async () => {
           const modalCloseBtn = editModal.querySelector("#btn-close"); // close 버튼
           const editBtn = editModal.querySelector("#editBtn"); // 수정 버튼
           const alertSpan = editModal.querySelector("#alert-span"); // 모달 내부 경고 창
-          
+
           const editBoardId = editId.replace("modal", ""); // 수정이 반영될 조원소개글의 id
           const editBoard = document.querySelector(`#board${editBoardId}`); // 수정할 조원소개 창
           const editBoardTitle = editBoard.querySelector("#boardMemberName"); // 수정할 조원소개 조원명
-          const editBoardContent = editBoard.querySelector("#boardMemberContent"); // 수정할 조원소개 내용
+          const editBoardContent = editBoard.querySelector(
+            "#boardMemberContent"
+          ); // 수정할 조원소개 내용
 
           // 파일 업로드 개수 제한
           editImgInput.addEventListener("change", (e) => {
@@ -429,10 +453,13 @@ const router = async () => {
               console.log("모두 변경");
               memberChange = true;
               const formData = new FormData();
-              formData.append("memberBoardNo", editModalId.replace("modalEdit", ""));
+              formData.append(
+                "memberBoardNo",
+                editModalId.replace("modalEdit", "")
+              );
               formData.append("memberName", editModalTitle.value);
               formData.append("introduceContent", editModalContent.value);
-              
+
               const response = await fetch(`${PATH}/member`, {
                 method: "PUT",
                 headers: {
@@ -445,7 +472,7 @@ const router = async () => {
                   memberBoardNo: editModalId.replace("modalEdit", ""),
                   memberName: editModalTitle.value,
                   introduceContent: editModalContent.value,
-                })
+                }),
               });
               console.log(response);
             } // 제목만 변경되었을 경우
@@ -468,7 +495,7 @@ const router = async () => {
                 body: JSON.stringify({
                   memberBoardNo: editModalId.replace("modalEdit", ""),
                   memberName: editModalTitle.value,
-                })
+                }),
               });
             } // 내용만 변경되었을 경우
             else if (editModalContent.value != editBoardContent.innerText) {
@@ -489,8 +516,8 @@ const router = async () => {
                 // body: formData,
                 body: JSON.stringify({
                   memberBoardNo: editModalId.replace("modalEdit", ""),
-                  introduceContent: editModalContent.value
-                })
+                  introduceContent: editModalContent.value,
+                }),
               });
             }
             // 현재 이미지 사용을 체크했을 경우
@@ -500,7 +527,7 @@ const router = async () => {
               console.log("이미지 변경");
               imgChange = true;
               const formData = new FormData();
-              
+
               // formData.append("memberBoardNo", editModalId.replace("modalEdit", ""));
               formData.append("image", editImgInput.files[0]);
 
@@ -541,7 +568,7 @@ const router = async () => {
           });
         } // 삭제 버튼 눌렀을 경우
         else if (id.indexOf("delete") != -1) {
-          if(!isAdmin){
+          if (!isAdmin) {
             alert("권한이 없습니다..!");
             post.innerHTML = "";
             modal.innerHTML = "";
@@ -549,20 +576,27 @@ const router = async () => {
             document.querySelector(".modal-backdrop").remove();
             document.body.className = "";
             document.body.style = "";
-  
+
             // fetch를 이용해 값 가져오기 (임시 값)
-            await fetch(
-              `${PATH}/`,
-              {
-                method: "get",
-              }
-            ) 
+            await fetch(`${PATH}/`, {
+              method: "get",
+            })
               .then((response) => response.json())
               .then((data) => {
                 console.log(data);
                 for (let value of data) {
-                  createBoard(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
-                  createModal(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+                  createBoard(
+                    value.memberBoardNo,
+                    value.memberName,
+                    value.introduceContent,
+                    value.fileName
+                  );
+                  createModal(
+                    value.memberBoardNo,
+                    value.memberName,
+                    value.introduceContent,
+                    value.fileName
+                  );
                   createEditModal(value.memberBoardNo, value.memberName);
                 }
               })
@@ -579,13 +613,12 @@ const router = async () => {
             },
             body: JSON.stringify({
               memberBoardNo: deleteId,
-            })
+            }),
           });
-          
-          console.log(status);
-          
-          if(status == 204){
 
+          console.log(status);
+
+          if (status == 204) {
             // 종료 버튼 구현
 
             post.innerHTML = "";
@@ -594,41 +627,55 @@ const router = async () => {
             document.querySelector(".modal-backdrop").remove();
             document.body.className = "";
             document.body.style = "";
-  
+
             // fetch를 이용해 값 가져오기 (임시 값)
-            await fetch(
-              `${PATH}/`,
-              {
-                method: "get",
-              }
-            ) 
+            await fetch(`${PATH}/`, {
+              method: "get",
+            })
               .then((response) => response.json())
               .then((data) => {
                 console.log(data);
                 for (let value of data) {
-                  createBoard(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
-                  createModal(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+                  createBoard(
+                    value.memberBoardNo,
+                    value.memberName,
+                    value.introduceContent,
+                    value.fileName
+                  );
+                  createModal(
+                    value.memberBoardNo,
+                    value.memberName,
+                    value.introduceContent,
+                    value.fileName
+                  );
                   createEditModal(value.memberBoardNo, value.memberName);
                 }
               })
               .catch((error) => console.log("fetch 에러!", error));
           }
         }
-      })
+      });
       // fetch를 이용해 값 가져오기 (임시 값)
-      await fetch(
-        `${PATH}/`,
-        {
-          method: "get",
-        }
-      ) 
+      await fetch(`${PATH}/`, {
+        method: "get",
+      })
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
           for (let value of data) {
             console.log(value);
-            createBoard(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
-            createModal(value.memberBoardNo, value.memberName, value.introduceContent, value.fileName);
+            createBoard(
+              value.memberBoardNo,
+              value.memberName,
+              value.introduceContent,
+              value.fileName
+            );
+            createModal(
+              value.memberBoardNo,
+              value.memberName,
+              value.introduceContent,
+              value.fileName
+            );
             createEditModal(value.memberBoardNo, value.memberName);
           }
         })
@@ -646,7 +693,7 @@ const router = async () => {
       const nicknameChkBtn = document.querySelector("#idChkBtn");
       const modifyBtn = document.querySelector("#modifyBtn");
 
-      nicknameChkBtn.addEventListener("click", async() => {
+      nicknameChkBtn.addEventListener("click", async () => {
         const userId = idInput.value;
         if (idInput.value === "") {
           alert("변경할 ID을 입력해주세요!");
@@ -667,13 +714,13 @@ const router = async () => {
               if (data.status == 200) {
                 alert("사용할 수 있는 ID입니다!");
                 nicknameChkVal = true;
-              } else if (data.status == 422){
+              } else if (data.status == 422) {
                 alert("query 값이 존재하지 않습니다.");
-              } else if (data.status == 409){
+              } else if (data.status == 409) {
                 alert("이미 사용하고 있는 ID 입니다.");
               }
             });
-        };
+        }
       });
       // modify 버튼으로 닉네임 중복여부를 확인하고
       // 확인되면 비밀번호 값과 nickname 값을 post 로 보내서
@@ -705,20 +752,19 @@ const router = async () => {
                 // 일치 여부에 따른 결과값
                 // TRUE / FALSE
                 alert("ID이 성공적으로 변경되었습니다!");
-                sessionStorage.removeItem('userId');
+                sessionStorage.removeItem("userId");
                 sessionStorage.setItem("userId", userId);
-              } 
+              }
               // 권한이 없는 경우
-              else if (data.status == 401){
+              else if (data.status == 401) {
                 alert("권한이 없습니다.");
                 console.log(data.message);
               }
               // 요청시 올바른 데이터를 전달하지 않은 경우
-              else if (data.status == 422){
+              else if (data.status == 422) {
                 alert("올바른 값이 아닙니다.");
                 console.log(data.message);
-              }
-              else if (data.status == 500){
+              } else if (data.status == 500) {
                 alert("서버에 문제가 생겼습니다.");
                 console.log(data.message);
               }
@@ -793,6 +839,11 @@ const router = async () => {
         writeDate,
         fileNames
       ) => {
+        // 이미지가 비어있을 경우(기본 이미지)
+        if (!fileNames || fileNames.length == 0) {
+          fileNames = ["./static/image/logo.jpg"];
+          console.log("empty");
+        }
         const div = document.createElement("div");
         div.classList = `col-md-4 board${boardNo}`;
         div.id = boardNo;
@@ -851,9 +902,16 @@ const router = async () => {
         hit,
         fileNames
       ) => {
+        // 이미지가 비어있을 경우(기본 이미지)
+        if (!fileNames || fileNames.length == 0) {
+          fileNames = ["./static/image/기본-이미지.jpg"];
+          console.log("empty");
+        }
         const div = document.createElement("div");
         div.className = "modal";
         div.id = `modal${boardNo}`;
+
+        writeDate = formatDate(writeDate);
 
         let htmlBtn = "";
         let htmlImg = "";
@@ -1139,16 +1197,21 @@ const router = async () => {
           const modalCloseBtn = editModal.querySelector("#btn-close");
           const editBtn = editModal.querySelector("#editBtn");
           const alertSpan = editModal.querySelector("#alert-span"); // 모달 내부 경고 창
+          const preview = editModal.querySelector("#editPreview"); // 이미지 미리보기 창
 
           const editBoard = document.querySelector(`.card${editId}`); // 수정할 게시글
           const editBoardTitle = editBoard.querySelector(".card-title"); // 수정할 게시글 제목
           const editBoardContent = editBoard.querySelector(".card-text"); // 수정할 게시글 글내용
+          const editBoardImage = editBoard.querySelector("img"); // 수정할 게시글 이미지
+          const editBoardImageSrc = editBoardImage.src; // 수정할 게시글 이미지 링크
 
           const editTargetModal = document.querySelector(`#modal${editId}`);
           const editTargetModalTitle =
             editTargetModal.querySelector(".modal-title");
           const editTargetModalContent =
             editTargetModal.querySelector(".modal-text");
+
+          preview.src = editBoardImageSrc;
 
           // 파일 업로드 개수 제한
           editImgInput.addEventListener("change", (e) => {
@@ -1189,9 +1252,19 @@ const router = async () => {
               defaultImgCheck.checked = false;
               editImgInput.disabled = true;
               editImgList.style.backgroundColor = "#E9ECEF";
+              preview.src = editBoardImageSrc;
             } else {
               editImgInput.disabled = false;
               editImgList.style.backgroundColor = "#ffffff";
+
+              if (editImgInput.files.length == 0) return;
+
+              let reader = new FileReader();
+              reader.readAsDataURL(editImgInput.files[0]);
+
+              reader.onload = () => {
+                preview.src = reader.result;
+              };
             }
           });
 
@@ -1201,9 +1274,22 @@ const router = async () => {
               nowImgCheck.checked = false;
               editImgInput.disabled = true;
               editImgList.style.backgroundColor = "#E9ECEF";
+              preview.src = "./static/image/logo.jpg";
             } else {
               editImgInput.disabled = false;
               editImgList.style.backgroundColor = "#ffffff";
+
+              if (editImgInput.files.length == 0) {
+                preview.src = editBoardImageSrc;
+                return;
+              }
+
+              let reader = new FileReader();
+              reader.readAsDataURL(editImgInput.files[0]);
+
+              reader.onload = () => {
+                preview.src = reader.result;
+              };
             }
           });
 
@@ -1211,6 +1297,13 @@ const router = async () => {
           editImgInput.addEventListener("change", () => {
             nowImgCheck.checked = false;
             defaultImgCheck.checked = false;
+
+            let reader = new FileReader();
+            reader.readAsDataURL(editImgInput.files[0]);
+
+            reader.onload = () => {
+              preview.src = reader.result;
+            };
           });
 
           // 수정 버튼 눌렀을 경우
@@ -1661,6 +1754,15 @@ const router = async () => {
           uploadImg.type = "radio";
           uploadImg.type = "file";
           imgList.innerHTML = "";
+        } else {
+          const fileImg = uploadImg.files;
+
+          let reader = new FileReader();
+          reader.readAsDataURL(fileImg[0]);
+
+          reader.onload = () => {
+            document.querySelector("#uploadPreview").src = reader.result;
+          };
         }
       });
 
@@ -1776,7 +1878,7 @@ const router = async () => {
         let myPassword = inputPassword.value;
         let userToken = sessionStorage.getItem("token");
         let userNickname = sessionStorage.getItem("nickname");
-        console.log("hi")
+        console.log("hi");
 
         // 입력값이 존재할 떄
         if (myPassword != "") {
@@ -2023,7 +2125,7 @@ const router = async () => {
       const token = sessionStorage.getItem("token");
       const modal = document.querySelector("#block_modal");
       const post = document.querySelector("#block_post");
-      const boardList = document.querySelector("#board-list")
+      const boardList = document.querySelector("#board-list");
       post.innerHTML = "";
 
       // 임의값
@@ -2157,7 +2259,6 @@ const router = async () => {
                     </a>`;
         post.prepend(div);
       };
-
 
       const createModal = (
         title,
@@ -2350,34 +2451,46 @@ const router = async () => {
       const data = JSON.parse(jsonData.data);
       console.log(data);
 
-      for( let i = 0; i < data.length; i++ ) {
-        createBoard(data[i].title, data[i].content, data[i].boardNo, data[i].writer, data[i].writeDate, data[i].fileName);
-        createModal(data[i].title, data[i].content, data[i].boardNo, data[i].writer, data[i].
-          writeDate, data[i].hit, data[i].fileName);
+      for (let i = 0; i < data.length; i++) {
+        createBoard(
+          data[i].title,
+          data[i].content,
+          data[i].boardNo,
+          data[i].writer,
+          data[i].writeDate,
+          data[i].fileName
+        );
+        createModal(
+          data[i].title,
+          data[i].content,
+          data[i].boardNo,
+          data[i].writer,
+          data[i].writeDate,
+          data[i].hit,
+          data[i].fileName
+        );
       }
 
-
-      
       boardList.addEventListener("click", async () => {
         let path = event.target;
-          let id = path.id;
-          let countWhile = 0; // 게시글이 아닌 공백(마진) 클릭을 확인하기 위한 값
-          while (!id) {
-            countWhile++;
-            // 게시글의 id 찾기
-            path = path.parentElement;
-            id = path.id;
-          }
+        let id = path.id;
+        let countWhile = 0; // 게시글이 아닌 공백(마진) 클릭을 확인하기 위한 값
+        while (!id) {
+          countWhile++;
+          // 게시글의 id 찾기
+          path = path.parentElement;
+          id = path.id;
+        }
         if (countWhile != 0) {
           const block_comment = document.querySelector(`#block_comment${id}`);
           block_comment.innerHTML = ""; // 클릭 이전에 코멘트가 있다면 삭제
           nowId = id;
-  
+
           // fetch를 이용해 값 가져오기
           const response = await fetch(`${PATH}/comment?boardNo=${id}`, {
             method: "get",
           });
-  
+
           // 값이 잘 전달 되었을 때 생성
           if (response.status == 200) {
             const jsonData = await response.json();
@@ -2391,7 +2504,7 @@ const router = async () => {
             else {
               for (let value of data) {
                 console.log(value);
-  
+
                 createComment(
                   value.id,
                   value.nickname,
@@ -2403,10 +2516,7 @@ const router = async () => {
             }
           }
         }
-
-      })
-
-                
+      });
     }
   }
 };

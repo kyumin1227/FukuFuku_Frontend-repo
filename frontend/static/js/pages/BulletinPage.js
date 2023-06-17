@@ -9,7 +9,7 @@ export default class {
   }
   async getHtml() {
     return `
-            <!-- Bulletin.js 파일 내부에 들어갈 html 코드 편집 파일입니다. -->
+           <!-- Bulletin.js 파일 내부에 들어갈 html 코드 편집 파일입니다. -->
 <!-- Bulletin.js의 html 코드와 항상 동일하게 유지할 것 -->
 
 <div id="block_content">
@@ -64,9 +64,8 @@ export default class {
             <div id="modal-alert"></div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-12 position-relative">
+                    <div class="col-6 position-relative">
                         <!-- 이미지 창 -->
-
                         <div class="d-flex align-items-center">
                             <form action="" method="post" enctype="multipart/form-data">
                                 <div class="mb-3">
@@ -76,13 +75,21 @@ export default class {
                                 </div>
                             </form>
                         </div>
+                        <!-- 등록 파일 출력 -->
+                        <div class="border border-gray w-100 overflow-scroll" style="height: 100px;">
+                            <ul id="imageList">
+                        
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                <!-- 등록 파일 출력 -->
-                <div class="border border-gray w-50 overflow-scroll" style="height: 100px;">
-                    <ul id="imageList">
-
-                    </ul>
+                    <div class="col-6 flex">
+                        <div class="row">
+                            <div ms-3>이미지 미리보기</div>
+                        </div>
+                        <div class="row d-flex">
+                            <img src="./static/image/logo.jpg" alt="..." id="uploadPreview" class="w-auto h-100">
+                        </div>
+                    </div>
                 </div>
                 <!-- 작성 내용 -->
                 <div>
@@ -117,7 +124,7 @@ export default class {
             <div id="alert-span"></div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-12 position-relative">
+                    <div class="col-6 position-relative">
                         <!-- 이미지 창 -->
 
                         <div class="d-flex align-items-center">
@@ -137,14 +144,22 @@ export default class {
                                 </div>
                             </form>
                         </div>
+                        <!-- 등록 파일 출력 -->
+                        <div id="editImageListDiv" class="border border-gray w-100 overflow-scroll"
+                            style="height: 100px; background-color: #ffffff;">
+                            <ul id="editImageList">
+                        
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                <!-- 등록 파일 출력 -->
-                <div id="editImageListDiv" class="border border-gray w-50 overflow-scroll"
-                    style="height: 100px; background-color: #ffffff;">
-                    <ul id="editImageList">
-
-                    </ul>
+                    <div class="col-6 flex">
+                        <div class="row">
+                            <div ms-3>이미지 미리보기</div>
+                        </div>
+                        <div class="row d-flex">
+                            <img src="./static/image/logo.jpg" alt="..." id="editPreview" class="w-auto h-100">
+                        </div>
+                    </div>
                 </div>
                 <!-- 작성 내용 -->
                 <div>
