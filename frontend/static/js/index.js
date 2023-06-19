@@ -845,7 +845,7 @@ const router = async () => {
           console.log("empty");
         }
         const div = document.createElement("div");
-        div.classList = `col-md-4 board${boardNo}`;
+        div.classList = `col-md-4 board${boardNo} hover-zoom`;
         div.id = boardNo;
         div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
                         data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
@@ -1497,6 +1497,10 @@ const router = async () => {
           });
         } // 삭제 버튼 눌렀을 경우
         else if (id.indexOf("delete") != -1) {
+          const deleteYes = confirm("삭제하시겠습니까?");
+          if (!deleteYes) {
+            return;
+          }
           const deleteId = id.replace("delete", "");
           console.log("delete!");
           console.log(deleteId);
