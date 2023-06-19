@@ -40,7 +40,7 @@ export default class {
 </div>
 <button class="btn btn-warning float-end" id="memberCBtn" data-bs-toggle="modal" data-bs-target="#Modal">NEW</button>
 <!----------------------- 조원소개 ----------------------->
-<div class="d-flex justify-content-center ">
+<div class="d-flex justify-content-center pb-5">
     <div class="bg-warning float-end " style="width:80px"></div>
 
     <div class="container-fluid row mx-5 px-5" id="member_post">
