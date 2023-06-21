@@ -822,7 +822,7 @@ const router = async () => {
       }
 
       /**
-       * 새로운 더미 게시글을 만든 후 가장 상단에 추가하는 함수입니다..
+       * 새로운 더미 게시글을 만든 후 가장 상단에 추가하는 함수입니다.
        *
        * @param {String} title - 제목
        * @param {String} content - 글 내용
@@ -844,6 +844,7 @@ const router = async () => {
           fileNames = ["./static/image/logo.jpg"];
           console.log("empty");
         }
+        content = content.replace(/<br>/g, "");
         const div = document.createElement("div");
         div.classList = `col-md-4 board${boardNo} hover-zoom`;
         div.id = boardNo;
@@ -939,7 +940,7 @@ const router = async () => {
         let html = `<div class="modal-dialog modal-xl">
                   <div class="modal-content">
                       <div class="modal-header">
-                          <h1 class="modal-title fs-5">#${boardNo} ${title}</h1>
+                          <h1 class="modal-title fs-5">${title}</h1>
                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
