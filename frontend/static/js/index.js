@@ -568,92 +568,91 @@ const router = async () => {
           });
         } // 삭제 버튼 눌렀을 경우
         else if (id.indexOf("delete") != -1) {
-          if (!isAdmin) {
-            alert("권한이 없습니다..!");
-            post.innerHTML = "";
-            modal.innerHTML = "";
-            editMemberModal.innerHTML = "";
-            document.querySelector(".modal-backdrop").remove();
-            document.body.className = "";
-            document.body.style = "";
-
-            // fetch를 이용해 값 가져오기 (임시 값)
-            await fetch(`${PATH}/`, {
-              method: "get",
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                console.log(data);
-                for (let value of data) {
-                  createBoard(
-                    value.memberBoardNo,
-                    value.memberName,
-                    value.introduceContent,
-                    value.fileName
-                  );
-                  createModal(
-                    value.memberBoardNo,
-                    value.memberName,
-                    value.introduceContent,
-                    value.fileName
-                  );
-                  createEditModal(value.memberBoardNo, value.memberName);
-                }
+          if(confirm("삭제하시겠습니까?")){
+            if (!isAdmin) {
+              alert("권한이 없습니다..!");
+              post.innerHTML = "";
+              modal.innerHTML = "";
+              editMemberModal.innerHTML = "";
+              document.querySelector(".modal-backdrop").remove();
+              document.body.className = "";
+              document.body.style = "";
+  
+              // fetch를 이용해 값 가져오기 (임시 값)
+              await fetch(`${PATH}/`, {
+                method: "get",
               })
-              .catch((error) => console.log("fetch 에러!", error));
-          }
-
-          const deleteId = id.replace("delete", "");
-          const { status } = await fetch(`${PATH}/member`, {
-            method: "DELETE",
-            headers: {
-              token: sessionStorage.getItem("token"),
-              nickname: sessionStorage.getItem("nickname"),
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              memberBoardNo: deleteId,
-            }),
-          });
-
-          console.log(status);
-
-          if (status == 204) {
-            // 종료 버튼 구현
-
-            post.innerHTML = "";
-            modal.innerHTML = "";
-            editMemberModal.innerHTML = "";
-            document.querySelector(".modal-backdrop").remove();
-            document.body.className = "";
-            document.body.style = "";
-
-            // fetch를 이용해 값 가져오기 (임시 값)
-            await fetch(`${PATH}/`, {
-              method: "get",
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                console.log(data);
-                for (let value of data) {
-                  createBoard(
-                    value.memberBoardNo,
-                    value.memberName,
-                    value.introduceContent,
-                    value.fileName
-                  );
-                  createModal(
-                    value.memberBoardNo,
-                    value.memberName,
-                    value.introduceContent,
-                    value.fileName
-                  );
-                  createEditModal(value.memberBoardNo, value.memberName);
-                }
+                .then((response) => response.json())
+                .then((data) => {
+                  console.log(data);
+                  for (let value of data) {
+                    createBoard(
+                      value.memberBoardNo,
+                      value.memberName,
+                      value.introduceContent,
+                      value.fileName
+                    );
+                    createModal(
+                      value.memberBoardNo,
+                      value.memberName,
+                      value.introduceContent,
+                      value.fileName
+                    );
+                    createEditModal(value.memberBoardNo, value.memberName);
+                  }
+                })
+                .catch((error) => console.log("fetch 에러!", error));
+            }
+  
+            const deleteId = id.replace("delete", "");
+            const { status } = await fetch(`${PATH}/member`, {
+              method: "DELETE",
+              headers: {
+                token: sessionStorage.getItem("token"),
+                nickname: sessionStorage.getItem("nickname"),
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                memberBoardNo: deleteId,
+              }),
+            });
+            if (status == 204) {
+              // 종료 버튼 구현
+  
+              post.innerHTML = "";
+              modal.innerHTML = "";
+              editMemberModal.innerHTML = "";
+              document.querySelector(".modal-backdrop").remove();
+              document.body.className = "";
+              document.body.style = "";
+  
+              // fetch를 이용해 값 가져오기 (임시 값)
+              await fetch(`${PATH}/`, {
+                method: "get",
               })
-              .catch((error) => console.log("fetch 에러!", error));
+                .then((response) => response.json())
+                .then((data) => {
+                  console.log(data);
+                  for (let value of data) {
+                    createBoard(
+                      value.memberBoardNo,
+                      value.memberName,
+                      value.introduceContent,
+                      value.fileName
+                    );
+                    createModal(
+                      value.memberBoardNo,
+                      value.memberName,
+                      value.introduceContent,
+                      value.fileName
+                    );
+                    createEditModal(value.memberBoardNo, value.memberName);
+                  }
+                })
+                .catch((error) => console.log("fetch 에러!", error));
+            }
           }
-        }
+          }
       });
       // fetch를 이용해 값 가져오기 (임시 값)
       await fetch(`${PATH}/`, {
