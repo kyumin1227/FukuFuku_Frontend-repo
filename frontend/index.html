@@ -1,0 +1,99 @@
+<!-- Spa를 위한 기본 틀 입니다. 해당 페이지 위에 모든 코드가 뿌려집니다. -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Single Page App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="./static/css/animation.css">
+</head>
+
+<body>
+
+    <header class="p-3 bg-primary">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <div id="move" class="d-flex align-items-center mb-2 mb-lg-0 text-white">
+                    <img src="./static/image/logo.svg" class="img-fluid me-2 move" width="45" alt="..." >
+                    <h4 class="fs-3 mb-0 move">FUKUFUKU</h4>
+                    <a href="/" style="display: none;" data-link id="mainLink"></a>
+                </div>
+                
+    
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+    
+                </ul>
+                <div class="text-end">
+                    <div id="status_login">
+                        <a href="/signin" class="btn btn-outline-light me-2" data-link>Login</a>
+                        <a href="/signup" class="btn btn-warning" data-link>Sign-up</a>
+                    </div>
+                    <div id="status_guest">
+                        <a href="/myUserData" class="btn btn-outline-light me-2" data-link>MyPage</a>
+                        <a class="btn btn-warning" id="logOut" data-link>LogOut</a>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </header>
+
+    <div id="block_alert"></div>
+    
+    <!-- Test 블록 -->
+    <div id="root"></div>
+    
+    <!-- Content 블록 (메인페이지, 게시판, 회원가입 등) -->
+    <div id="block_content"></div>
+    
+    <!-- Modal 블록 (게시글) -->
+    <div id="block_modal"></div>
+    
+    <script>
+    const token = sessionStorage.getItem('token');
+    const status_login = document.querySelector('#status_login');
+    const status_guest = document.querySelector('#status_guest');
+    const logOut = document.querySelector('#logOut')
+    
+    
+    const loginFunc = () => {
+        status_login.style.display = "none";
+        status_guest.style.display = "block";
+    }
+    
+    const guestFunc = () => {
+        status_login.style.display = "block";
+        status_guest.style.display = "none";
+    }
+    
+    if(token) {
+        loginFunc();
+    } else {
+        guestFunc();
+    }
+    
+    logOut.addEventListener('click', () => {
+        sessionStorage.clear();
+        guestFunc();
+        mainLink.click();
+    });
+    
+    const logoLink = document.querySelector('#move');
+    const mainLink = document.querySelector("#mainLink");
+    
+    if (logoLink) {
+    logoLink.addEventListener('click', (e) => {
+        mainLink.click();
+    });
+    }
+    
+    </script>
+    <script type="module" src="./static/js/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

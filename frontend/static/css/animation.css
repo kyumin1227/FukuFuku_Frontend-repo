@@ -1,0 +1,47 @@
+.flip-outer {
+  width: 350px;
+  height: 350px;
+}
+
+.flip-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: all 1s;
+  transform-style: preserve-3d;
+}
+.flip-inner:hover {
+  transform: rotateY(180deg);
+}
+
+.front {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: absolute;
+  z-index: 2; /* 추가된 부분 */
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.back {
+  background-image: url("https://yju-fukufuku.s3.us-east-1.amazonaws.com/4Sz6zI4E-.jpeg");
+  background-size:cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  /* padding-top: 50px;
+  box-sizing: border-box; */
+  text-align: center;
+  position: absolute;
+  transform: rotateY(180deg);
+  overflow: hidden;
+}
+
+.hover-zoom {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-zoom:hover {
+  transform: scale(1.06);
+}
