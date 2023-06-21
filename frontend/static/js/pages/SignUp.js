@@ -12,7 +12,7 @@ export default class {
       <div class="row">
         <div class="col-10">
           <div class="form-floating mb-4">
-            <input type="text" class="form-control" id="InputId" placeholder="ID">
+            <input type="text" class="form-control" id="InputId" placeholder="ID"  maxlength="10">
             <label for="floatingInput">ID</label>
           </div>
         </div>
