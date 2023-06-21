@@ -25,7 +25,7 @@ export default class {
         </div>
       </div>
       <div class="form-floating mb-4">
-        <input type="text" class="form-control" id="InputNickname" placeholder="nickname" oninput=${handleOnInput(this)} maxlength="10" required>
+        <input type="text" class="form-control" id="InputNickname" placeholder="nickname" maxlength="10" required>
         <label for="floatingPassword">nickname</label>
         <div id="alert" class="float-start ms-1 mb-2" >
       </div>
@@ -47,5 +47,6 @@ export default class {
 
   </main>
         `;
+        
   }
 }
