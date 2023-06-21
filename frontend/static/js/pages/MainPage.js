@@ -8,39 +8,42 @@ export default class {
     <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="./static/image/japan1.jpg" class="d-block w-100" alt="...">
+                <img src="./static/image/japan1.jpg" class="d-block w-100" style="height:950px" alt="...">
             </div>
             <div class="carousel-item">
-                <img src="./static/image/japan2.jpg" class="d-block w-100" alt="...">
+                <img src="./static/image/japan2.jpg" class="d-block w-100" style="height:950px" alt="...">
             </div>
             <div class="carousel-item">
-                <img src="./static/image/japan3.jpg" class="d-block w-100" alt="...">
+                <img src="./static/image/japan3.jpg" class="d-block w-100" style="height:950px" alt="...">
             </div>
         </div>
     </div>
 
-    <div id="opacity-bg" class="flex h-75 bg-dark bg-opacity-75 top-0"style="margin-top: 10vh; position: absolute; bottom: 100px; left: 10%; width: 80%; display: flex;">
+    <div id="opacity-bg" class="flex bg-dark bg-opacity-75 top-0" style="margin-top: 10vh; position: absolute; bottom: 100px; left: 10%; width: 80%; display: flex; height:790px">
     
         <div class="w-100 justify-content-center flex">
-            <div class="row mt-5 pb-5">
-                <div class="col-4"></div>
-                <div class="text-white justify-content-center col-4">
-                    Lorem, ipsum dolor sit amet consectetur adipisicingelit. Sed aperiam
-                    neque non fugiat voluptatibus doloremque nam nemo ut veniam. Odit doloremque id totam molestiae nisi
-                    optio. Dolore
-                    tempora voluptate aperiam?
+            <div class="row mt-5 pb-4">
+                <div class="col-1"></div>
+                <div class="text-white justify-content-center col-5">
+                    <img src="./static/image/우리표지.png" class="w-100" >
+                </div>
+                <div class="text-white justify-content-center col-5 m-auto">
+                    <div class="row">
+                        <div class="col-4"></div>
+                        <a id="mainBtn" href="/bulletin" class="col-4 btn btn-primary justify-content-center" data-link>현지 추천 장소</a>
+                    </div>
                 </div>
             </div>
             <div class="row mt-5">
                 <div class="col-5"></div>
-                <a id="mainBtn" href="/bulletin" class="col-2 btn btn-primary justify-content-center" data-link>현지 추천 장소</a>
+               
             </div>
         </div>
     </div>
 </div>
 <button class="btn btn-warning float-end" id="memberCBtn" data-bs-toggle="modal" data-bs-target="#Modal">NEW</button>
 <!----------------------- 조원소개 ----------------------->
-<div class="d-flex justify-content-center pb-5">
+<div class="d-flex justify-content-center ">
     <div class="bg-warning float-end " style="width:80px"></div>
 
     <div class="container-fluid row mx-5 px-5" id="member_post">
