@@ -1951,9 +1951,12 @@ const router = async () => {
       const username = document.getElementById("InputNickname");
       const nameAlert = document.getElementById("alert");
 
-      const handleOnInput = (e) => {
+      const handleOnInput = () => {
+        if(/[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(username.value)){
+          alert("영어만 입력해주세요.")
+        }
         username.value = username.value.replace(/[^A-Za-z]/ig, '')
-        alert("영어만 입력해주세요");
+
       }
 
       document.getElementById('InputNickname').addEventListener('input', handleOnInput);
@@ -1961,7 +1964,7 @@ const router = async () => {
       username.addEventListener("blur", () => {
         const name = document.getElementById("InputNickname").value;
 
-        console.log(name);
+        console.log(name); 
 
         fetch(`${PATH}/account/idCheck/?nickname=${name}`, {
           method: "GET",
