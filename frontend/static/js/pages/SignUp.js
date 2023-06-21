@@ -3,6 +3,10 @@ export default class {
     document.title = "SignUp";
   }
   async getHtml() {
+    const handleOnInput = (e) => {
+      e.value = e.value.replace(/[^A-Za-z]/ig, '')
+    }
+
     return `
     <main class="text-center mt-5 w-100, h-100">
     <h1 class="h1 mb-5 fw-normal text-primary">SignUp</h1>
@@ -21,7 +25,7 @@ export default class {
         </div>
       </div>
       <div class="form-floating mb-4">
-        <input type="text" class="form-control" id="InputNickname" placeholder="nickname" maxlength="10" required>
+        <input type="text" class="form-control" id="InputNickname" placeholder="nickname" oninput=${handleOnInput(this)} maxlength="10" required>
         <label for="floatingPassword">nickname</label>
         <div id="alert" class="float-start ms-1 mb-2" >
       </div>

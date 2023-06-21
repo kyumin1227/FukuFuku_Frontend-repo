@@ -1951,8 +1951,14 @@ const router = async () => {
       const username = document.getElementById("InputNickname");
       const nameAlert = document.getElementById("alert");
 
+      function handleOnInput(e)  {
+        e.value = e.value.replace(/[^A-Za-z]/ig, '')
+      }
+
       username.addEventListener("blur", () => {
         const name = document.getElementById("InputNickname").value;
+
+        handleOnInput(name);
 
         console.log(name);
 
