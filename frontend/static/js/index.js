@@ -728,6 +728,7 @@ const router = async () => {
       modifyBtn.addEventListener("click", () => {
         if (nicknameChkVal) {
           const userId = idInput.value;
+          // const userPassword = inputPassword.value;
           fetch(`${PATH}/account/updateUserId`, {
             // fetch에는 웹서버/updateNickname 으로 보내기
             method: "PUT",
@@ -740,6 +741,7 @@ const router = async () => {
               // userId: sessionStorage.getItem("userId"),
               // password: inputPassword.value,
               userId: userId,
+
             }),
             // 변경할 닉네임 + (입력했던 pw와 로컬 스토리지에 있는 nickname 값 보내기)
           })
@@ -2021,7 +2023,7 @@ const router = async () => {
             });
         }
         else {
-          alert("값을 입력해주세요")
+          alert("ID를 입력해주세요");
         }
       });
       // 버튼에 이벤트 추가
