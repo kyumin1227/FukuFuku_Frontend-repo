@@ -28,7 +28,10 @@ export default class {
                     <img src="./static/image/우리표지.png" class="w-100" >
                 </div>
                 <div class="text-white justify-content-center col-5 m-auto">
-                    <a id="mainBtn" href="/bulletin" class="col-5 btn btn-primary justify-content-center" style="left: 20%" data-link>현지 추천 장소</a>
+                    <div class="row">
+                        <div class="col-4"></div>
+                        <a id="mainBtn" href="/bulletin" class="col-4 btn btn-primary justify-content-center" data-link>현지 추천 장소</a>
+                    </div>
                 </div>
             </div>
             <div class="row mt-5">

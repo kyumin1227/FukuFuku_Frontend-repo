@@ -199,11 +199,15 @@ const router = async () => {
                               </div>
                           </div>
                       </div>
-                      <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="button" data-bs-toggle="modal" data-bs-target="#modalEdit${boardNo}" id="modal${boardNo}edit" class="btn btn-primary">Modify</button>
-                          <button type="button" id="${boardNo}delete" class="btn btn-danger">Delete</button>
-                      </div>
+                      ${
+                        isAdmin
+                        ? `<div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#modalEdit${boardNo}" id="modal${boardNo}edit" class="btn btn-primary">Modify</button>
+                        <button type="button" id="${boardNo}delete" class="btn btn-danger">Delete</button>
+                        </div>`
+                        :""
+                      }
                   </div>
               </div>`;
 
