@@ -18,7 +18,7 @@ export default class {
           <label for="floatingPassword">Password</label>
         </div>
 
-        <button class="w-100 btn btn-lg btn-primary" id="LoginBtn">Sign Up</button>
+        <button class="w-100 btn btn-lg btn-primary" id="LoginBtn">Sign In</button>
 
       </div>
   
