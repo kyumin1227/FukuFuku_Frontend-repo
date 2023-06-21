@@ -37,3 +37,11 @@
   transform: rotateY(180deg);
   overflow: hidden;
 }
+
+.hover-zoom {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-zoom:hover {
+  transform: scale(1.06);
+}

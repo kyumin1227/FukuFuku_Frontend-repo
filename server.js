@@ -4,11 +4,10 @@
 const express = require("express");
 const path = require("path");
 const cors = require("cors");
+require("dotenv").config();
 
 // express 사용
 const app = express();
-
-const PORT = 3000;
 
 app.use(cors()); // 모든 도메인 허용
 
@@ -22,6 +21,6 @@ app.get("/*", (req, res) => {
 });
 
 // port 생성 서버 실행
-app.listen(process.env.PORT || PORT, () =>
-  console.log(`Server running http://localhost:${PORT}`)
+app.listen(process.env.PORT, () =>
+  console.log(`Server running http://localhost:${process.env.PORT}`)
 );
