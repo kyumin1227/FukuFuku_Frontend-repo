@@ -845,7 +845,7 @@ const router = async () => {
           console.log("empty");
         }
         const div = document.createElement("div");
-        div.classList = `col-md-4 board${boardNo}`;
+        div.classList = `col-md-4 board${boardNo} hover-zoom`;
         div.id = boardNo;
         div.innerHTML = `<a href="/" class="text-decoration-none text-dark" data-bs-toggle="modal"
                         data-bs-target="#modal${boardNo}">   <!-- modal 아이디로 타켓 지정 -->
@@ -1187,6 +1187,8 @@ const router = async () => {
           let count = 0;
           let imgChange = false;
           const editId = id.replace("edit", "");
+
+          // 수정용 모달창
           const editModal = document.querySelector("#Edit_Modal"); // 게시글 수정용 모달창
           const editModalTitle = editModal.querySelector("#uploadTitle");
           const editModalContent = editModal.querySelector("#uploadText");
@@ -1199,12 +1201,14 @@ const router = async () => {
           const alertSpan = editModal.querySelector("#alert-span"); // 모달 내부 경고 창
           const preview = editModal.querySelector("#editPreview"); // 이미지 미리보기 창
 
+          // 수정할 게시글
           const editBoard = document.querySelector(`.card${editId}`); // 수정할 게시글
           const editBoardTitle = editBoard.querySelector(".card-title"); // 수정할 게시글 제목
           const editBoardContent = editBoard.querySelector(".card-text"); // 수정할 게시글 글내용
           const editBoardImage = editBoard.querySelector("img"); // 수정할 게시글 이미지
           const editBoardImageSrc = editBoardImage.src; // 수정할 게시글 이미지 링크
 
+          // 수정할 게시글 (모달)
           const editTargetModal = document.querySelector(`#modal${editId}`);
           const editTargetModalTitle =
             editTargetModal.querySelector(".modal-title");
@@ -1493,6 +1497,10 @@ const router = async () => {
           });
         } // 삭제 버튼 눌렀을 경우
         else if (id.indexOf("delete") != -1) {
+          const deleteYes = confirm("삭제하시겠습니까?");
+          if (!deleteYes) {
+            return;
+          }
           const deleteId = id.replace("delete", "");
           console.log("delete!");
           console.log(deleteId);
