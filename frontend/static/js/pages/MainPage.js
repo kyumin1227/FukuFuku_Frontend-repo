@@ -19,16 +19,13 @@ export default class {
         </div>
     </div>
 
-    <div id="opacity-bg" class="flex h-75 bg-dark bg-opacity-75 top-0"style="margin-top: 10vh; position: absolute; bottom: 100px; left: 10%; width: 80%; display: flex;">
+    <div id="opacity-bg" class="flex bg-dark bg-opacity-75 top-0"style="margin-top: 10vh; position: absolute; bottom: 100px; left: 10%; width: 80%; display: flex; height:900px">
     
         <div class="w-100 justify-content-center flex">
             <div class="row mt-5 pb-5">
-                <div class="col-4"></div>
-                <div class="text-white justify-content-center col-4">
-                    Lorem, ipsum dolor sit amet consectetur adipisicingelit. Sed aperiam
-                    neque non fugiat voluptatibus doloremque nam nemo ut veniam. Odit doloremque id totam molestiae nisi
-                    optio. Dolore
-                    tempora voluptate aperiam?
+                <div class="col-3"></div>
+                <div class="text-white justify-content-center col-6">
+                    <img src="./static/image/우리표지.png" class="w-100" >
                 </div>
             </div>
             <div class="row mt-5">
@@ -40,7 +37,7 @@ export default class {
 </div>
 <button class="btn btn-warning float-end" id="memberCBtn" data-bs-toggle="modal" data-bs-target="#Modal">NEW</button>
 <!----------------------- 조원소개 ----------------------->
-<div class="d-flex justify-content-center pb-5">
+<div class="d-flex justify-content-center ">
     <div class="bg-warning float-end " style="width:80px"></div>
 
     <div class="container-fluid row mx-5 px-5" id="member_post">
