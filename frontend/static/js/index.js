@@ -1950,6 +1950,13 @@ const router = async () => {
       const username = document.getElementById("InputNickname");
       const nameAlert = document.getElementById("alert");
 
+      const handleOnInput = (e) => {
+        username.value = username.value.replace(/[^A-Za-z]/ig, '')
+        alert("영어만 입력해주세요");
+      }
+
+      document.getElementById('InputNickname').addEventListener('input', handleOnInput);
+
       username.addEventListener("blur", () => {
         const name = document.getElementById("InputNickname").value;
 
@@ -1985,7 +1992,7 @@ const router = async () => {
       idCheck.addEventListener("click", async () => {
         userId = document.getElementById("InputId").value;
         console.log(userId);
-        if (userId != "") {
+        if (userId) {
           fetch(`${PATH}/account/idCheck/?userId=${userId}`, {
             method: "GET",
             // query: {
@@ -2008,6 +2015,9 @@ const router = async () => {
                 alert("아이디가 이미 존재합니다.");
               }
             });
+        }
+        else {
+          alert("값을 입력해주세요")
         }
       });
       // 버튼에 이벤트 추가

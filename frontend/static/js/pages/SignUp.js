@@ -3,6 +3,10 @@ export default class {
     document.title = "SignUp";
   }
   async getHtml() {
+    const handleOnInput = (e) => {
+      e.value = e.value.replace(/[^A-Za-z]/ig, '')
+    }
+
     return `
     <main class="text-center mt-5 w-100, h-100">
     <h1 class="h1 mb-5 fw-normal text-primary">SignUp</h1>
@@ -43,5 +47,6 @@ export default class {
 
   </main>
         `;
+        
   }
 }
