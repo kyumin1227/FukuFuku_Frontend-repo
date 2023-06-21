@@ -8,29 +8,32 @@ export default class {
     <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="./static/image/japan1.jpg" class="d-block w-100" alt="...">
+                <img src="./static/image/japan1.jpg" class="d-block w-100" style="height:950px" alt="...">
             </div>
             <div class="carousel-item">
-                <img src="./static/image/japan2.jpg" class="d-block w-100" alt="...">
+                <img src="./static/image/japan2.jpg" class="d-block w-100" style="height:950px" alt="...">
             </div>
             <div class="carousel-item">
-                <img src="./static/image/japan3.jpg" class="d-block w-100" alt="...">
+                <img src="./static/image/japan3.jpg" class="d-block w-100" style="height:950px" alt="...">
             </div>
         </div>
     </div>
 
-    <div id="opacity-bg" class="flex bg-dark bg-opacity-75 top-0"style="margin-top: 10vh; position: absolute; bottom: 100px; left: 10%; width: 80%; display: flex; height:900px">
+    <div id="opacity-bg" class="flex bg-dark bg-opacity-75 top-0" style="margin-top: 10vh; position: absolute; bottom: 100px; left: 10%; width: 80%; display: flex; height:790px">
     
         <div class="w-100 justify-content-center flex">
-            <div class="row mt-5 pb-5">
-                <div class="col-3"></div>
-                <div class="text-white justify-content-center col-6">
+            <div class="row mt-5 pb-4">
+                <div class="col-1"></div>
+                <div class="text-white justify-content-center col-5">
                     <img src="./static/image/우리표지.png" class="w-100" >
+                </div>
+                <div class="text-white justify-content-center col-5 m-auto">
+                    <a id="mainBtn" href="/bulletin" class="col-5 btn btn-primary justify-content-center" style="left: 20%" data-link>현지 추천 장소</a>
                 </div>
             </div>
             <div class="row mt-5">
                 <div class="col-5"></div>
-                <a id="mainBtn" href="/bulletin" class="col-2 btn btn-primary justify-content-center" data-link>현지 추천 장소</a>
+               
             </div>
         </div>
     </div>
